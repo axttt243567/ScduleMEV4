@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -9,35 +10,85 @@ class AiChatPage extends StatefulWidget {
 
 class _AiChatPageState extends State<AiChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      isAi: true,
-      sender: 'Nexus AI',
-      message:
-          "Hello! I've analyzed your attendance and upcoming schedule. You have a Calculus II exam this Friday at 10:00 AM.",
-    ),
-    ChatMessage(
-      isAi: false,
-      sender: 'Student',
-      message:
-          'Can you show me the summary of my last three lectures on Integration?',
-    ),
-    ChatMessage(
-      isAi: true,
-      sender: 'Nexus AI',
-      message:
-          'Certainly. Here is the comprehensive summary of your recent Calculus II lectures.',
-      attachment: ChatAttachment(
-        fileName: 'Calculus_Integration_Summary.pdf',
-        fileSize: '1.2 MB',
-        fileType: 'PDF Document',
-      ),
-    ),
+  final ScrollController _scrollController = ScrollController();
+  final List<ChatMessage> _messages = []; // Start with empty chat
+  bool _isTyping = false;
+
+  // Lorem ipsum sentences for random AI responses
+  static const _loremSentences = [
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+    'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    'Curabitur pretium tincidunt lacus, nec gravida ante vehicula vel.',
+    'Praesent blandit laoreet nibh, eu pretium nisl blandit ut.',
+    'Fusce lacinia arcu et nulla, vivamus quis tellus sed odio accumsan.',
+    'Nullam quis risus eget urna mollis ornare vel eu leo.',
+    'Maecenas sed diam eget risus varius blandit sit amet non magna.',
+    'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.',
+    'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.',
+    'Morbi leo risus, porta ac consectetur ac, vestibulum at eros.',
+    'Aenean eu leo quam pellentesque ornare sem lacinia quam venenatis vestibulum.',
+    'Donec ullamcorper nulla non metus auctor fringilla.',
   ];
+
+  String _generateLoremIpsum() {
+    final random = Random();
+    final sentenceCount = random.nextInt(3) + 2; // 2-4 sentences
+    final sentences = <String>[];
+    for (int i = 0; i < sentenceCount; i++) {
+      sentences.add(_loremSentences[random.nextInt(_loremSentences.length)]);
+    }
+    return sentences.join(' ');
+  }
+
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    // Add user message
+    setState(() {
+      _messages.add(ChatMessage(isAi: false, sender: 'You', message: text));
+      _messageController.clear();
+      _isTyping = true;
+    });
+
+    // Scroll to bottom
+    _scrollToBottom();
+
+    // Simulate AI "thinking" delay (1-2 seconds)
+    Future.delayed(Duration(milliseconds: 1000 + Random().nextInt(1000)), () {
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+          _messages.add(ChatMessage(
+            isAi: true,
+            sender: 'Nexus AI',
+            message: _generateLoremIpsum(),
+          ));
+        });
+        _scrollToBottom();
+      }
+    });
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -53,23 +104,31 @@ class _AiChatPageState extends State<AiChatPage> {
             // Main Chat Area
             Expanded(
               child: ListView(
+                controller: _scrollController,
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 children: [
                   // Feature Highlight Card
                   _buildFeatureCard(),
                   const SizedBox(height: 20),
                   // Date Separator
-                  _buildDateSeparator('Today'),
-                  const SizedBox(height: 16),
+                  if (_messages.isNotEmpty) ...[
+                    _buildDateSeparator('Today'),
+                    const SizedBox(height: 16),
+                  ],
                   // Messages
-                  ..._messages.map(
-                    (msg) => Padding(
+                  ..._messages.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final msg = entry.value;
+                    // Check if this is the latest AI message
+                    final isLatestAi = msg.isAi && 
+                        index == _messages.lastIndexWhere((m) => m.isAi);
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildMessage(msg),
-                    ),
-                  ),
-                  // Typing Indicator
-                  _buildTypingIndicator(),
+                      child: _buildMessage(msg, isLatest: isLatestAi),
+                    );
+                  }),
+                  // Typing Indicator (only when AI is "thinking")
+                  if (_isTyping) _buildTypingIndicator(),
                 ],
               ),
             ),
@@ -100,7 +159,7 @@ class _AiChatPageState extends State<AiChatPage> {
               height: 40,
               decoration: BoxDecoration(
                 color: const Color(0xFF16161E),
-                borderRadius: BorderRadius.circular(12),
+                shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFF27272A)),
               ),
               child: const Icon(
@@ -110,25 +169,15 @@ class _AiChatPageState extends State<AiChatPage> {
               ),
             ),
           ),
-          // Title
-          Expanded(
-            child: Text(
-              'Nexus AI',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          // Spacer to push info button to right
+          const Spacer(),
           // Info Button
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               color: const Color(0xFF16161E),
-              borderRadius: BorderRadius.circular(12),
+              shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFF27272A)),
             ),
             child: Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
@@ -215,17 +264,17 @@ class _AiChatPageState extends State<AiChatPage> {
     );
   }
 
-  Widget _buildMessage(ChatMessage message) {
+  Widget _buildMessage(ChatMessage message, {bool isLatest = false}) {
     if (message.isAi) {
-      return _buildAiMessage(message);
+      return _buildAiMessage(message, isLatest: isLatest);
     } else {
       return _buildUserMessage(message);
     }
   }
 
-  Widget _buildAiMessage(ChatMessage message) {
+  Widget _buildAiMessage(ChatMessage message, {bool isLatest = false}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // AI Avatar
         Container(
@@ -287,10 +336,110 @@ class _AiChatPageState extends State<AiChatPage> {
                 const SizedBox(height: 8),
                 _buildAttachment(message.attachment!),
               ],
+              // Action buttons for the latest AI message
+              if (isLatest) ...[
+                const SizedBox(height: 10),
+                _buildMessageActions(message),
+              ],
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMessageActions(ChatMessage message) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildActionButton(
+          icon: Icons.copy_rounded,
+          label: 'Copy',
+          onTap: () {
+            // Copy message to clipboard
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Copied to clipboard'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        _buildActionButton(
+          icon: Icons.account_tree_rounded,
+          label: 'Branch',
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Branch created'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        _buildActionButton(
+          icon: Icons.refresh_rounded,
+          label: 'Regenerate',
+          onTap: () {
+            // Remove last AI message and regenerate
+            if (_messages.isNotEmpty && _messages.last.isAi) {
+              setState(() {
+                _messages.removeLast();
+                _isTyping = true;
+              });
+              // Generate new response
+              Future.delayed(Duration(milliseconds: 1000 + Random().nextInt(1000)), () {
+                if (mounted) {
+                  setState(() {
+                    _isTyping = false;
+                    _messages.add(ChatMessage(
+                      isAi: true,
+                      sender: 'Nexus AI',
+                      message: _generateLoremIpsum(),
+                    ));
+                  });
+                  _scrollToBottom();
+                }
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A24),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF27272A)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: Colors.grey[500]),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -492,6 +641,8 @@ class _AiChatPageState extends State<AiChatPage> {
                     child: TextField(
                       controller: _messageController,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
                         hintText: 'Ask anything about your courses...',
                         hintStyle: TextStyle(
@@ -505,31 +656,31 @@ class _AiChatPageState extends State<AiChatPage> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: Icon(Icons.mic, color: Colors.grey[500], size: 20),
-                  ),
+
                 ],
               ),
             ),
           ),
           const SizedBox(width: 10),
           // Send Button
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF3B82F6),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF3B82F6).withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+          GestureDetector(
+            onTap: _sendMessage,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.send, color: Colors.white, size: 20),
             ),
-            child: const Icon(Icons.send, color: Colors.white, size: 20),
           ),
         ],
       ),

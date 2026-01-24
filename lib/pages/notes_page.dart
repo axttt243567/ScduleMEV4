@@ -1356,9 +1356,11 @@ class _NotesPageState extends State<NotesPage> {
             padding: EdgeInsets.only(left: depth * 20.0),
             child: Row(
               children: [
-                // Indent line
+                // Animated indent line
                 if (depth > 0)
-                  Container(
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
                     width: 2,
                     height: 20,
                     margin: const EdgeInsets.only(right: 10),
@@ -1371,35 +1373,47 @@ class _NotesPageState extends State<NotesPage> {
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
-                // Expand/collapse indicator for folders with children
+                // Animated expand/collapse indicator
                 if (hasSubfolders || folder.files.isNotEmpty)
-                  Icon(
-                    shouldExpandSubfolders 
-                        ? Icons.keyboard_arrow_down_rounded 
-                        : Icons.keyboard_arrow_right_rounded,
-                    size: 14,
-                    color: isCurrentFolder 
-                        ? const Color(0xFF3B82F6) 
-                        : Colors.grey[600],
+                  AnimatedRotation(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    turns: shouldExpandSubfolders ? 0.25 : 0, // 90 degrees rotation
+                    child: Icon(
+                      Icons.keyboard_arrow_right_rounded,
+                      size: 14,
+                      color: isCurrentFolder 
+                          ? const Color(0xFF3B82F6) 
+                          : Colors.grey[600],
+                    ),
                   )
                 else
                   const SizedBox(width: 14),
                 const SizedBox(width: 4),
-                // Folder icon
-                Icon(
-                  isRoot ? Icons.folder_special_rounded : Icons.folder_rounded,
-                  size: 16,
-                  color: isCurrentFolder 
-                      ? const Color(0xFF3B82F6) 
-                      : isInNavigationPath
-                          ? const Color(0xFF3B82F6).withOpacity(0.7)
-                          : Colors.grey[600],
+                // Animated folder icon color
+                TweenAnimationBuilder<Color?>(
+                  duration: const Duration(milliseconds: 300),
+                  tween: ColorTween(
+                    begin: Colors.grey[600],
+                    end: isCurrentFolder 
+                        ? const Color(0xFF3B82F6) 
+                        : isInNavigationPath
+                            ? const Color(0xFF3B82F6).withOpacity(0.7)
+                            : Colors.grey[600],
+                  ),
+                  builder: (context, color, child) {
+                    return Icon(
+                      isRoot ? Icons.folder_special_rounded : Icons.folder_rounded,
+                      size: 16,
+                      color: color,
+                    );
+                  },
                 ),
                 const SizedBox(width: 8),
-                // Folder name
+                // Folder name with animated color
                 Expanded(
-                  child: Text(
-                    folder.name,
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isCurrentFolder ? FontWeight.w600 : FontWeight.w400,
@@ -1409,111 +1423,148 @@ class _NotesPageState extends State<NotesPage> {
                               ? Colors.grey[300]
                               : Colors.grey[400],
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      folder.name,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-                // Current location indicator
-                if (isCurrentFolder)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      '●',
-                      style: TextStyle(
-                        fontSize: 6,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                else
-                  // File count (subtle) - shows total content count
-                  Text(
-                    '${folder.totalFileCount}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[700],
-                    ),
-                  ),
+                // Animated current location indicator
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(scale: animation, child: child);
+                  },
+                  child: isCurrentFolder
+                      ? Container(
+                          key: const ValueKey('current'),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B82F6),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            '●',
+                            style: TextStyle(
+                              fontSize: 6,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          key: const ValueKey('count'),
+                          '${folder.totalFileCount}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                ),
               ],
             ),
           ),
         ),
-        // Subfolders - only show if this folder is expanded (in navigation path)
-        if (hasSubfolders && shouldExpandSubfolders)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: folder.subFolders.map((subFolder) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: _buildCleanTreeNode(subFolder, depth + 1, false),
-                );
-              }).toList(),
-            ),
-          ),
-        // Files - only show if this is the current folder
-        if (folder.files.isNotEmpty && shouldShowFiles)
-          Padding(
-            padding: EdgeInsets.only(top: hasSubfolders ? 4 : 6, left: (depth + 1) * 20.0 + 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: folder.files.map((file) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 2,
-                        height: 16,
-                        margin: const EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A36),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                      ),
-                      Icon(
-                        file.icon,
-                        size: 12,
-                        color: file.color.withOpacity(0.7),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          file.name,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[500],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: file.color.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          file.extension,
-                          style: TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w600,
-                            color: file.color.withOpacity(0.8),
-                          ),
-                        ),
-                      ),
-                    ],
+        // Animated subfolders expansion
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topLeft,
+          child: hasSubfolders && shouldExpandSubfolders
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: folder.subFolders.map((subFolder) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: _buildCleanTreeNode(subFolder, depth + 1, false),
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
-            ),
-          ),
+                )
+              : const SizedBox.shrink(),
+        ),
+        // Animated files expansion
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topLeft,
+          child: folder.files.isNotEmpty && shouldShowFiles
+              ? Padding(
+                  padding: EdgeInsets.only(top: hasSubfolders ? 4 : 6, left: (depth + 1) * 20.0 + 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: folder.files.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final file = entry.value;
+                      // Staggered animation for files
+                      return TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 200 + (index * 50)),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset((1 - value) * 20, 0),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 3),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 2,
+                                height: 16,
+                                margin: const EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2A2A36),
+                                  borderRadius: BorderRadius.circular(1),
+                                ),
+                              ),
+                              Icon(
+                                file.icon,
+                                size: 12,
+                                color: file.color.withOpacity(0.7),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  file.name,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[500],
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: file.color.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: Text(
+                                  file.extension,
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w600,
+                                    color: file.color.withOpacity(0.8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
       ],
     );
   }
