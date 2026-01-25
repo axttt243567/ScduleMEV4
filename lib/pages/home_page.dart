@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'ai_chat_page.dart';
 import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -541,16 +540,6 @@ class _HomePageState extends State<HomePage> {
               // TODO: Handle notification tap
             },
             child: _buildIconButton(Icons.notifications_outlined),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AiChatPage()),
-              );
-            },
-            child: _buildIconButton(Icons.auto_awesome, isHighlighted: true),
           ),
           const SizedBox(width: 12),
           GestureDetector(

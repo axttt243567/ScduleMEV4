@@ -9,7 +9,6 @@ import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path_lib;
 import 'ai_chat_page.dart';
-import 'settings_page.dart';
 
 // Data models for nested file structure
 enum FileType { pdf, jpeg, jpg, png, doc, txt, mp3, mp4 }
@@ -1066,29 +1065,12 @@ class _NotesPageState extends State<NotesPage> {
         children: [
           GestureDetector(
             onTap: () {
-              // TODO: Handle notification tap
-            },
-            child: _buildIconButton(Icons.notifications_outlined),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AiChatPage()),
               );
             },
             child: _buildIconButton(Icons.auto_awesome, isHighlighted: true),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-            child: _buildIconButton(Icons.tune),
           ),
         ],
       ),

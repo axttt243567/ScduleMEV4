@@ -85,7 +85,6 @@ flutter:
   assets:
     - assets/notes/images/
     - assets/notes/pdfs/
-    - TEST_FILES/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

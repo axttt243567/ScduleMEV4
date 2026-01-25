@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'ai_chat_page.dart';
-import 'settings_page.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -308,9 +306,7 @@ class _CalendarPageState extends State<CalendarPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 12),
-              _buildHeader(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildMonthHeader(),
               const SizedBox(height: 16),
               _buildCalendarGrid(),
@@ -320,60 +316,6 @@ class _CalendarPageState extends State<CalendarPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: () {
-              // TODO: Handle notification tap
-            },
-            child: _buildIconButton(Icons.notifications_outlined),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AiChatPage()),
-              );
-            },
-            child: _buildIconButton(Icons.auto_awesome, isHighlighted: true),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-            child: _buildIconButton(Icons.tune),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon, {bool isHighlighted = false}) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: const Color(0xFF16161E),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Icon(
-        icon,
-        color: isHighlighted ? const Color(0xFF3B82F6) : Colors.grey[500],
-        size: 20,
       ),
     );
   }
