@@ -58,6 +58,13 @@ dependencies:
   
   # Path utilities
   path: ^1.9.0
+  
+  # Interactive maps for AI chat
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  
+  # Charts for AI chat
+  fl_chart: ^0.69.2
 
 dev_dependencies:
   flutter_test:

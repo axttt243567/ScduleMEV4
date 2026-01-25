@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -87,6 +90,7 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     // Check for dev testing keywords
     int? devImageCount;
     bool useMultiBlock = false;
+    bool useCodeBlock = false;
     
     // Check for #imgN keyword
     final imgRegex = RegExp(r'#img(\d+)', caseSensitive: false);
@@ -99,6 +103,39 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     if (text.toLowerCase().contains('#multi')) {
       useMultiBlock = true;
     }
+    
+    // Check for #code keyword for code block testing
+    if (text.toLowerCase().contains('#code')) {
+      useCodeBlock = true;
+    }
+    
+    // Check for #map keyword for map block testing
+    bool useMapBlock = text.toLowerCase().contains('#map');
+    
+    // Check for chart keywords
+    bool useBarChart = text.toLowerCase().contains('#bar');
+    bool usePieChart = text.toLowerCase().contains('#pie');
+    
+    // Check for #all keyword to show all content types
+    bool useAllBlocks = text.toLowerCase().contains('#all');
+    
+    // Check for individual new keywords
+    bool useLineChart = text.toLowerCase().contains('#line');
+    bool useRadarChart = text.toLowerCase().contains('#radar');
+    bool useProgress = text.toLowerCase().contains('#progress');
+    bool useTimeline = text.toLowerCase().contains('#timeline');
+    bool useQuiz = text.toLowerCase().contains('#quiz');
+    bool useChecklist = text.toLowerCase().contains('#checklist');
+    bool useTable = text.toLowerCase().contains('#table');
+    bool useCarousel = text.toLowerCase().contains('#cards');
+    bool useAudio = text.toLowerCase().contains('#audio');
+    bool useVideo = text.toLowerCase().contains('#video');
+    bool useContact = text.toLowerCase().contains('#contact');
+    bool useEvent = text.toLowerCase().contains('#event');
+    bool useWeather = text.toLowerCase().contains('#weather');
+    bool useCountdown = text.toLowerCase().contains('#countdown');
+    bool useFlash = text.toLowerCase().contains('#flash');
+    bool useActions = text.toLowerCase().contains('#actions');
 
     // Add user message
     setState(() {
@@ -122,14 +159,56 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
         setState(() {
           _isTyping = false;
           
-          if (useMultiBlock) {
-            // Multi-block response with alternating text and images
+          if (useAllBlocks) {
+            // #all - Show ALL content types in one response
             _messages.add(ChatMessage(
               isAi: true,
               sender: 'Nexus AI',
-              message: '', // Not used when contentBlocks is provided
-              contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3),
+              message: '',
+              contentBlocks: _generateAllBlocksResponse(),
             ));
+          } else if (useLineChart) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateLineChartResponse()));
+          } else if (useRadarChart) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateRadarChartResponse()));
+          } else if (useProgress) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateProgressResponse()));
+          } else if (useTimeline) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateTimelineResponse()));
+          } else if (useQuiz) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateQuizResponse()));
+          } else if (useChecklist) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateChecklistResponse()));
+          } else if (useTable) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateTableResponse()));
+          } else if (useCarousel) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCarouselResponse()));
+          } else if (useAudio) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateAudioResponse()));
+          } else if (useVideo) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateVideoResponse()));
+          } else if (useContact) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateContactResponse()));
+          } else if (useEvent) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateEventResponse()));
+          } else if (useActions) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateActionsResponse()));
+          } else if (useWeather) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateWeatherResponse()));
+          } else if (useCountdown) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCountdownResponse()));
+          } else if (useFlash) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateFlashcardsResponse()));
+          } else if (useBarChart) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateBarChartResponse()));
+          } else if (usePieChart) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generatePieChartResponse()));
+          } else if (useMapBlock) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateMapBlockResponse()));
+          } else if (useCodeBlock) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCodeBlockResponse()));
+          } else if (useMultiBlock) {
+            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3)));
           } else {
             // Standard response (backward compatible)
             _messages.add(ChatMessage(
@@ -145,6 +224,247 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
         _scrollToBottom();
       }
     });
+  }
+
+  /// Dev testing: Generate response with interactive map
+  List<AIContentBlock> _generateMapBlockResponse() {
+    final blocks = <AIContentBlock>[];
+    final random = Random();
+    
+    // Sample locations (universities and landmarks)
+    final sampleLocations = [
+      MapLocation(
+        latitude: 28.6139,
+        longitude: 77.2090,
+        title: 'India Gate, New Delhi',
+        description: 'A historic war memorial located in the heart of New Delhi, India.',
+      ),
+      MapLocation(
+        latitude: 19.0760,
+        longitude: 72.8777,
+        title: 'Gateway of India, Mumbai',
+        description: 'An iconic arch monument overlooking the Arabian Sea.',
+      ),
+      MapLocation(
+        latitude: 12.9716,
+        longitude: 77.5946,
+        title: 'Vidhana Soudha, Bangalore',
+        description: 'The seat of Karnataka\'s state legislature in Bangalore.',
+      ),
+      MapLocation(
+        latitude: 22.5726,
+        longitude: 88.3639,
+        title: 'Victoria Memorial, Kolkata',
+        description: 'A large marble building dedicated to Queen Victoria.',
+      ),
+      MapLocation(
+        latitude: 13.0827,
+        longitude: 80.2707,
+        title: 'Marina Beach, Chennai',
+        description: 'One of the longest urban beaches in the world.',
+      ),
+    ];
+    
+    // Pick a random location
+    final location = sampleLocations[random.nextInt(sampleLocations.length)];
+    
+    // Intro text
+    blocks.add(AIContentBlock.text('Here\'s the location you asked about:'));
+    
+    // Map block
+    blocks.add(AIContentBlock.map(
+      mapCenter: location,
+      mapMarkers: [location],
+      mapZoom: 14.0,
+    ));
+    
+    // Follow-up text
+    blocks.add(AIContentBlock.text('You can zoom and pan the map to explore the area. Tap the marker for more details.'));
+    
+    return blocks;
+  }
+
+  /// Dev testing: Generate response with bar chart
+  List<AIContentBlock> _generateBarChartResponse() {
+    final blocks = <AIContentBlock>[];
+    
+    // Sample data for bar chart (course scores)
+    final chartData = [
+      ChartDataItem(label: 'Math', value: 85),
+      ChartDataItem(label: 'Physics', value: 78),
+      ChartDataItem(label: 'Chemistry', value: 92),
+      ChartDataItem(label: 'English', value: 88),
+      ChartDataItem(label: 'History', value: 74),
+    ];
+    
+    // Intro text
+    blocks.add(AIContentBlock.text('Here\'s your performance analysis across subjects:'));
+    
+    // Bar chart
+    blocks.add(AIContentBlock.barChart(
+      chartData: chartData,
+      chartTitle: 'Subject-wise Scores',
+    ));
+    
+    // Analysis text
+    blocks.add(AIContentBlock.text('Chemistry shows your best performance at 92%. Consider focusing more on History to improve your overall average.'));
+    
+    return blocks;
+  }
+
+  /// Dev testing: Generate response with pie chart
+  List<AIContentBlock> _generatePieChartResponse() {
+    final blocks = <AIContentBlock>[];
+    
+    // Sample data for pie chart (time allocation)
+    final chartData = [
+      ChartDataItem(label: 'Classes', value: 35),
+      ChartDataItem(label: 'Study', value: 25),
+      ChartDataItem(label: 'Assignments', value: 20),
+      ChartDataItem(label: 'Breaks', value: 12),
+      ChartDataItem(label: 'Other', value: 8),
+    ];
+    
+    // Intro text
+    blocks.add(AIContentBlock.text('Here\'s how your time is distributed this week:'));
+    
+    // Pie chart
+    blocks.add(AIContentBlock.pieChart(
+      chartData: chartData,
+      chartTitle: 'Weekly Time Allocation',
+    ));
+    
+    // Analysis text
+    blocks.add(AIContentBlock.text('You\'re spending 35% of your time in classes. Consider allocating more time to self-study for better exam preparation.'));
+    
+    return blocks;
+  }
+
+  /// Dev testing: Generate response with ALL content types
+  List<AIContentBlock> _generateAllBlocksResponse() {
+    return [
+      AIContentBlock.text('🎉 Here\'s a showcase of ALL AI response content types!'),
+      
+      // Charts
+      AIContentBlock.barChart(chartData: [ChartDataItem(label: 'Mon', value: 85), ChartDataItem(label: 'Tue', value: 72), ChartDataItem(label: 'Wed', value: 90), ChartDataItem(label: 'Thu', value: 68)], chartTitle: 'Weekly Progress'),
+      AIContentBlock.pieChart(chartData: [ChartDataItem(label: 'Study', value: 40), ChartDataItem(label: 'Class', value: 30), ChartDataItem(label: 'Break', value: 30)], chartTitle: 'Time Split'),
+      AIContentBlock.lineChart(lineData: [ChartDataPoint(x: 0, y: 60, label: 'Jan'), ChartDataPoint(x: 1, y: 75, label: 'Feb'), ChartDataPoint(x: 2, y: 85, label: 'Mar'), ChartDataPoint(x: 3, y: 90, label: 'Apr')], chartTitle: 'Grade Trend'),
+      AIContentBlock.radarChart(chartData: [ChartDataItem(label: 'Math', value: 80), ChartDataItem(label: 'Science', value: 70), ChartDataItem(label: 'English', value: 90), ChartDataItem(label: 'History', value: 65), ChartDataItem(label: 'Art', value: 85)], chartTitle: 'Skill Radar'),
+      AIContentBlock.progressBars(progressItems: [ProgressItem(label: 'Assignment 1', value: 80), ProgressItem(label: 'Assignment 2', value: 45), ProgressItem(label: 'Project', value: 100)], chartTitle: 'Task Progress'),
+      
+      // Timeline
+      AIContentBlock.timeline(timelineEvents: [TimelineEvent(title: 'Class Start', date: '9:00 AM'), TimelineEvent(title: 'Lunch Break', date: '12:00 PM'), TimelineEvent(title: 'Lab Session', date: '2:00 PM')]),
+      
+      // Interactive
+      AIContentBlock.quiz(quizData: QuizData(question: 'What is 2 + 2?', options: ['3', '4', '5', '6'], correctIndex: 1)),
+      AIContentBlock.checklist(checklistItems: [ChecklistItem(text: 'Review notes'), ChecklistItem(text: 'Complete HW', checked: true), ChecklistItem(text: 'Study for exam')], chartTitle: 'To-Do'),
+      AIContentBlock.collapsible(collapsibleTitle: 'Click to expand details', collapsibleContent: 'This is the hidden content that appears when you tap on the header! Great for FAQs or additional info.'),
+      AIContentBlock.dataTable(tableData: TableData(headers: ['Subject', 'Grade', 'Credits'], rows: [['Math', 'A', '4'], ['Physics', 'B+', '3'], ['English', 'A-', '3']]), chartTitle: 'Grades'),
+      AIContentBlock.carousel(carouselItems: [InfoCard(title: 'Physics 101', subtitle: 'Room 204', icon: Icons.science), InfoCard(title: 'Math 201', subtitle: 'Room 105', icon: Icons.calculate), InfoCard(title: 'English 101', subtitle: 'Room 302', icon: Icons.book)]),
+      
+      // Media
+      AIContentBlock.audioPlayer(mediaUrl: 'lecture.mp3', mediaTitle: 'Lecture Recording', mediaDuration: const Duration(minutes: 45)),
+      AIContentBlock.videoPlayer(mediaUrl: 'tutorial.mp4', mediaTitle: 'Video Tutorial'),
+      AIContentBlock.fileAttachment(mediaUrl: 'notes.pdf', mediaTitle: 'Study_Notes.pdf'),
+      AIContentBlock.voiceMessage(mediaDuration: const Duration(seconds: 32)),
+      
+      // Actions
+      AIContentBlock.quickActions(actionButtons: [ActionButton(label: 'Calendar', icon: Icons.calendar_today, color: const Color(0xFF3B82F6)), ActionButton(label: 'Reminder', icon: Icons.alarm, color: const Color(0xFFF59E0B)), ActionButton(label: 'Share', icon: Icons.share, color: const Color(0xFF10B981))]),
+      AIContentBlock.contactCard(contactData: ContactData(name: 'Prof. Johnson', role: 'Mathematics', phone: '+1234567890', email: 'prof.j@edu.com')),
+      AIContentBlock.calendarEvent(eventData: CalendarEventData(title: 'Final Exam', date: 'Jan 28', time: '10:00 AM', location: 'Hall A')),
+      
+      // Rich text
+      AIContentBlock.mathEquation(mathEquation: 'E = mc² + ∫f(x)dx'),
+      
+      // Bonus
+      AIContentBlock.weather(weatherData: WeatherData(location: 'Campus', temperature: 24, condition: 'Sunny', icon: Icons.wb_sunny)),
+      AIContentBlock.countdown(countdownData: CountdownData(title: 'Exam in...', targetDate: DateTime.now().add(const Duration(days: 5)))),
+      AIContentBlock.flashcards(flashcards: [FlashcardData(front: 'H₂O', back: 'Water molecule'), FlashcardData(front: 'F = ma', back: 'Force = mass × acceleration')]),
+      AIContentBlock.pdfPreview(mediaUrl: 'syllabus.pdf', mediaTitle: 'Course Syllabus'),
+      
+      AIContentBlock.text('That\'s all 24+ content types! Use individual keywords to test each one.'),
+    ];
+  }
+
+  List<AIContentBlock> _generateLineChartResponse() => [AIContentBlock.text('Here\'s your grade progression:'), AIContentBlock.lineChart(lineData: [ChartDataPoint(x: 0, y: 65, label: 'Week 1'), ChartDataPoint(x: 1, y: 72, label: 'Week 2'), ChartDataPoint(x: 2, y: 78, label: 'Week 3'), ChartDataPoint(x: 3, y: 85, label: 'Week 4'), ChartDataPoint(x: 4, y: 88, label: 'Week 5')], chartTitle: 'Grade Trend'), AIContentBlock.text('Great improvement! You\'ve gained 23 points over 5 weeks.')];
+  
+  List<AIContentBlock> _generateRadarChartResponse() => [AIContentBlock.text('Here\'s your skill assessment:'), AIContentBlock.radarChart(chartData: [ChartDataItem(label: 'Problem Solving', value: 85), ChartDataItem(label: 'Communication', value: 70), ChartDataItem(label: 'Creativity', value: 90), ChartDataItem(label: 'Leadership', value: 65), ChartDataItem(label: 'Teamwork', value: 80)], chartTitle: 'Skills Radar')];
+  
+  List<AIContentBlock> _generateProgressResponse() => [AIContentBlock.text('Here\'s your assignment progress:'), AIContentBlock.progressBars(progressItems: [ProgressItem(label: 'Math Homework', value: 100), ProgressItem(label: 'Science Project', value: 75), ProgressItem(label: 'Essay Draft', value: 40), ProgressItem(label: 'Lab Report', value: 60)], chartTitle: 'Assignments')];
+  
+  List<AIContentBlock> _generateTimelineResponse() => [AIContentBlock.text('Here\'s today\'s schedule:'), AIContentBlock.timeline(timelineEvents: [TimelineEvent(title: 'Morning Lecture', description: 'Introduction to Calculus', date: '9:00 AM'), TimelineEvent(title: 'Lab Session', description: 'Chemistry Lab B', date: '11:00 AM'), TimelineEvent(title: 'Study Group', description: 'Library Room 3', date: '2:00 PM'), TimelineEvent(title: 'Office Hours', description: 'Prof. Smith', date: '4:00 PM')])];
+  
+  List<AIContentBlock> _generateQuizResponse() => [AIContentBlock.text('Quick Quiz Time! 📝'), AIContentBlock.quiz(quizData: QuizData(question: 'Which planet is known as the Red Planet?', options: ['Venus', 'Mars', 'Jupiter', 'Saturn'], correctIndex: 1))];
+  
+  List<AIContentBlock> _generateChecklistResponse() => [AIContentBlock.text('Here\'s your study checklist:'), AIContentBlock.checklist(checklistItems: [ChecklistItem(text: 'Read Chapter 5', checked: true), ChecklistItem(text: 'Complete practice problems'), ChecklistItem(text: 'Review lecture notes'), ChecklistItem(text: 'Prepare questions for class')], chartTitle: 'Study Tasks')];
+  
+  List<AIContentBlock> _generateTableResponse() => [AIContentBlock.text('Here\'s your grade summary:'), AIContentBlock.dataTable(tableData: TableData(headers: ['Subject', 'Midterm', 'Final', 'Grade'], rows: [['Mathematics', '88', '92', 'A'], ['Physics', '75', '82', 'B+'], ['Chemistry', '90', '88', 'A-'], ['English', '85', '90', 'A']]), chartTitle: 'Term Grades')];
+  
+  List<AIContentBlock> _generateCarouselResponse() => [AIContentBlock.text('Your enrolled courses:'), AIContentBlock.carousel(carouselItems: [InfoCard(title: 'Calculus II', subtitle: 'MWF 9:00 AM', description: 'Room 201', icon: Icons.calculate, color: const Color(0xFF3B82F6)), InfoCard(title: 'Physics 101', subtitle: 'TTH 11:00 AM', description: 'Lab B', icon: Icons.science, color: const Color(0xFF8B5CF6)), InfoCard(title: 'English Lit', subtitle: 'MWF 2:00 PM', description: 'Room 305', icon: Icons.book, color: const Color(0xFF10B981))])];
+  
+  List<AIContentBlock> _generateAudioResponse() => [AIContentBlock.text('Here\'s the lecture recording:'), AIContentBlock.audioPlayer(mediaUrl: 'lecture.mp3', mediaTitle: 'Calculus Lecture - Week 4', mediaDuration: const Duration(minutes: 52, seconds: 30))];
+  
+  List<AIContentBlock> _generateVideoResponse() => [AIContentBlock.text('Watch this tutorial:'), AIContentBlock.videoPlayer(mediaUrl: 'tutorial.mp4', mediaTitle: 'Quadratic Equations Explained')];
+  
+  List<AIContentBlock> _generateContactResponse() => [AIContentBlock.text('Here\'s your professor\'s contact info:'), AIContentBlock.contactCard(contactData: ContactData(name: 'Dr. Sarah Miller', role: 'Professor of Mathematics', phone: '+1 (555) 123-4567', email: 'smiller@university.edu'))];
+  
+  List<AIContentBlock> _generateEventResponse() => [AIContentBlock.text('Upcoming event:'), AIContentBlock.calendarEvent(eventData: CalendarEventData(title: 'Midterm Exam', date: 'Feb 15', time: '10:00 AM - 12:00 PM', location: 'Examination Hall A', color: const Color(0xFFEF4444)))];
+  
+  List<AIContentBlock> _generateActionsResponse() => [AIContentBlock.text('Quick actions available:'), AIContentBlock.quickActions(actionButtons: [ActionButton(label: 'Add to Calendar', icon: Icons.calendar_today, color: const Color(0xFF3B82F6)), ActionButton(label: 'Set Reminder', icon: Icons.alarm, color: const Color(0xFFF59E0B)), ActionButton(label: 'Share', icon: Icons.share, color: const Color(0xFF10B981)), ActionButton(label: 'Download', icon: Icons.download, color: const Color(0xFF8B5CF6))])];
+  
+  List<AIContentBlock> _generateWeatherResponse() => [AIContentBlock.text('Current campus weather:'), AIContentBlock.weather(weatherData: WeatherData(location: 'University Campus', temperature: 22, condition: 'Partly Cloudy', icon: Icons.cloud))];
+  
+  List<AIContentBlock> _generateCountdownResponse() => [AIContentBlock.text('Exam countdown:'), AIContentBlock.countdown(countdownData: CountdownData(title: 'Final Exam - Mathematics', targetDate: DateTime.now().add(const Duration(days: 7, hours: 5)), color: const Color(0xFFEF4444)))];
+  
+  List<AIContentBlock> _generateFlashcardsResponse() => [AIContentBlock.text('Study flashcards:'), AIContentBlock.flashcards(flashcards: [FlashcardData(front: 'What is the derivative of x²?', back: '2x'), FlashcardData(front: '∫sin(x)dx = ?', back: '-cos(x) + C'), FlashcardData(front: 'lim(x→0) sin(x)/x = ?', back: '1')])];
+
+  /// Dev testing: Generate response with code blocks
+  List<AIContentBlock> _generateCodeBlockResponse() {
+    final blocks = <AIContentBlock>[];
+    final random = Random();
+    
+    // Intro text
+    blocks.add(AIContentBlock.text('Here\'s an example of how you can implement this:'));
+    
+    // Sample code snippets
+    final sampleCodes = [
+      ('''void main() {
+  print('Hello, World!');
+  
+  final numbers = [1, 2, 3, 4, 5];
+  final doubled = numbers.map((n) => n * 2);
+  print(doubled.toList());
+}''', 'dart'),
+      ('''def calculate_average(numbers):
+    if not numbers:
+        return 0
+    return sum(numbers) / len(numbers)
+
+# Example usage
+scores = [85, 92, 78, 90, 88]
+avg = calculate_average(scores)
+print(f"Average: {avg}")''', 'python'),
+      ('''async function fetchUserData(userId) {
+  try {
+    const response = await fetch(\`/api/users/\${userId}\`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}''', 'javascript'),
+    ];
+    
+    // Pick a random code sample
+    final codeIndex = random.nextInt(sampleCodes.length);
+    final (code, lang) = sampleCodes[codeIndex];
+    blocks.add(AIContentBlock.code(code, language: lang));
+    
+    // Explanation text
+    blocks.add(AIContentBlock.text('This code demonstrates the basic pattern. You can modify it according to your specific requirements.'));
+    
+    return blocks;
   }
 
   /// Dev testing: Generate multi-block response with text and images in order
@@ -1370,8 +1690,949 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
       );
     } else if (block.type == AIContentBlockType.images && block.images != null) {
       return _buildImageGallery(block.images!);
+    } else if (block.type == AIContentBlockType.code && block.code != null) {
+      return _buildCodeBlock(block.code!, block.language ?? 'code');
+    } else if (block.type == AIContentBlockType.map && block.mapCenter != null) {
+      return _buildMapBlock(block.mapCenter!, block.mapMarkers, block.mapZoom ?? 15.0);
+    } else if (block.type == AIContentBlockType.barChart && block.chartData != null) {
+      return _buildBarChart(block.chartData!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.pieChart && block.chartData != null) {
+      return _buildPieChart(block.chartData!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.lineChart && block.lineData != null) {
+      return _buildLineChart(block.lineData!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.radarChart && block.chartData != null) {
+      return _buildRadarChart(block.chartData!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.progressBars && block.progressItems != null) {
+      return _buildProgressBars(block.progressItems!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.timeline && block.timelineEvents != null) {
+      return _buildTimeline(block.timelineEvents!);
+    } else if (block.type == AIContentBlockType.quiz && block.quizData != null) {
+      return _buildQuiz(block.quizData!);
+    } else if (block.type == AIContentBlockType.checklist && block.checklistItems != null) {
+      return _buildChecklist(block.checklistItems!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.collapsible && block.collapsibleTitle != null) {
+      return _buildCollapsible(block.collapsibleTitle!, block.collapsibleContent ?? '');
+    } else if (block.type == AIContentBlockType.dataTable && block.tableData != null) {
+      return _buildDataTable(block.tableData!, block.chartTitle);
+    } else if (block.type == AIContentBlockType.carousel && block.carouselItems != null) {
+      return _buildCarousel(block.carouselItems!);
+    } else if (block.type == AIContentBlockType.audioPlayer && block.mediaUrl != null) {
+      return _buildAudioPlayer(block.mediaUrl!, block.mediaTitle, block.mediaDuration);
+    } else if (block.type == AIContentBlockType.videoPlayer && block.mediaUrl != null) {
+      return _buildVideoPlayer(block.mediaUrl!, block.mediaTitle, block.thumbnailUrl);
+    } else if (block.type == AIContentBlockType.fileAttachment && block.mediaUrl != null) {
+      return _buildFileAttachment(block.mediaUrl!, block.mediaTitle ?? 'File');
+    } else if (block.type == AIContentBlockType.voiceMessage) {
+      return _buildVoiceMessage(block.mediaDuration);
+    } else if (block.type == AIContentBlockType.quickActions && block.actionButtons != null) {
+      return _buildQuickActions(block.actionButtons!);
+    } else if (block.type == AIContentBlockType.contactCard && block.contactData != null) {
+      return _buildContactCard(block.contactData!);
+    } else if (block.type == AIContentBlockType.calendarEvent && block.eventData != null) {
+      return _buildCalendarEvent(block.eventData!);
+    } else if (block.type == AIContentBlockType.markdown && block.markdownContent != null) {
+      return _buildMarkdown(block.markdownContent!);
+    } else if (block.type == AIContentBlockType.mathEquation && block.mathEquation != null) {
+      return _buildMathEquation(block.mathEquation!);
+    } else if (block.type == AIContentBlockType.weather && block.weatherData != null) {
+      return _buildWeather(block.weatherData!);
+    } else if (block.type == AIContentBlockType.countdown && block.countdownData != null) {
+      return _buildCountdown(block.countdownData!);
+    } else if (block.type == AIContentBlockType.flashcards && block.flashcards != null) {
+      return _buildFlashcards(block.flashcards!);
+    } else if (block.type == AIContentBlockType.pdfPreview && block.mediaUrl != null) {
+      return _buildPdfPreview(block.mediaUrl!, block.mediaTitle);
     }
     return const SizedBox.shrink();
+  }
+
+  Widget _buildBarChart(List<ChartDataItem> data, String? title) {
+    final chartColors = [
+      const Color(0xFF3B82F6),
+      const Color(0xFF8B5CF6),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
+      const Color(0xFF06B6D4),
+    ];
+    
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          if (title != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(
+                color: Color(0xFF161B22),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.bar_chart_rounded, size: 16, color: Color(0xFF3B82F6)),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          // Bar Chart
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              height: 180,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: data.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2,
+                  barGroups: data.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    final item = entry.value;
+                    return BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: item.value,
+                          color: item.color ?? chartColors[i % chartColors.length],
+                          width: 22,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 35,
+                        getTitlesWidget: (value, meta) => Text(
+                          value.toInt().toString(),
+                          style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                        ),
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) => Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            data[value.toInt()].label,
+                            style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: const Color(0xFF27272A),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPieChart(List<ChartDataItem> data, String? title) {
+    final chartColors = [
+      const Color(0xFF3B82F6),
+      const Color(0xFF8B5CF6),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
+      const Color(0xFF06B6D4),
+    ];
+    
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          if (title != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(
+                color: Color(0xFF161B22),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.pie_chart_rounded, size: 16, color: Color(0xFF8B5CF6)),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          // Pie Chart and Legend
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Pie Chart
+                Expanded(
+                  flex: 2,
+                  child: SizedBox(
+                    height: 140,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 30,
+                        sections: data.asMap().entries.map((entry) {
+                          final i = entry.key;
+                          final item = entry.value;
+                          return PieChartSectionData(
+                            value: item.value,
+                            color: item.color ?? chartColors[i % chartColors.length],
+                            radius: 45,
+                            title: '${item.value.toInt()}%',
+                            titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Legend
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: data.asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final item = entry.value;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: item.color ?? chartColors[i % chartColors.length],
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                item.label,
+                                style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============== PHASE 1: DATA VISUALIZATION ==============
+
+  Widget _buildLineChart(List<ChartDataPoint> data, String? title) {
+    return _buildChartContainer(title, Icons.show_chart, const Color(0xFF10B981), 
+      SizedBox(
+        height: 160,
+        child: LineChart(
+          LineChartData(
+            gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (v) => FlLine(color: const Color(0xFF27272A), strokeWidth: 1)),
+            titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: (v, m) => Text(v.toInt().toString(), style: TextStyle(fontSize: 10, color: Colors.grey[500])))),
+              bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, m) => Text(data[v.toInt() < data.length ? v.toInt() : 0].label ?? '', style: TextStyle(fontSize: 10, color: Colors.grey[400]))))),
+            borderData: FlBorderData(show: false),
+            lineBarsData: [LineChartBarData(spots: data.map((p) => FlSpot(p.x, p.y)).toList(), isCurved: true, color: const Color(0xFF10B981), barWidth: 3, dotData: const FlDotData(show: true), belowBarData: BarAreaData(show: true, color: const Color(0xFF10B981).withOpacity(0.1)))],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRadarChart(List<ChartDataItem> data, String? title) {
+    return _buildChartContainer(title, Icons.radar, const Color(0xFF8B5CF6),
+      SizedBox(
+        height: 180,
+        child: RadarChart(
+          RadarChartData(
+            radarShape: RadarShape.polygon,
+            tickCount: 4,
+            ticksTextStyle: TextStyle(color: Colors.grey[600], fontSize: 8),
+            tickBorderData: const BorderSide(color: Color(0xFF27272A)),
+            gridBorderData: const BorderSide(color: Color(0xFF27272A)),
+            dataSets: [RadarDataSet(dataEntries: data.map((d) => RadarEntry(value: d.value)).toList(), fillColor: const Color(0xFF8B5CF6).withOpacity(0.3), borderColor: const Color(0xFF8B5CF6), borderWidth: 2)],
+            getTitle: (i, a) => RadarChartTitle(text: data[i].label, angle: a),
+            titleTextStyle: TextStyle(color: Colors.grey[400], fontSize: 10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressBars(List<ProgressItem> items, String? title) {
+    final colors = [const Color(0xFF3B82F6), const Color(0xFF10B981), const Color(0xFF8B5CF6), const Color(0xFFF59E0B), const Color(0xFFEF4444)];
+    return _buildChartContainer(title, Icons.trending_up, const Color(0xFF3B82F6),
+      Column(children: items.asMap().entries.map((e) {
+        final i = e.key; final item = e.value;
+        return Padding(padding: const EdgeInsets.only(bottom: 12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(item.label, style: TextStyle(fontSize: 12, color: Colors.grey[300])), Text('${item.value.toInt()}/${item.max.toInt()}', style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
+            const SizedBox(height: 6),
+            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: item.value / item.max, backgroundColor: const Color(0xFF27272A), valueColor: AlwaysStoppedAnimation(item.color ?? colors[i % colors.length]), minHeight: 8)),
+          ]),
+        );
+      }).toList()),
+    );
+  }
+
+  Widget _buildTimeline(List<TimelineEvent> events) {
+    final colors = [const Color(0xFF3B82F6), const Color(0xFF10B981), const Color(0xFF8B5CF6), const Color(0xFFF59E0B)];
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Column(children: events.asMap().entries.map((e) {
+        final i = e.key; final ev = e.value; final isLast = i == events.length - 1;
+        return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(children: [
+            Container(width: 12, height: 12, decoration: BoxDecoration(color: ev.color ?? colors[i % colors.length], shape: BoxShape.circle)),
+            if (!isLast) Container(width: 2, height: 50, color: const Color(0xFF27272A)),
+          ]),
+          const SizedBox(width: 12),
+          Expanded(child: Padding(padding: EdgeInsets.only(bottom: isLast ? 0 : 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(ev.date, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+            const SizedBox(height: 2),
+            Text(ev.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+            if (ev.description != null) Text(ev.description!, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+          ]))),
+        ]);
+      }).toList()),
+    );
+  }
+
+  // ============== PHASE 2: INTERACTIVE CONTENT ==============
+
+  Widget _buildQuiz(QuizData quiz) {
+    return StatefulBuilder(builder: (context, setState) {
+      int? selected;
+      bool revealed = false;
+      return Container(
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [const Icon(Icons.quiz, size: 16, color: Color(0xFFF59E0B)), const SizedBox(width: 8), const Text('Quiz', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFF59E0B)))]),
+          const SizedBox(height: 12),
+          Text(quiz.question, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+          const SizedBox(height: 12),
+          ...quiz.options.asMap().entries.map((e) {
+            final i = e.key; final opt = e.value;
+            final isCorrect = i == quiz.correctIndex;
+            final isSelected = selected == i;
+            return GestureDetector(
+              onTap: () => setState(() { selected = i; revealed = true; }),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: revealed ? (isCorrect ? const Color(0xFF10B981).withOpacity(0.2) : isSelected ? const Color(0xFFEF4444).withOpacity(0.2) : const Color(0xFF1E1E26)) : const Color(0xFF1E1E26),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: revealed ? (isCorrect ? const Color(0xFF10B981) : isSelected ? const Color(0xFFEF4444) : const Color(0xFF27272A)) : const Color(0xFF27272A))),
+                child: Row(children: [
+                  Container(width: 20, height: 20, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[600]!)), child: revealed && isCorrect ? const Icon(Icons.check, size: 14, color: Color(0xFF10B981)) : null),
+                  const SizedBox(width: 10), Expanded(child: Text(opt, style: TextStyle(fontSize: 13, color: Colors.grey[300]))),
+                ]),
+              ),
+            );
+          }),
+        ]),
+      );
+    });
+  }
+
+  Widget _buildChecklist(List<ChecklistItem> items, String? title) {
+    return StatefulBuilder(builder: (context, setState) {
+      final checked = List<bool>.from(items.map((i) => i.checked));
+      return _buildChartContainer(title ?? 'Checklist', Icons.checklist, const Color(0xFF10B981),
+        Column(children: items.asMap().entries.map((e) {
+          final i = e.key; final item = e.value;
+          return GestureDetector(
+            onTap: () => setState(() => checked[i] = !checked[i]),
+            child: Padding(padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(children: [
+                Container(width: 22, height: 22, decoration: BoxDecoration(color: checked[i] ? const Color(0xFF10B981) : Colors.transparent, borderRadius: BorderRadius.circular(6), border: Border.all(color: checked[i] ? const Color(0xFF10B981) : Colors.grey[600]!)),
+                  child: checked[i] ? const Icon(Icons.check, size: 14, color: Colors.white) : null),
+                const SizedBox(width: 10),
+                Expanded(child: Text(item.text, style: TextStyle(fontSize: 13, color: Colors.grey[300], decoration: checked[i] ? TextDecoration.lineThrough : null))),
+              ]),
+            ),
+          );
+        }).toList()),
+      );
+    });
+  }
+
+  Widget _buildCollapsible(String title, String content) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+          iconColor: Colors.grey[400], collapsedIconColor: Colors.grey[500],
+          title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+          children: [Text(content, style: TextStyle(fontSize: 12, color: Colors.grey[400], height: 1.5))],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataTable(TableData data, String? title) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (title != null) Padding(padding: const EdgeInsets.all(12), child: Row(children: [const Icon(Icons.table_chart, size: 16, color: Color(0xFF3B82F6)), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white))])),
+        SingleChildScrollView(scrollDirection: Axis.horizontal, child: DataTable(
+          headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E26)),
+          columns: data.headers.map((h) => DataColumn(label: Text(h, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)))).toList(),
+          rows: data.rows.map((r) => DataRow(cells: r.map((c) => DataCell(Text(c, style: TextStyle(fontSize: 11, color: Colors.grey[400])))).toList())).toList(),
+        )),
+      ]),
+    );
+  }
+
+  Widget _buildCarousel(List<InfoCard> items) {
+    final colors = [const Color(0xFF3B82F6), const Color(0xFF8B5CF6), const Color(0xFF10B981), const Color(0xFFF59E0B)];
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      height: 140,
+      child: PageView.builder(
+        itemCount: items.length,
+        controller: PageController(viewportFraction: 0.85),
+        itemBuilder: (context, i) {
+          final item = items[i]; final color = item.color ?? colors[i % colors.length];
+          return Container(
+            margin: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(gradient: LinearGradient(colors: [color.withOpacity(0.3), color.withOpacity(0.1)]), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.5))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+              if (item.icon != null) Icon(item.icon, color: color, size: 28),
+              const SizedBox(height: 8),
+              Text(item.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+              if (item.subtitle != null) Text(item.subtitle!, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============== PHASE 3: MEDIA ==============
+
+  Widget _buildAudioPlayer(String url, String? title, Duration? duration) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(children: [
+        Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+          child: const Icon(Icons.play_arrow, color: Color(0xFF3B82F6), size: 28)),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title ?? 'Audio', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+          const SizedBox(height: 4),
+          Row(children: [Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(2), child: const LinearProgressIndicator(value: 0, backgroundColor: Color(0xFF27272A), valueColor: AlwaysStoppedAnimation(Color(0xFF3B82F6)), minHeight: 4))),
+            const SizedBox(width: 8), Text(duration != null ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}' : '0:00', style: TextStyle(fontSize: 10, color: Colors.grey[500]))]),
+        ])),
+      ]),
+    );
+  }
+
+  Widget _buildVideoPlayer(String url, String? title, String? thumbnail) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Column(children: [
+        Container(height: 140, decoration: BoxDecoration(color: const Color(0xFF1E1E26), borderRadius: const BorderRadius.vertical(top: Radius.circular(11))),
+          child: Center(child: Container(width: 56, height: 56, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle), child: const Icon(Icons.play_arrow, color: Colors.white, size: 36)))),
+        Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(color: Color(0xFF16161E), borderRadius: BorderRadius.vertical(bottom: Radius.circular(11))),
+          child: Row(children: [const Icon(Icons.videocam, size: 16, color: Color(0xFFEF4444)), const SizedBox(width: 8), Expanded(child: Text(title ?? 'Video', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)))])),
+      ]),
+    );
+  }
+
+  Widget _buildFileAttachment(String url, String title) {
+    final ext = title.split('.').last.toLowerCase();
+    final isPdf = ext == 'pdf';
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(children: [
+        Container(width: 44, height: 44, decoration: BoxDecoration(color: (isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6)).withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+          child: Icon(isPdf ? Icons.picture_as_pdf : Icons.insert_drive_file, color: isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6))),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.white)), Text(ext.toUpperCase(), style: TextStyle(fontSize: 10, color: Colors.grey[500]))])),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(6)),
+          child: const Text('Download', style: TextStyle(fontSize: 11, color: Colors.white))),
+      ]),
+    );
+  }
+
+  Widget _buildVoiceMessage(Duration? duration) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(children: [
+        Container(width: 36, height: 36, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle), child: const Icon(Icons.play_arrow, color: Colors.white, size: 20)),
+        const SizedBox(width: 10),
+        Expanded(child: Row(children: List.generate(20, (i) => Container(width: 3, height: 8 + Random().nextDouble() * 12, margin: const EdgeInsets.only(right: 2), decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.5), borderRadius: BorderRadius.circular(2)))))),
+        const SizedBox(width: 8),
+        Text(duration != null ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}' : '0:12', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+      ]),
+    );
+  }
+
+  // ============== PHASE 4: ACTIONS ==============
+
+  Widget _buildQuickActions(List<ActionButton> actions) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      child: Wrap(spacing: 8, runSpacing: 8, children: actions.map((a) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.15), borderRadius: BorderRadius.circular(20), border: Border.all(color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.5))),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(a.icon, size: 16, color: a.color ?? const Color(0xFF3B82F6)), const SizedBox(width: 6), Text(a.label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: a.color ?? const Color(0xFF3B82F6)))]),
+        );
+      }).toList()),
+    );
+  }
+
+  Widget _buildContactCard(ContactData contact) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(children: [
+        CircleAvatar(radius: 24, backgroundColor: const Color(0xFF3B82F6).withOpacity(0.2), child: Text(contact.name[0], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF3B82F6)))),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(contact.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+          if (contact.role != null) Text(contact.role!, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+        ])),
+        if (contact.phone != null) Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.call, size: 18, color: Color(0xFF10B981))),
+        const SizedBox(width: 8),
+        if (contact.email != null) Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.email, size: 18, color: Color(0xFF3B82F6))),
+      ]),
+    );
+  }
+
+  Widget _buildCalendarEvent(CalendarEventData event) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: event.color ?? const Color(0xFF3B82F6))),
+      child: Row(children: [
+        Container(width: 48, padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: (event.color ?? const Color(0xFF3B82F6)).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+          child: Column(children: [Text(event.date.split(' ').first, style: TextStyle(fontSize: 10, color: Colors.grey[400])), Text(event.date.split(' ').length > 1 ? event.date.split(' ')[1] : '', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: event.color ?? const Color(0xFF3B82F6)))])),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(event.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+          if (event.time != null) Row(children: [Icon(Icons.access_time, size: 12, color: Colors.grey[500]), const SizedBox(width: 4), Text(event.time!, style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
+          if (event.location != null) Row(children: [Icon(Icons.location_on, size: 12, color: Colors.grey[500]), const SizedBox(width: 4), Text(event.location!, style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
+        ])),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(6)),
+          child: const Text('Add', style: TextStyle(fontSize: 11, color: Colors.white))),
+      ]),
+    );
+  }
+
+  // ============== PHASE 5: RICH FORMATTING ==============
+
+  Widget _buildMarkdown(String content) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Text(content.replaceAll('**', '').replaceAll('*', '').replaceAll('#', ''), style: TextStyle(fontSize: 13, color: Colors.grey[300], height: 1.5)),
+    );
+  }
+
+  Widget _buildMathEquation(String equation) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: const Color(0xFF0D1117), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(children: [
+        const Icon(Icons.functions, color: Color(0xFF8B5CF6), size: 20),
+        const SizedBox(width: 12),
+        Expanded(child: Text(equation, style: const TextStyle(fontFamily: 'monospace', fontSize: 16, color: Colors.white, fontStyle: FontStyle.italic))),
+      ]),
+    );
+  }
+
+  // ============== PHASE 6: BONUS ==============
+
+  Widget _buildWeather(WeatherData weather) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF06B6D4)]), borderRadius: BorderRadius.circular(16)),
+      child: Row(children: [
+        Icon(weather.icon, size: 48, color: Colors.white),
+        const SizedBox(width: 16),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('${weather.temperature.toInt()}°C', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(weather.condition, style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.8))),
+          Text(weather.location, style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.6))),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _buildCountdown(CountdownData data) {
+    final diff = data.targetDate.difference(DateTime.now());
+    final days = diff.inDays; final hours = diff.inHours % 24;
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: (data.color ?? const Color(0xFFEF4444)).withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: data.color ?? const Color(0xFFEF4444))),
+      child: Column(children: [
+        Icon(Icons.timer, color: data.color ?? const Color(0xFFEF4444), size: 28),
+        const SizedBox(height: 8),
+        Text(data.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _countdownUnit(days.toString(), 'Days'), const SizedBox(width: 16),
+          _countdownUnit(hours.toString(), 'Hours'), const SizedBox(width: 16),
+          _countdownUnit((diff.inMinutes % 60).toString(), 'Mins'),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _countdownUnit(String value, String label) {
+    return Column(children: [
+      Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+      Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+    ]);
+  }
+
+  Widget _buildFlashcards(List<FlashcardData> cards) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      height: 140,
+      child: PageView.builder(
+        itemCount: cards.length,
+        controller: PageController(viewportFraction: 0.9),
+        itemBuilder: (context, i) {
+          return StatefulBuilder(builder: (context, setState) {
+            bool flipped = false;
+            return GestureDetector(
+              onTap: () => setState(() => flipped = !flipped),
+              child: Container(
+                margin: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(gradient: LinearGradient(colors: flipped ? [const Color(0xFF10B981), const Color(0xFF06B6D4)] : [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]), borderRadius: BorderRadius.circular(12)),
+                child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(flipped ? Icons.lightbulb : Icons.help_outline, color: Colors.white.withOpacity(0.5), size: 24),
+                  const SizedBox(height: 8),
+                  Text(flipped ? cards[i].back : cards[i].front, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white), textAlign: TextAlign.center),
+                  const SizedBox(height: 8),
+                  Text('Tap to ${flipped ? 'see question' : 'reveal answer'}', style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.6))),
+                ])),
+              ),
+            );
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildPdfPreview(String url, String? title) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.5))),
+      child: Column(children: [
+        Container(height: 120, decoration: BoxDecoration(color: const Color(0xFF1E1E26), borderRadius: const BorderRadius.vertical(top: Radius.circular(11))),
+          child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.picture_as_pdf, color: Color(0xFFEF4444), size: 40),
+            const SizedBox(height: 8),
+            Text(title ?? 'PDF Document', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+          ]))),
+        Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(color: Color(0xFF16161E), borderRadius: BorderRadius.vertical(bottom: Radius.circular(11))),
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            _pdfAction(Icons.visibility, 'View'),
+            _pdfAction(Icons.download, 'Download'),
+            _pdfAction(Icons.share, 'Share'),
+          ])),
+      ]),
+    );
+  }
+
+  Widget _pdfAction(IconData icon, String label) {
+    return Column(children: [
+      Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(8)), child: Icon(icon, size: 18, color: Colors.grey[400])),
+      const SizedBox(height: 4),
+      Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+    ]);
+  }
+
+  // Helper for chart containers
+  Widget _buildChartContainer(String? title, IconData icon, Color color, Widget child) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (title != null) Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), decoration: const BoxDecoration(color: Color(0xFF161B22), borderRadius: BorderRadius.vertical(top: Radius.circular(11))),
+          child: Row(children: [Icon(icon, size: 16, color: color), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white))])),
+        Padding(padding: const EdgeInsets.all(16), child: child),
+      ]),
+    );
+  }
+
+  Widget _buildMapBlock(MapLocation center, List<MapLocation>? markers, double zoom) {
+    final allMarkers = markers ?? [center];
+    
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Map header with location info
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: const BoxDecoration(
+              color: Color(0xFF161B22),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.location_on, size: 16, color: Color(0xFF3B82F6)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    center.title ?? 'Location',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Interactive map
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(11)),
+            child: SizedBox(
+              height: 180,
+              child: FlutterMap(
+                options: MapOptions(
+                  initialCenter: LatLng(center.latitude, center.longitude),
+                  initialZoom: zoom,
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all,
+                  ),
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.scheduleme.app',
+                  ),
+                  MarkerLayer(
+                    markers: allMarkers.map((loc) => Marker(
+                      point: LatLng(loc.latitude, loc.longitude),
+                      width: 40,
+                      height: 40,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3B82F6),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Location description if available
+          if (center.description != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Color(0xFF16161E),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+              ),
+              child: Text(
+                center.description!,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[400],
+                  height: 1.4,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeBlock(String code, String language) {
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1117),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with language and copy button
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: const BoxDecoration(
+              color: Color(0xFF161B22),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.code, size: 14, color: Colors.grey[500]),
+                    const SizedBox(width: 6),
+                    Text(
+                      language.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[500],
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // Copy code to clipboard
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Code copied to clipboard'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF21262D),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.copy_rounded, size: 12, color: Colors.grey[400]),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Copy',
+                          style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Code content with horizontal scroll
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(12),
+            child: SelectableText(
+              code,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 13,
+                color: Color(0xFFC9D1D9),
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildImageGallery(List<AIResponseImage> images) {
@@ -2392,21 +3653,279 @@ class AIResponseImage {
 }
 
 /// Content block types for multi-part AI responses
-enum AIContentBlockType { text, images }
+enum AIContentBlockType { 
+  text, images, code, map, barChart, pieChart,
+  // Phase 1: Data Visualization
+  lineChart, radarChart, progressBars, timeline,
+  // Phase 2: Interactive Content
+  quiz, checklist, collapsible, dataTable, carousel,
+  // Phase 3: Media
+  audioPlayer, videoPlayer, fileAttachment, voiceMessage,
+  // Phase 4: Actions
+  quickActions, deepLinks, contactCard, calendarEvent,
+  // Phase 5: Rich Formatting
+  markdown, mathEquation,
+  // Phase 6: Bonus
+  weather, countdown, flashcards, pdfPreview,
+}
 
-/// A single content block in an AI response (either text or images)
+/// Location data for map content blocks
+class MapLocation {
+  final double latitude;
+  final double longitude;
+  final String? title;
+  final String? description;
+
+  MapLocation({
+    required this.latitude,
+    required this.longitude,
+    this.title,
+    this.description,
+  });
+}
+
+/// Data item for charts
+class ChartDataItem {
+  final String label;
+  final double value;
+  final Color? color;
+
+  ChartDataItem({required this.label, required this.value, this.color});
+}
+
+/// Data point for line charts
+class ChartDataPoint {
+  final double x;
+  final double y;
+  final String? label;
+
+  ChartDataPoint({required this.x, required this.y, this.label});
+}
+
+/// Progress item for progress bars
+class ProgressItem {
+  final String label;
+  final double value;
+  final double max;
+  final Color? color;
+
+  ProgressItem({required this.label, required this.value, this.max = 100, this.color});
+}
+
+/// Timeline event
+class TimelineEvent {
+  final String title;
+  final String? description;
+  final String date;
+  final Color? color;
+  final IconData? icon;
+
+  TimelineEvent({required this.title, this.description, required this.date, this.color, this.icon});
+}
+
+/// Quiz data
+class QuizData {
+  final String question;
+  final List<String> options;
+  final int correctIndex;
+
+  QuizData({required this.question, required this.options, required this.correctIndex});
+}
+
+/// Checklist item
+class ChecklistItem {
+  final String text;
+  final bool checked;
+
+  ChecklistItem({required this.text, this.checked = false});
+}
+
+/// Table data
+class TableData {
+  final List<String> headers;
+  final List<List<String>> rows;
+
+  TableData({required this.headers, required this.rows});
+}
+
+/// Info card for carousel
+class InfoCard {
+  final String title;
+  final String? subtitle;
+  final String? description;
+  final IconData? icon;
+  final Color? color;
+
+  InfoCard({required this.title, this.subtitle, this.description, this.icon, this.color});
+}
+
+/// Action button
+class ActionButton {
+  final String label;
+  final IconData icon;
+  final Color? color;
+  final String? action;
+
+  ActionButton({required this.label, required this.icon, this.color, this.action});
+}
+
+/// Contact data
+class ContactData {
+  final String name;
+  final String? role;
+  final String? phone;
+  final String? email;
+  final String? avatarUrl;
+
+  ContactData({required this.name, this.role, this.phone, this.email, this.avatarUrl});
+}
+
+/// Calendar event data
+class CalendarEventData {
+  final String title;
+  final String date;
+  final String? time;
+  final String? location;
+  final Color? color;
+
+  CalendarEventData({required this.title, required this.date, this.time, this.location, this.color});
+}
+
+/// Weather data
+class WeatherData {
+  final String location;
+  final double temperature;
+  final String condition;
+  final IconData icon;
+
+  WeatherData({required this.location, required this.temperature, required this.condition, required this.icon});
+}
+
+/// Countdown data
+class CountdownData {
+  final String title;
+  final DateTime targetDate;
+  final Color? color;
+
+  CountdownData({required this.title, required this.targetDate, this.color});
+}
+
+/// Flashcard data
+class FlashcardData {
+  final String front;
+  final String back;
+
+  FlashcardData({required this.front, required this.back});
+}
+
+/// A single content block in an AI response
 class AIContentBlock {
   final AIContentBlockType type;
+  // Basic content
   final String? text;
   final List<AIResponseImage>? images;
+  final String? code;
+  final String? language;
+  // Map
+  final MapLocation? mapCenter;
+  final List<MapLocation>? mapMarkers;
+  final double? mapZoom;
+  // Charts
+  final List<ChartDataItem>? chartData;
+  final List<ChartDataPoint>? lineData;
+  final String? chartTitle;
+  // Progress
+  final List<ProgressItem>? progressItems;
+  // Timeline
+  final List<TimelineEvent>? timelineEvents;
+  // Quiz
+  final QuizData? quizData;
+  // Checklist
+  final List<ChecklistItem>? checklistItems;
+  // Collapsible
+  final String? collapsibleTitle;
+  final String? collapsibleContent;
+  // Table
+  final TableData? tableData;
+  // Carousel
+  final List<InfoCard>? carouselItems;
+  // Media
+  final String? mediaUrl;
+  final String? mediaTitle;
+  final Duration? mediaDuration;
+  final String? thumbnailUrl;
+  // Actions
+  final List<ActionButton>? actionButtons;
+  // Contact
+  final ContactData? contactData;
+  // Calendar
+  final CalendarEventData? eventData;
+  // Weather
+  final WeatherData? weatherData;
+  // Countdown
+  final CountdownData? countdownData;
+  // Flashcards
+  final List<FlashcardData>? flashcards;
+  // Markdown/Math
+  final String? markdownContent;
+  final String? mathEquation;
 
-  AIContentBlock.text(this.text)
-      : type = AIContentBlockType.text,
-        images = null;
+  // Constructors for each type
+  AIContentBlock.text(this.text) : type = AIContentBlockType.text, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
 
-  AIContentBlock.images(this.images)
-      : type = AIContentBlockType.images,
-        text = null;
+  AIContentBlock.images(this.images) : type = AIContentBlockType.images, text = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.code(this.code, {this.language = 'dart'}) : type = AIContentBlockType.code, text = null, images = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.map({required this.mapCenter, this.mapMarkers, this.mapZoom = 15.0}) : type = AIContentBlockType.map, text = null, images = null, code = null, language = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.barChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.barChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.pieChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.pieChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.lineChart({required this.lineData, this.chartTitle}) : type = AIContentBlockType.lineChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.radarChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.radarChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.progressBars({required this.progressItems, this.chartTitle}) : type = AIContentBlockType.progressBars, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.timeline({required this.timelineEvents, this.chartTitle}) : type = AIContentBlockType.timeline, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.quiz({required this.quizData}) : type = AIContentBlockType.quiz, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.checklist({required this.checklistItems, this.chartTitle}) : type = AIContentBlockType.checklist, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.collapsible({required this.collapsibleTitle, required this.collapsibleContent}) : type = AIContentBlockType.collapsible, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.dataTable({required this.tableData, this.chartTitle}) : type = AIContentBlockType.dataTable, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.carousel({required this.carouselItems, this.chartTitle}) : type = AIContentBlockType.carousel, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.audioPlayer({required this.mediaUrl, this.mediaTitle, this.mediaDuration}) : type = AIContentBlockType.audioPlayer, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.videoPlayer({required this.mediaUrl, this.mediaTitle, this.thumbnailUrl}) : type = AIContentBlockType.videoPlayer, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.fileAttachment({required this.mediaUrl, required this.mediaTitle}) : type = AIContentBlockType.fileAttachment, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.voiceMessage({this.mediaDuration}) : type = AIContentBlockType.voiceMessage, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.quickActions({required this.actionButtons}) : type = AIContentBlockType.quickActions, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.contactCard({required this.contactData}) : type = AIContentBlockType.contactCard, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.calendarEvent({required this.eventData}) : type = AIContentBlockType.calendarEvent, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.markdown({required this.markdownContent}) : type = AIContentBlockType.markdown, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, mathEquation = null;
+
+  AIContentBlock.mathEquation({required this.mathEquation}) : type = AIContentBlockType.mathEquation, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null;
+
+  AIContentBlock.weather({required this.weatherData}) : type = AIContentBlockType.weather, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.countdown({required this.countdownData}) : type = AIContentBlockType.countdown, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.flashcards({required this.flashcards}) : type = AIContentBlockType.flashcards, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.pdfPreview({required this.mediaUrl, this.mediaTitle}) : type = AIContentBlockType.pdfPreview, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
 }
 
 // Swipeable fullscreen image gallery
