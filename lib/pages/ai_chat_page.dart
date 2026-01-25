@@ -340,49 +340,110 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     return blocks;
   }
 
-  /// Dev testing: Generate response with ALL content types
+  /// Dev testing: Generate response with ALL content types (with labels)
   List<AIContentBlock> _generateAllBlocksResponse() {
     return [
-      AIContentBlock.text('🎉 Here\'s a showcase of ALL AI response content types!'),
+      AIContentBlock.text('🎉 ALL AI Response Content Types Showcase\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━'),
       
-      // Charts
+      // Bar Chart
+      AIContentBlock.text('📊 BAR CHART  →  #bar'),
       AIContentBlock.barChart(chartData: [ChartDataItem(label: 'Mon', value: 85), ChartDataItem(label: 'Tue', value: 72), ChartDataItem(label: 'Wed', value: 90), ChartDataItem(label: 'Thu', value: 68)], chartTitle: 'Weekly Progress'),
+      
+      // Pie Chart
+      AIContentBlock.text('🥧 PIE CHART  →  #pie'),
       AIContentBlock.pieChart(chartData: [ChartDataItem(label: 'Study', value: 40), ChartDataItem(label: 'Class', value: 30), ChartDataItem(label: 'Break', value: 30)], chartTitle: 'Time Split'),
+      
+      // Line Chart
+      AIContentBlock.text('📈 LINE CHART  →  #line'),
       AIContentBlock.lineChart(lineData: [ChartDataPoint(x: 0, y: 60, label: 'Jan'), ChartDataPoint(x: 1, y: 75, label: 'Feb'), ChartDataPoint(x: 2, y: 85, label: 'Mar'), ChartDataPoint(x: 3, y: 90, label: 'Apr')], chartTitle: 'Grade Trend'),
+      
+      // Radar Chart
+      AIContentBlock.text('🎯 RADAR CHART  →  #radar'),
       AIContentBlock.radarChart(chartData: [ChartDataItem(label: 'Math', value: 80), ChartDataItem(label: 'Science', value: 70), ChartDataItem(label: 'English', value: 90), ChartDataItem(label: 'History', value: 65), ChartDataItem(label: 'Art', value: 85)], chartTitle: 'Skill Radar'),
+      
+      // Progress Bars
+      AIContentBlock.text('📶 PROGRESS BARS  →  #progress'),
       AIContentBlock.progressBars(progressItems: [ProgressItem(label: 'Assignment 1', value: 80), ProgressItem(label: 'Assignment 2', value: 45), ProgressItem(label: 'Project', value: 100)], chartTitle: 'Task Progress'),
       
       // Timeline
+      AIContentBlock.text('⏱️ TIMELINE  →  #timeline'),
       AIContentBlock.timeline(timelineEvents: [TimelineEvent(title: 'Class Start', date: '9:00 AM'), TimelineEvent(title: 'Lunch Break', date: '12:00 PM'), TimelineEvent(title: 'Lab Session', date: '2:00 PM')]),
       
-      // Interactive
+      // Quiz
+      AIContentBlock.text('❓ QUIZ  →  #quiz'),
       AIContentBlock.quiz(quizData: QuizData(question: 'What is 2 + 2?', options: ['3', '4', '5', '6'], correctIndex: 1)),
+      
+      // Checklist
+      AIContentBlock.text('✅ CHECKLIST  →  #checklist'),
       AIContentBlock.checklist(checklistItems: [ChecklistItem(text: 'Review notes'), ChecklistItem(text: 'Complete HW', checked: true), ChecklistItem(text: 'Study for exam')], chartTitle: 'To-Do'),
+      
+      // Collapsible
+      AIContentBlock.text('🔽 COLLAPSIBLE  →  (no keyword)'),
       AIContentBlock.collapsible(collapsibleTitle: 'Click to expand details', collapsibleContent: 'This is the hidden content that appears when you tap on the header! Great for FAQs or additional info.'),
+      
+      // Data Table
+      AIContentBlock.text('📋 DATA TABLE  →  #table'),
       AIContentBlock.dataTable(tableData: TableData(headers: ['Subject', 'Grade', 'Credits'], rows: [['Math', 'A', '4'], ['Physics', 'B+', '3'], ['English', 'A-', '3']]), chartTitle: 'Grades'),
+      
+      // Carousel
+      AIContentBlock.text('🎠 CARDS CAROUSEL  →  #cards'),
       AIContentBlock.carousel(carouselItems: [InfoCard(title: 'Physics 101', subtitle: 'Room 204', icon: Icons.science), InfoCard(title: 'Math 201', subtitle: 'Room 105', icon: Icons.calculate), InfoCard(title: 'English 101', subtitle: 'Room 302', icon: Icons.book)]),
       
-      // Media
+      // Audio Player
+      AIContentBlock.text('🎵 AUDIO PLAYER  →  #audio'),
       AIContentBlock.audioPlayer(mediaUrl: 'lecture.mp3', mediaTitle: 'Lecture Recording', mediaDuration: const Duration(minutes: 45)),
+      
+      // Video Player
+      AIContentBlock.text('🎬 VIDEO PLAYER  →  #video'),
       AIContentBlock.videoPlayer(mediaUrl: 'tutorial.mp4', mediaTitle: 'Video Tutorial'),
+      
+      // File Attachment
+      AIContentBlock.text('📎 FILE ATTACHMENT  →  (no keyword)'),
       AIContentBlock.fileAttachment(mediaUrl: 'notes.pdf', mediaTitle: 'Study_Notes.pdf'),
+      
+      // Voice Message
+      AIContentBlock.text('🎤 VOICE MESSAGE  →  (no keyword)'),
       AIContentBlock.voiceMessage(mediaDuration: const Duration(seconds: 32)),
       
-      // Actions
+      // Quick Actions
+      AIContentBlock.text('⚡ QUICK ACTIONS  →  #actions'),
       AIContentBlock.quickActions(actionButtons: [ActionButton(label: 'Calendar', icon: Icons.calendar_today, color: const Color(0xFF3B82F6)), ActionButton(label: 'Reminder', icon: Icons.alarm, color: const Color(0xFFF59E0B)), ActionButton(label: 'Share', icon: Icons.share, color: const Color(0xFF10B981))]),
+      
+      // Contact Card
+      AIContentBlock.text('👤 CONTACT CARD  →  #contact'),
       AIContentBlock.contactCard(contactData: ContactData(name: 'Prof. Johnson', role: 'Mathematics', phone: '+1234567890', email: 'prof.j@edu.com')),
+      
+      // Calendar Event
+      AIContentBlock.text('📅 CALENDAR EVENT  →  #event'),
       AIContentBlock.calendarEvent(eventData: CalendarEventData(title: 'Final Exam', date: 'Jan 28', time: '10:00 AM', location: 'Hall A')),
       
-      // Rich text
+      // Math Equation
+      AIContentBlock.text('🧮 MATH EQUATION  →  (no keyword)'),
       AIContentBlock.mathEquation(mathEquation: 'E = mc² + ∫f(x)dx'),
       
-      // Bonus
+      // Weather
+      AIContentBlock.text('🌤️ WEATHER WIDGET  →  #weather'),
       AIContentBlock.weather(weatherData: WeatherData(location: 'Campus', temperature: 24, condition: 'Sunny', icon: Icons.wb_sunny)),
+      
+      // Countdown
+      AIContentBlock.text('⏳ COUNTDOWN TIMER  →  #countdown'),
       AIContentBlock.countdown(countdownData: CountdownData(title: 'Exam in...', targetDate: DateTime.now().add(const Duration(days: 5)))),
+      
+      // Flashcards
+      AIContentBlock.text('🃏 FLASHCARDS  →  #flash'),
       AIContentBlock.flashcards(flashcards: [FlashcardData(front: 'H₂O', back: 'Water molecule'), FlashcardData(front: 'F = ma', back: 'Force = mass × acceleration')]),
+      
+      // PDF Preview
+      AIContentBlock.text('📄 PDF PREVIEW  →  (no keyword)'),
       AIContentBlock.pdfPreview(mediaUrl: 'syllabus.pdf', mediaTitle: 'Course Syllabus'),
       
-      AIContentBlock.text('That\'s all 24+ content types! Use individual keywords to test each one.'),
+      // Map (separate keyword)
+      AIContentBlock.text('🗺️ MAP  →  #map'),
+      
+      // Code Block (separate keyword)
+      AIContentBlock.text('💻 CODE BLOCK  →  #code'),
+      
+      AIContentBlock.text('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 24 content types!\nUse individual #keywords to test each one.'),
     ];
   }
 
