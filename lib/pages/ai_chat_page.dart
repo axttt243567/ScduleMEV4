@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:async';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -8,11 +9,18 @@ class AiChatPage extends StatefulWidget {
   State<AiChatPage> createState() => _AiChatPageState();
 }
 
-class _AiChatPageState extends State<AiChatPage> {
+class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = []; // Start with empty chat
   bool _isTyping = false;
+
+  // Attachment state
+  final List<PendingAttachment> _pendingAttachments = [];
+  bool _isRecording = false;
+  int _recordingDuration = 0;
+  Timer? _recordingTimer;
+  AnimationController? _recordingAnimController;
 
   // Lorem ipsum sentences for random AI responses
   static const _loremSentences = [
@@ -33,6 +41,15 @@ class _AiChatPageState extends State<AiChatPage> {
     'Donec ullamcorper nulla non metus auctor fringilla.',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _recordingAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+  }
+
   String _generateLoremIpsum() {
     final random = Random();
     final sentenceCount = random.nextInt(3) + 2; // 2-4 sentences
@@ -43,14 +60,56 @@ class _AiChatPageState extends State<AiChatPage> {
     return sentences.join(' ');
   }
 
+  // Sample placeholder image URLs for demo
+  List<AIResponseImage>? _generateSampleImages() {
+    final random = Random();
+    final shouldIncludeImages = random.nextBool(); // 50% chance
+    if (!shouldIncludeImages) return null;
+
+    final imageCount = random.nextInt(4) + 1; // 1-4 images
+    final sampleTitles = ['Schedule Overview', 'Class Analysis', 'Attendance Chart', 'Course Statistics'];
+    final sampleCaptions = ['Your weekly schedule breakdown', 'Performance analytics for this semester', 'Monthly attendance trends', 'Subject-wise distribution'];
+    
+    return List.generate(imageCount, (i) => AIResponseImage(
+      url: 'placeholder_${i + 1}', // Placeholder - will show demo image
+      title: sampleTitles[i % sampleTitles.length],
+      caption: sampleCaptions[i % sampleCaptions.length],
+    ));
+  }
+
   void _sendMessage() {
     final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _pendingAttachments.isEmpty) return;
+
+    // Create message with attachments
+    final attachmentsCopy = List<PendingAttachment>.from(_pendingAttachments);
+
+    // Check for dev testing keywords
+    int? devImageCount;
+    bool useMultiBlock = false;
+    
+    // Check for #imgN keyword
+    final imgRegex = RegExp(r'#img(\d+)', caseSensitive: false);
+    final imgMatch = imgRegex.firstMatch(text);
+    if (imgMatch != null) {
+      devImageCount = int.tryParse(imgMatch.group(1) ?? '');
+    }
+    
+    // Check for #multi keyword for multi-block testing
+    if (text.toLowerCase().contains('#multi')) {
+      useMultiBlock = true;
+    }
 
     // Add user message
     setState(() {
-      _messages.add(ChatMessage(isAi: false, sender: 'You', message: text));
+      _messages.add(ChatMessage(
+        isAi: false,
+        sender: 'You',
+        message: text.isNotEmpty ? text : _getAttachmentSummary(attachmentsCopy),
+        pendingAttachments: attachmentsCopy,
+      ));
       _messageController.clear();
+      _pendingAttachments.clear();
       _isTyping = true;
     });
 
@@ -62,15 +121,134 @@ class _AiChatPageState extends State<AiChatPage> {
       if (mounted) {
         setState(() {
           _isTyping = false;
-          _messages.add(ChatMessage(
-            isAi: true,
-            sender: 'Nexus AI',
-            message: _generateLoremIpsum(),
-          ));
+          
+          if (useMultiBlock) {
+            // Multi-block response with alternating text and images
+            _messages.add(ChatMessage(
+              isAi: true,
+              sender: 'Nexus AI',
+              message: '', // Not used when contentBlocks is provided
+              contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3),
+            ));
+          } else {
+            // Standard response (backward compatible)
+            _messages.add(ChatMessage(
+              isAi: true,
+              sender: 'Nexus AI',
+              message: _generateLoremIpsum(),
+              images: devImageCount != null 
+                  ? _generateTestImages(devImageCount) 
+                  : _generateSampleImages(),
+            ));
+          }
         });
         _scrollToBottom();
       }
     });
+  }
+
+  /// Dev testing: Generate multi-block response with text and images in order
+  List<AIContentBlock> _generateMultiBlockResponse(int imageCount) {
+    final blocks = <AIContentBlock>[];
+    final random = Random();
+    
+    // First text block
+    blocks.add(AIContentBlock.text(_generateLoremIpsum()));
+    
+    // First image set (half of requested images)
+    final firstImageCount = (imageCount / 2).ceil();
+    if (firstImageCount > 0) {
+      blocks.add(AIContentBlock.images(_generateTestImages(firstImageCount)));
+    }
+    
+    // Second text block
+    blocks.add(AIContentBlock.text(_generateLoremIpsum()));
+    
+    // Second image set (remaining images)
+    final secondImageCount = imageCount - firstImageCount;
+    if (secondImageCount > 0) {
+      blocks.add(AIContentBlock.images(_generateTestImages(secondImageCount)));
+    }
+    
+    // Third text block (conclusion)
+    if (random.nextBool()) {
+      blocks.add(AIContentBlock.text(_generateLoremIpsum()));
+    }
+    
+    return blocks;
+  }
+
+  /// Dev testing: Generate exact number of images for #imgN keyword
+  List<AIResponseImage>? _generateTestImages(int count) {
+    if (count <= 0) return null;
+    
+    final sampleTitles = ['Schedule Overview', 'Class Analysis', 'Attendance Chart', 'Course Statistics', 'Grade Report', 'Study Plan', 'Exam Timeline', 'Notes Summary'];
+    final sampleCaptions = ['Your weekly schedule breakdown', 'Performance analytics for this semester', 'Monthly attendance trends', 'Subject-wise distribution', 'Term grade overview', 'Weekly study goals', 'Upcoming exam dates', 'Lecture notes compilation'];
+    
+    return List.generate(count, (i) => AIResponseImage(
+      url: 'test_image_${i + 1}',
+      title: sampleTitles[i % sampleTitles.length],
+      caption: sampleCaptions[i % sampleCaptions.length],
+    ));
+  }
+
+  String _getAttachmentSummary(List<PendingAttachment> attachments) {
+    if (attachments.isEmpty) return '';
+    final types = attachments.map((a) => a.type.name).toSet().join(', ');
+    return 'Sent ${attachments.length} attachment(s): $types';
+  }
+
+  void _addAttachment(AttachmentType type, String name) {
+    setState(() {
+      _pendingAttachments.add(PendingAttachment(
+        type: type,
+        name: name,
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      ));
+    });
+  }
+
+  void _removeAttachment(String id) {
+    setState(() {
+      _pendingAttachments.removeWhere((a) => a.id == id);
+    });
+  }
+
+  void _startRecording() {
+    setState(() {
+      _isRecording = true;
+      _recordingDuration = 0;
+    });
+    _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _recordingDuration++;
+      });
+    });
+  }
+
+  void _stopRecording() {
+    _recordingTimer?.cancel();
+    final duration = _recordingDuration;
+    setState(() {
+      _isRecording = false;
+      _recordingDuration = 0;
+    });
+    // Add voice recording as attachment
+    _addAttachment(AttachmentType.voice, 'Voice (${_formatDuration(duration)})');
+  }
+
+  void _cancelRecording() {
+    _recordingTimer?.cancel();
+    setState(() {
+      _isRecording = false;
+      _recordingDuration = 0;
+    });
+  }
+
+  String _formatDuration(int seconds) {
+    final mins = seconds ~/ 60;
+    final secs = seconds % 60;
+    return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   void _scrollToBottom() {
@@ -89,8 +267,11 @@ class _AiChatPageState extends State<AiChatPage> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _recordingTimer?.cancel();
+    _recordingAnimController?.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1102,30 +1283,48 @@ class _AiChatPageState extends State<AiChatPage> {
                   ),
                 ),
               ),
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75,
-                ),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF16161E),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(4),
+              // New: Render content blocks if available
+              if (message.contentBlocks != null && message.contentBlocks!.isNotEmpty) ...[
+                ...message.contentBlocks!.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final block = entry.value;
+                  return Padding(
+                    padding: EdgeInsets.only(top: index > 0 ? 10 : 0),
+                    child: _buildContentBlock(block),
+                  );
+                }),
+              ] else ...[
+                // Fallback to old behavior
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
                   ),
-                  border: Border.all(color: const Color(0xFF27272A)),
-                ),
-                child: Text(
-                  message.message,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                    height: 1.4,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16161E),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                      bottomLeft: Radius.circular(4),
+                    ),
+                    border: Border.all(color: const Color(0xFF27272A)),
+                  ),
+                  child: Text(
+                    message.message,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      height: 1.4,
+                    ),
                   ),
                 ),
-              ),
+                // AI Response Images Gallery (old behavior)
+                if (message.images != null && message.images!.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  _buildImageGallery(message.images!),
+                ],
+              ],
               // Attachment if exists
               if (message.attachment != null) ...[
                 const SizedBox(height: 8),
@@ -1142,6 +1341,275 @@ class _AiChatPageState extends State<AiChatPage> {
       ],
     );
   }
+
+  Widget _buildContentBlock(AIContentBlock block) {
+    if (block.type == AIContentBlockType.text && block.text != null) {
+      return Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+            bottomRight: Radius.circular(16),
+            bottomLeft: Radius.circular(4),
+          ),
+          border: Border.all(color: const Color(0xFF27272A)),
+        ),
+        child: Text(
+          block.text!,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.white,
+            height: 1.4,
+          ),
+        ),
+      );
+    } else if (block.type == AIContentBlockType.images && block.images != null) {
+      return _buildImageGallery(block.images!);
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildImageGallery(List<AIResponseImage> images) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth * 0.75;
+
+    // Horizontal scrollable image gallery
+    return Container(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      height: 160,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: images.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          return _buildHorizontalGalleryImage(images[index], allImages: images, index: index);
+        },
+      ),
+    );
+  }
+
+  Widget _buildHorizontalGalleryImage(AIResponseImage image, {List<AIResponseImage>? allImages, int index = 0}) {
+    return GestureDetector(
+      onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+      child: Container(
+        width: 140,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF27272A)),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF3B82F6).withOpacity(0.25),
+              const Color(0xFF8B5CF6).withOpacity(0.25),
+            ],
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.25), size: 36),
+            if (image.title != null)
+              Positioned(
+                bottom: 8,
+                left: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    image.title!,
+                    style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w500),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            // Image count indicator on first image
+            if (index == 0 && allImages != null && allImages.length > 1)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '1/${allImages.length}',
+                    style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildSingleImage(AIResponseImage image, double maxWidth, {List<AIResponseImage>? allImages, int index = 0}) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image
+          GestureDetector(
+            onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              child: Container(
+                height: 180,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF3B82F6).withOpacity(0.3),
+                      const Color(0xFF8B5CF6).withOpacity(0.3),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.3), size: 48),
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.zoom_out_map, color: Colors.white, size: 14),
+                            SizedBox(width: 4),
+                            Text('View', style: TextStyle(color: Colors.white, fontSize: 11)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Title & Caption
+          if (image.title != null || image.caption != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Color(0xFF16161E),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (image.title != null)
+                    Text(
+                      image.title!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  if (image.caption != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      image.caption!,
+                      style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGalleryImage(AIResponseImage image, double height, {List<AIResponseImage>? allImages, int index = 0}) {
+    return GestureDetector(
+      onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFF27272A)),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF3B82F6).withOpacity(0.25),
+              const Color(0xFF8B5CF6).withOpacity(0.25),
+            ],
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.25), size: 28),
+            if (image.title != null)
+              Positioned(
+                bottom: 6,
+                left: 6,
+                right: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    image.title!,
+                    style: const TextStyle(fontSize: 9, color: Colors.white),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(AIResponseImage image, {List<AIResponseImage>? allImages, int initialIndex = 0}) {
+    final images = allImages ?? [image];
+    final startIndex = allImages != null ? initialIndex : 0;
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (context) => _FullScreenImageGallery(
+        images: images,
+        initialIndex: startIndex,
+      ),
+    );
+  }
+
+
+
 
   Widget _buildMessageActions(ChatMessage message) {
     return Row(
@@ -1259,6 +1727,21 @@ class _AiChatPageState extends State<AiChatPage> {
                   ),
                 ),
               ),
+              // Pending Attachments display
+              if (message.pendingAttachments != null && message.pendingAttachments!.isNotEmpty)
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                  ),
+                  margin: const EdgeInsets.only(bottom: 6),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    alignment: WrapAlignment.end,
+                    children: message.pendingAttachments!.map((att) => _buildSentAttachmentChip(att)).toList(),
+                  ),
+                ),
+              // Message text
               Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -1299,6 +1782,52 @@ class _AiChatPageState extends State<AiChatPage> {
       ],
     );
   }
+
+  Widget _buildSentAttachmentChip(PendingAttachment attachment) {
+    IconData icon;
+    Color color;
+    switch (attachment.type) {
+      case AttachmentType.image:
+        icon = Icons.image_rounded;
+        color = const Color(0xFF3B82F6);
+        break;
+      case AttachmentType.file:
+        icon = Icons.insert_drive_file_rounded;
+        color = const Color(0xFF8B5CF6);
+        break;
+      case AttachmentType.voice:
+        icon = Icons.mic_rounded;
+        color = const Color(0xFF10B981);
+        break;
+      case AttachmentType.camera:
+        icon = Icons.camera_alt_rounded;
+        color = const Color(0xFF3B82F6);
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(width: 6),
+          Text(
+            attachment.name.length > 15 
+                ? '${attachment.name.substring(0, 12)}...' 
+                : attachment.name,
+            style: const TextStyle(fontSize: 11, color: Colors.white70),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildAttachment(ChatAttachment attachment) {
     return Container(
@@ -1399,85 +1928,406 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   Widget _buildInputBar() {
+    // If recording, show recording UI instead
+    if (_isRecording) {
+      return _buildRecordingBar();
+    }
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       decoration: BoxDecoration(
         color: const Color(0xFF0A0A0C).withOpacity(0.95),
         border: Border(
           top: BorderSide(color: const Color(0xFF27272A), width: 1),
         ),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Add Button
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF16161E),
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF27272A)),
-            ),
-            child: Icon(Icons.add, color: Colors.grey[400], size: 22),
-          ),
-          const SizedBox(width: 10),
-          // Text Input
-          Expanded(
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFF16161E),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFF27272A)),
+          // Pending Attachments Preview
+          if (_pendingAttachments.isNotEmpty)
+            Container(
+              height: 80,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _pendingAttachments.length,
+                itemBuilder: (context, index) {
+                  final attachment = _pendingAttachments[index];
+                  return _buildAttachmentPreview(attachment);
+                },
               ),
-              child: Row(
-                children: [
-                  Expanded(
+            ),
+          // Input Row
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, _pendingAttachments.isEmpty ? 12 : 8, 16, 24),
+            child: Row(
+              children: [
+                // Add Button - Opens Attachment Options
+                GestureDetector(
+                  onTap: () => _showAttachmentSheet(),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF16161E),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF27272A)),
+                    ),
+                    child: Icon(Icons.add, color: Colors.grey[400], size: 22),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Text Input
+                Expanded(
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF16161E),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: const Color(0xFF27272A)),
+                    ),
                     child: TextField(
                       controller: _messageController,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
-                        hintText: 'Ask anything about your courses...',
-                        hintStyle: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                        hintText: _pendingAttachments.isNotEmpty 
+                            ? 'Add a message...' 
+                            : 'Ask anything about your courses...',
+                        hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(width: 10),
+                // Send Button
+                GestureDetector(
+                  onTap: _sendMessage,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3B82F6),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3B82F6).withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.send, color: Colors.white, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                ],
+  Widget _buildAttachmentPreview(PendingAttachment attachment) {
+    IconData icon;
+    Color color;
+    switch (attachment.type) {
+      case AttachmentType.image:
+        icon = Icons.image_rounded;
+        color = const Color(0xFF3B82F6);
+        break;
+      case AttachmentType.file:
+        icon = Icons.insert_drive_file_rounded;
+        color = const Color(0xFF8B5CF6);
+        break;
+      case AttachmentType.voice:
+        icon = Icons.mic_rounded;
+        color = const Color(0xFF10B981);
+        break;
+      case AttachmentType.camera:
+        icon = Icons.camera_alt_rounded;
+        color = const Color(0xFF3B82F6);
+        break;
+    }
+
+    return Container(
+      width: 100,
+      margin: const EdgeInsets.only(right: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Stack(
+        children: [
+          // Content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Text(
+                    attachment.name,
+                    style: const TextStyle(fontSize: 9, color: Colors.white70),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Remove Button
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => _removeAttachment(attachment.id),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF27272A),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, color: Colors.white70, size: 12),
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          // Send Button
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecordingBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0A0C).withOpacity(0.95),
+        border: Border(
+          top: BorderSide(color: const Color(0xFF10B981).withOpacity(0.5), width: 2),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Cancel Button
           GestureDetector(
-            onTap: _sendMessage,
+            onTap: _cancelRecording,
             child: Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF3B82F6),
+                color: const Color(0xFF27272A),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, color: Colors.white70, size: 22),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Recording Indicator
+          Expanded(
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0xFF10B981).withOpacity(0.5)),
+              ),
+              child: Row(
+                children: [
+                  AnimatedBuilder(
+                    animation: _recordingAnimController!,
+                    builder: (context, child) {
+                      return Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Color.lerp(const Color(0xFF10B981), const Color(0xFFEF4444), _recordingAnimController!.value),
+                          shape: BoxShape.circle,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Recording... ${_formatDuration(_recordingDuration)}',
+                    style: const TextStyle(color: Color(0xFF10B981), fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Stop & Send Button
+          GestureDetector(
+            onTap: _stopRecording,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    color: const Color(0xFF10B981).withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: const Icon(Icons.send, color: Colors.white, size: 20),
+              child: const Icon(Icons.check, color: Colors.white, size: 22),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+
+  // ========== ATTACHMENT OPTIONS BOTTOM SHEET ==========
+  void _showAttachmentSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF0A0A0C),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(child: _buildAttachmentOption(Icons.camera_alt_rounded, 'Camera', const Color(0xFF3B82F6), () {
+                  Navigator.pop(context);
+                  _addAttachment(AttachmentType.camera, 'Photo_${DateTime.now().millisecondsSinceEpoch}.jpg');
+                })),
+                const SizedBox(width: 12),
+                Expanded(child: _buildAttachmentOption(Icons.folder_rounded, 'File', const Color(0xFF8B5CF6), () {
+                  Navigator.pop(context);
+                  _showFilePickerSheet();
+                })),
+                const SizedBox(width: 12),
+                Expanded(child: _buildAttachmentOption(Icons.mic_rounded, 'Voice', const Color(0xFF10B981), () {
+                  Navigator.pop(context);
+                  _startRecording();
+                })),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFilePickerSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF0A0A0C),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 20),
+            const Text('Choose File Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: _buildFileTypeOption(Icons.image_rounded, 'Images', const Color(0xFF3B82F6), () {
+                  Navigator.pop(context);
+                  _addAttachment(AttachmentType.image, 'image_${DateTime.now().millisecondsSinceEpoch}.png');
+                })),
+                const SizedBox(width: 12),
+                Expanded(child: _buildFileTypeOption(Icons.picture_as_pdf_rounded, 'PDF', const Color(0xFFEF4444), () {
+                  Navigator.pop(context);
+                  _addAttachment(AttachmentType.file, 'document.pdf');
+                })),
+                const SizedBox(width: 12),
+                Expanded(child: _buildFileTypeOption(Icons.insert_drive_file_rounded, 'Other', const Color(0xFFF59E0B), () {
+                  Navigator.pop(context);
+                  _addAttachment(AttachmentType.file, 'file_${DateTime.now().millisecondsSinceEpoch}.txt');
+                })),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileTypeOption(IconData icon, String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildAttachmentOption(IconData icon, String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 10),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+          ],
+        ),
       ),
     );
   }
@@ -1488,12 +2338,18 @@ class ChatMessage {
   final String sender;
   final String message;
   final ChatAttachment? attachment;
+  final List<PendingAttachment>? pendingAttachments;
+  final List<AIResponseImage>? images;
+  final List<AIContentBlock>? contentBlocks; // New: multiple text/image blocks in order
 
   ChatMessage({
     required this.isAi,
     required this.sender,
     required this.message,
     this.attachment,
+    this.pendingAttachments,
+    this.images,
+    this.contentBlocks,
   });
 }
 
@@ -1507,4 +2363,242 @@ class ChatAttachment {
     required this.fileSize,
     required this.fileType,
   });
+}
+
+enum AttachmentType { image, file, voice, camera }
+
+class PendingAttachment {
+  final String id;
+  final AttachmentType type;
+  final String name;
+
+  PendingAttachment({
+    required this.id,
+    required this.type,
+    required this.name,
+  });
+}
+
+class AIResponseImage {
+  final String url;
+  final String? caption;
+  final String? title;
+
+  AIResponseImage({
+    required this.url,
+    this.caption,
+    this.title,
+  });
+}
+
+/// Content block types for multi-part AI responses
+enum AIContentBlockType { text, images }
+
+/// A single content block in an AI response (either text or images)
+class AIContentBlock {
+  final AIContentBlockType type;
+  final String? text;
+  final List<AIResponseImage>? images;
+
+  AIContentBlock.text(this.text)
+      : type = AIContentBlockType.text,
+        images = null;
+
+  AIContentBlock.images(this.images)
+      : type = AIContentBlockType.images,
+        text = null;
+}
+
+// Swipeable fullscreen image gallery
+class _FullScreenImageGallery extends StatefulWidget {
+  final List<AIResponseImage> images;
+  final int initialIndex;
+
+  const _FullScreenImageGallery({
+    required this.images,
+    this.initialIndex = 0,
+  });
+
+  @override
+  State<_FullScreenImageGallery> createState() => _FullScreenImageGalleryState();
+}
+
+class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentImage = widget.images[_currentIndex];
+    
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header with title/caption
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF27272A),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 20),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currentImage.title ?? 'Image ${_currentIndex + 1}',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                        ),
+                        if (currentImage.caption != null)
+                          Text(
+                            currentImage.caption!,
+                            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Page indicator text
+                  if (widget.images.length > 1)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF27272A),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${_currentIndex + 1}/${widget.images.length}',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            // Swipeable images
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: widget.images.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return _buildImagePage(widget.images[index]);
+                },
+              ),
+            ),
+            // Page indicator dots
+            if (widget.images.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(widget.images.length, (index) {
+                    return Container(
+                      width: _currentIndex == index ? 24 : 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      decoration: BoxDecoration(
+                        color: _currentIndex == index 
+                            ? const Color(0xFF3B82F6) 
+                            : const Color(0xFF27272A),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            // Swipe hint for multiple images
+            if (widget.images.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.swipe, color: Colors.grey[600], size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Swipe to view more',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePage(AIResponseImage image) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF3B82F6).withOpacity(0.4),
+                const Color(0xFF8B5CF6).withOpacity(0.4),
+              ],
+            ),
+            border: Border.all(color: const Color(0xFF27272A)),
+          ),
+          child: AspectRatio(
+            aspectRatio: 4 / 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.4), size: 64),
+                const SizedBox(height: 16),
+                Text(
+                  image.title ?? 'Demo Image',
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                ),
+                if (image.caption != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    image.caption!,
+                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
