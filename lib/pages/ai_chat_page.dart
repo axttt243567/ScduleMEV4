@@ -1633,37 +1633,12 @@ print(f"Average: {avg}")''', 'python'),
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // AI Avatar
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: const Color(0xFF3B82F6).withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.auto_awesome,
-            color: Color(0xFF3B82F6),
-            size: 16,
-          ),
-        ),
         const SizedBox(width: 10),
         // Message Content
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 4, bottom: 4),
-                child: Text(
-                  message.sender,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ),
               // New: Render content blocks if available
               if (message.contentBlocks != null && message.contentBlocks!.isNotEmpty) ...[
                 ...message.contentBlocks!.asMap().entries.map((entry) {
@@ -3038,17 +3013,6 @@ print(f"Average: {avg}")''', 'python'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 4, bottom: 4),
-                child: Text(
-                  message.sender,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ),
               // Pending Attachments display
               if (message.pendingAttachments != null && message.pendingAttachments!.isNotEmpty)
                 Container(
@@ -3221,7 +3185,7 @@ print(f"Average: {avg}")''', 'python'),
         ),
         const SizedBox(width: 8),
         Text(
-          'Nexus is processing...',
+          'Thinking...',
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w500,
