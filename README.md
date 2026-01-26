@@ -9,14 +9,14 @@ A premium Flutter-based scheduling and productivity application for students, fe
 - **Home Dashboard** — Daily overview, quick actions, and widgets
 - **Notes** — Document storage with PDFs, images, audio, and video
 - **Attendance Tracker** — Track and visualize attendance records
-- **AI Chat (Nexus AI)** — Advanced AI assistant with rich responses
+- **AI Chat** — Advanced AI assistant with rich responses
 - **Settings** — App configuration and preferences
 
 ---
 
 ## AI Chat - Content Block System
 
-The Nexus AI chat features a powerful **multi-block response system** supporting 24+ content types. The AI can respond with charts, interactive elements, media, and more.
+The AI chat features a powerful **multi-block response system** supporting 24+ content types. The AI can respond with charts, interactive elements, media, and more.
 
 ### Data Visualization
 
