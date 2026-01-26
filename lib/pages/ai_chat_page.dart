@@ -136,6 +136,11 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     bool useCountdown = text.toLowerCase().contains('#countdown');
     bool useFlash = text.toLowerCase().contains('#flash');
     bool useActions = text.toLowerCase().contains('#actions');
+    
+    // Check for new paper/note styles
+    bool useNote = text.toLowerCase().contains('#note');
+    bool usePaper = text.toLowerCase().contains('#paper');
+    bool useLetter = text.toLowerCase().contains('#letter');
 
     // Add user message
     setState(() {
@@ -209,6 +214,12 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCodeBlockResponse()));
           } else if (useMultiBlock) {
             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3)));
+          } else if (useNote) {
+             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.note(text.replaceAll('#note', '').trim().isEmpty ? 'Don\'t forget to study for the exam tomorrow!' : text.replaceAll('#note', '').trim())]));
+          } else if (usePaper) {
+             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.paper(text.replaceAll('#paper', '').trim().isEmpty ? 'Chapter 1 Notes:\n\n1. Introduction to Physics\n2. Newton\'s Laws\n3. Kinetic Energy' : text.replaceAll('#paper', '').trim())]));
+          } else if (useLetter) {
+             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.letter(text.replaceAll('#letter', '').trim().isEmpty ? 'Dear Student,\n\nWe are pleased to inform you that your application for the advanced research program has been accepted.\n\nSincerely,\nThe Dean' : text.replaceAll('#letter', '').trim())]));
           } else {
             // Standard response (backward compatible)
             _messages.add(ChatMessage(
@@ -345,6 +356,16 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     return [
       AIContentBlock.text('🎉 ALL AI Response Content Types Showcase\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━'),
       
+      // New Styles
+      AIContentBlock.text('📝 NOTE BLOCK  →  #note'),
+      AIContentBlock.note("This is a sticky note. Don't forget to buy milk!"),
+      
+      AIContentBlock.text('📄 PAPER BLOCK  →  #paper'),
+      AIContentBlock.paper("This is a lined paper block.\nIt looks like a notebook page."),
+      
+      AIContentBlock.text('✉️ LETTER BLOCK  →  #letter'),
+      AIContentBlock.letter("My Dearest Friend,\n\nI hope this letter finds you well. The weather here has been quite peculiar lately...\n\nSincerely,\nNexus AI"),
+
       // Bar Chart
       AIContentBlock.text('📊 BAR CHART  →  #bar'),
       AIContentBlock.barChart(chartData: [ChartDataItem(label: 'Mon', value: 85), ChartDataItem(label: 'Tue', value: 72), ChartDataItem(label: 'Wed', value: 90), ChartDataItem(label: 'Thu', value: 68)], chartTitle: 'Weekly Progress'),
@@ -442,8 +463,20 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
       
       // Code Block (separate keyword)
       AIContentBlock.text('💻 CODE BLOCK  →  #code'),
+
+      // Note Block
+      AIContentBlock.text('📝 STICKY NOTE → #note'),
+      AIContentBlock.note('Don\'t forget: Exam tomorrow at 9 AM!'),
+
+      // Paper Block
+      AIContentBlock.text('📓 LINED PAPER → #paper'),
+      AIContentBlock.paper('History Notes:\n- World War II started in 1939\n- Ended in 1945\n- Major powers: Allies vs Axis'),
+
+      // Letter Block
+      AIContentBlock.text('📜 VINTAGE LETTER → #letter'),
+      AIContentBlock.letter('Dear Student,\n\nCongratulations on your excellent performance this semester. Keep up the great work!\n\nBest,\nDean of Students'),
       
-      AIContentBlock.text('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 24 content types!\nUse individual #keywords to test each one.'),
+      AIContentBlock.text('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 27 content types!\nUse individual #keywords to test each one.'),
     ];
   }
 
@@ -1778,6 +1811,12 @@ print(f"Average: {avg}")''', 'python'),
       return _buildFlashcards(block.flashcards!);
     } else if (block.type == AIContentBlockType.pdfPreview && block.mediaUrl != null) {
       return _buildPdfPreview(block.mediaUrl!, block.mediaTitle);
+    } else if (block.type == AIContentBlockType.note && block.text != null) {
+      return _buildNote(block.text!);
+    } else if (block.type == AIContentBlockType.paper && block.text != null) {
+      return _buildPaper(block.text!);
+    } else if (block.type == AIContentBlockType.letter && block.text != null) {
+      return _buildLetter(block.text!);
     }
     return const SizedBox.shrink();
   }
@@ -2457,6 +2496,202 @@ print(f"Average: {avg}")''', 'python'),
       const SizedBox(height: 4),
       Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
     ]);
+  }
+
+  Widget _buildNote(String text) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF08A), // Yellow sticky note
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(2),
+          topRight: Radius.circular(2),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(4, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pin visual
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444), // Red pin
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF422006), // Dark brown text
+              fontFamily: 'Cursive', // Fallback to cursive if specific font not available
+              fontStyle: FontStyle.italic,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaper(String text) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC), // Off-white
+        borderRadius: BorderRadius.circular(2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
+          stops: const [0.95, 1.0], // Slight curl effect at bottom
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Binding holes
+          Positioned(
+            left: -12,
+            top: 0,
+            bottom: 0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(3, (index) => Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0A0A0C), // Background color to simulate hole
+                  shape: BoxShape.circle,
+                ),
+              )),
+            ),
+          ),
+          // Vertical red margin line
+          Positioned(
+            left: 20,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 1,
+              color: const Color(0xFFFECACA).withOpacity(0.5),
+            ),
+          ),
+          // Content
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: const Color(0xFF334155),
+                  height: 1.8, // Line height to match lines
+                  shadows: [
+                    Shadow(offset: const Offset(0, 1), color: Colors.white.withOpacity(0.5)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLetter(String text) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5E6D3), // Parchment
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: const Color(0xFFD4C5A2), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        image: const DecorationImage(
+          image: NetworkImage('https://www.transparenttextures.com/patterns/aged-paper.png'), // Subtle texture attempt
+          repeat: ImageRepeat.repeat,
+          opacity: 0.1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Stamp/Seal (visual)
+          Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFB91C1C).withOpacity(0.6), width: 2),
+              ),
+              child: Center(
+                child: Icon(Icons.stars, color: const Color(0xFFB91C1C).withOpacity(0.6), size: 24),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF3F2E18), // Dark brown
+              fontFamily: 'Serif',
+              height: 1.6,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Text(
+              'Nexus AI',
+              style: TextStyle(
+                fontSize: 12,
+                color: const Color(0xFF3F2E18).withOpacity(0.6),
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // Helper for chart containers
@@ -3692,6 +3927,8 @@ enum AIContentBlockType {
   markdown, mathEquation,
   // Phase 6: Bonus
   weather, countdown, flashcards, pdfPreview,
+  // New Styles
+  note, paper, letter,
 }
 
 /// Location data for map content blocks
@@ -3897,6 +4134,12 @@ class AIContentBlock {
 
   // Constructors for each type
   AIContentBlock.text(this.text) : type = AIContentBlockType.text, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.note(this.text) : type = AIContentBlockType.note, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.paper(this.text) : type = AIContentBlockType.paper, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+
+  AIContentBlock.letter(this.text) : type = AIContentBlockType.letter, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
 
   AIContentBlock.images(this.images) : type = AIContentBlockType.images, text = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
 
