@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
@@ -164,6 +165,24 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     // Check for #textstyles (20 styles showcase)
     bool useTextStyles = text.toLowerCase().contains('#textstyles');
 
+    // Check for #lettervariants
+    bool useLetterVariants = text.toLowerCase().contains('#lettervariants');
+
+    // Check for #newletterstyles
+    bool useNewLetterStyles = text.toLowerCase().contains('#newletterstyles');
+
+    // Check for #morelettervariants
+    bool useMoreLetterVariants = text.toLowerCase().contains('#morelettervariants');
+
+    // Check for #playwritevariants
+    bool usePlaywriteVariants = text.toLowerCase().contains('#playwritevariants');
+
+    // Check for #codevariants
+    bool useCodeVariants = text.toLowerCase().contains('#codevariants');
+
+    // Check for #pycs
+    bool usePythonCheatsheet = text.toLowerCase().contains('#pycs');
+
     // Add user message
     setState(() {
       _messages.add(
@@ -230,6 +249,68 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
                 contentBlocks: _generateTextStylesResponse(),
               ),
             );
+          } else if (useLetterVariants) {
+             // #lettervariants - Show 10 variants
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateLetterVariantsResponse(),
+              ),
+            );
+          } else if (useNewLetterStyles) {
+            // #newletterstyles - Specific requested content
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateNewLetterStylesResponse(),
+              ),
+            );
+          } else if (useMoreLetterVariants) {
+             // #morelettervariants - Show 10 NEW variants (10-19)
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateMoreLetterVariantsResponse(),
+              ),
+            );
+          } else if (usePlaywriteVariants) {
+             // #playwritevariants - Show 30 Aesthetic Variants
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generatePlaywriteShowcase(),
+              ),
+            );
+          } else if (useCodeVariants) {
+             // #codevariants - Show 20 Code/IDE Variants
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateCodeVariantsShowcase(),
+              ),
+            );
+          } else if (usePythonCheatsheet) {
+            // #pycs - Python Cheatsheet (3 Varied Responses)
+            for (var blockList in _generatePythonCheatsheetResponse()) {
+               _messages.add(
+                ChatMessage(
+                  isAi: true,
+                  sender: 'Nexus AI',
+                  message: '',
+                  contentBlocks: blockList,
+                ),
+              );
+            }
           } else if (useLineChart) {
             _messages.add(
               ChatMessage(
@@ -1157,6 +1238,214 @@ while guess != secret_number:
     ];
   }
 
+  List<AIContentBlock> _generateLetterVariantsResponse() {
+    return [
+       AIContentBlock.text('Here are the 10 distinct Letter Block variants:', variant: 0),
+       
+       AIContentBlock.text('Variant 0: Standard (Default)'),
+       AIContentBlock.letter('This is the standard letter style. Simple, elegant, and timeless.', variant: 0),
+
+       AIContentBlock.text('Variant 1: Royal'),
+       AIContentBlock.letter('To His Majesty,\n\nWe are pleased to announce the arrival of the golden carriage.', variant: 1),
+
+       AIContentBlock.text('Variant 2: Love'),
+       AIContentBlock.letter('My Dearest,\n\nRoses are red, violets are blue, this letter style is pink for you.', variant: 2),
+
+       AIContentBlock.text('Variant 3: Ancient'),
+       AIContentBlock.letter('From the Archives:\n\nThis parchment dates back to the third era of the kingdom.', variant: 3),
+
+       AIContentBlock.text('Variant 4: Dark Mode'),
+       AIContentBlock.letter('Classified Protocol:\n\nOperation Nightfall is a go. Maintain radio silence.', variant: 4),
+
+       AIContentBlock.text('Variant 5: Cyber / Holographic'),
+       AIContentBlock.letter('// SYSTEM_MESSAGE\n\n> CONNECTION_ESTABLISHED\n> UPLOADING_DATA_PACKET...', variant: 5),
+
+       AIContentBlock.text('Variant 6: Formal / Diplomatic'),
+       AIContentBlock.letter('To Whom It May Concern,\n\nThis document certifies the agreement between the parties.', variant: 6),
+
+       AIContentBlock.text('Variant 7: Natural / Eco'),
+       AIContentBlock.letter('Nature Note:\n\nPlease recycle this paper after reading. Save the trees!', variant: 7),
+
+       AIContentBlock.text('Variant 8: Urgent / Redacted'),
+       AIContentBlock.letter('WARNING:\n\nThis message contains sensitive information. DO NOT SHARE.', variant: 8),
+
+       AIContentBlock.text('Variant 9: Magic / Mystic'),
+       AIContentBlock.letter('A Wizard\'s Scroll:\n\nThe stars align tonight for the great summoning.', variant: 9),
+    ];
+  }
+
+  List<AIContentBlock> _generateNewLetterStylesResponse() {
+    return [
+      AIContentBlock.text('🔥 ERROR 404 EXPLANATION (Variant 8 - Urgent/Redacted)'),
+      AIContentBlock.letter(
+        'ERROR 404: RESOURCE NOT FOUND\n\nThe requested URL was not found on this server. This implies a broken link or removed content.\n\nPlease verify your connection settings and check the destination path immediately. Do not ignore this critical system warning as data loss may occur.',
+        variant: 8,
+      ),
+
+      AIContentBlock.text('🌿 REDUCING CARBON EMISSIONS (Variant 7 - Natural/Eco)'),
+      AIContentBlock.letter(
+        'Towards a Greener Future:\n\nReducing carbon emissions is the defining challenge of our time, requiring a harmonious blend of individual responsibility and systemic change. We must aggressively transition from fossil fuels to renewable energy sources like wind, solar, and hydroelectric power. Simultaneously, protecting our existing forests and planting new ones is vital, as they serve as the planet\'s lungs, absorbing excess carbon dioxide.\n\nOn a personal level, we can contribute by reducing energy consumption, minimizing waste, and opting for sustainable transportation. Every small action—from recycling to choosing local produce—creates a ripple effect. Together, these efforts weave a cleaner, more resilient future for our planet.',
+        variant: 7,
+      ),
+
+      AIContentBlock.text('📜 FREEDOM OF SPEECH (Variant 6 - Formal/Diplomatic)'),
+      AIContentBlock.letter(
+        'Declaration on Freedom of Speech:\n\nFreedom of speech is a fundamental human right, serving as the cornerstone of a democratic society. It grants individuals the liberty to express their opinions, beliefs, and ideas without fear of government retaliation, censorship, or societal sanction. This freedom fosters an open marketplace of ideas where truth can emerge from debate and where diverse perspectives can coexist.\n\nHowever, this right is not absolute. It carries with it the responsibility to respect the rights and reputations of others. Speech that incites violence, defamation, or hatred is often subject to legal limitations to ensure the safety and cohesiveness of the community. Navigating these boundaries is a complex challenge for any nation.\n\nIn the digital age, the dialogue around free speech has evolved, extending into online spaces where information travels instantly. Protecting this right requires vigilant defense against suppression while acknowledging the need for civil discourse. Ultimately, freedom of speech empowers citizens to hold power accountable, advocate for change, and participate fully in the governance of their society.',
+        variant: 6,
+      ),
+    ];
+  }
+
+  List<AIContentBlock> _generateMoreLetterVariantsResponse() {
+    return [
+      AIContentBlock.text('🎨 10 NEW HANDWRITTEN & PLAYFUL VARIANTS'),
+      
+      AIContentBlock.text('Variant 10: Playful Sticky'),
+      AIContentBlock.letter('Don\'t forget the meeting at 3 PM! Bring donuts! 🍩', variant: 10),
+
+      AIContentBlock.text('Variant 11: Academic Notebook'),
+      AIContentBlock.letter('Physics Notes:\nE = mc² implies that mass and energy are interchangeable. fascinating!', variant: 11),
+
+      AIContentBlock.text('Variant 12: Dev Sketch'),
+      AIContentBlock.letter('// TODO: Refactor the login module.\n// It\'s a bit messy right now.', variant: 12),
+
+      AIContentBlock.text('Variant 13: Corporate Note'),
+      AIContentBlock.letter('To the Board:\n\nQ3 projections look promising. We should proceed with the merger.', variant: 13),
+
+      AIContentBlock.text('Variant 14: Learner Flashcard'),
+      AIContentBlock.letter('VOCABULARY:\n\nSerendipity (n.)\nThe occurrence of events by chance in a happy way.', variant: 14),
+
+      AIContentBlock.text('Variant 15: Tech Blueprint'),
+      AIContentBlock.letter('ARCHITECTURE DRAFT:\n\nClient -> API Gateway -> Microservices -> Database', variant: 15),
+
+      AIContentBlock.text('Variant 16: Journal Entry'),
+      AIContentBlock.letter('Dear Diary,\n\nToday I learned about Flutter animations. They are smoother than I expected.', variant: 16),
+
+      AIContentBlock.text('Variant 17: Code Review'),
+      AIContentBlock.letter('CRITICAL:\n\nLine 42 causes a memory leak. Please fix before deploying.', variant: 17),
+
+      AIContentBlock.text('Variant 18: Brainstorming'),
+      AIContentBlock.letter('IDEAS:\n- App for cats\n- AI that writes poetry\n- Uber for pigeons', variant: 18),
+
+      AIContentBlock.text('Variant 19: Love Note (Modern)'),
+      AIContentBlock.letter('Thinking of you...\n\nCan\'t wait to see you this weekend! ❤️', variant: 19),
+    ];
+  }
+
+  List<AIContentBlock> _generatePlaywriteShowcase() {
+    return [
+      AIContentBlock.text('🖋️ PLAYWRITE AESTHETIC COLLECTION\nTwo-font combinations • Institutional, Academic, Study, Programming'),
+      
+      // --- GROUP 1: SHORT (10-20 words) ---
+      AIContentBlock.text('SHORT FORM (10-20 Words)'),
+      
+      AIContentBlock.letter('UNIVERSITY NOTICE\n\nLibrary hours extended until midnight for finals week. Study hard!', variant: 20),
+      AIContentBlock.letter('CS101 REMINDER\n\nDon\'t forget to submit your Python assignment by Friday 11:59 PM.', variant: 21),
+      AIContentBlock.letter('LAB SAFETY\n\nSafety goggles must be worn at all times near chemicals. No exceptions.', variant: 22),
+      AIContentBlock.letter('DEAN\'S LIST\n\nCongratulations on achieving a 4.0 GPA this semester. Keep it up!', variant: 23),
+      AIContentBlock.letter('HACKATHON ALERT\n\nJoin us this weekend for 48 hours of coding, pizza, and prizes.', variant: 24),
+      AIContentBlock.letter('STUDY GROUP\n\nMeeting at the quad @ 2 PM. Bringing flashcards for Biology.', variant: 25),
+      AIContentBlock.letter('SYSADMIN LOG\n\nServer maintenance scheduled for 3 AM. Expect brief downtime.', variant: 26),
+      AIContentBlock.letter('RESEARCH GRANT\n\nYour proposal for "AI in Education" has been approved for funding.', variant: 27),
+      AIContentBlock.letter('EXAM TIP\n\nFocus on Chapter 4: Thermodynamics. It will be 40% of the test.', variant: 28),
+      AIContentBlock.letter('WELCOME FRESHMEN\n\nOrientation begins in the main hall. Grab your welcome packet!', variant: 29),
+
+      // --- GROUP 2: MEDIUM (20-50 words) ---
+      AIContentBlock.text('MEDIUM FORM (20-50 Words)'),
+
+      AIContentBlock.letter('DEPARTMENT OF COMPUTER SCIENCE\n\nTo all students: The new AI laboratory on the 3rd floor is now open. It features high-performance GPUs for deep learning projects. Please reserve your slot online before visiting.', variant: 30),
+      AIContentBlock.letter('HISTORY OF ART STUDY GUIDE\n\nRemember that the Renaissance was not just about art, but a rebirth of classical learning. Pay attention to the shift from medieval scholasticism to humanism. Key figures: da Vinci, Michelangelo, Raphael.', variant: 31),
+      AIContentBlock.letter('INTERNSHIP OPPORTUNITY\n\nTechCorp is looking for junior developers. If you know React and Flutter, send your resume to careers@techcorp.com. This is a paid 3-month summer position with a chance for full-time employment.', variant: 32),
+      AIContentBlock.letter('CAMPUS SUSTAINABILITY PLEDGE\n\nWe are committed to reducing our carbon footprint. Please use the recycling bins provided in every classroom. Single-use plastics are banned from the cafeteria starting next month. Let\'s go green!', variant: 33),
+      AIContentBlock.letter('ALGORITHM ANALYSIS\n\nWhen optimizing your sorting algorithm, consider the time complexity. QuickSort is O(n log n) on average, but degrades to O(n²) in worst-case scenarios. MergeSort is a safer bet for consistent performance.', variant: 34),
+      AIContentBlock.letter('PHILOSOPHY 101\n\n"I think, therefore I am." - Descartes. elaborate on this statement. Does existence precede essence, or is it the other way around? Submit your 2-page reflection by Monday morning.', variant: 35),
+      AIContentBlock.letter('CODE CONDUCT\n\nRespect your peers in code reviews. Constructive criticism helps us grow, but harsh words discourage innovation. Always suggest a better way rather than just pointing out the flaw.', variant: 36),
+      AIContentBlock.letter('BIOLOGY FIELD TRIP\n\nWe depart for the botanical gardens at 8:00 AM sharp. Bring a notebook, a pen, and a packed lunch. We will be identifying native plant species for the term project.', variant: 37),
+      AIContentBlock.letter('DATA SECURITY MEMO\n\nNever commit API keys to public repositories. Use environment variables (.env) and add them to your .gitignore file. A leaked key can compromise the entire infrastructure within minutes.', variant: 38),
+      AIContentBlock.letter('LIBRARY POLICY UPDATE\n\nQuiet zones are strictly enforced on floors 4 and 5. Group study rooms must be booked in advance. Please return all borrowed books to the front desk or the automated drop box.', variant: 39),
+
+      // --- GROUP 3: LONG (200 words) ---
+      AIContentBlock.text('LONG FORM (~200 Words)'),
+
+      AIContentBlock.letter('ACADEMIC INTEGRITY POLICY\n\nPlagiarism is a serious offense in the academic world. It undermines the value of your degree and the trust placed in you by the institution. When you cite sources, you acknowledge the intellectual debt you owe to those who came before you. It is not merely a rule to follow, but a practice of honesty and respect.\n\nIn the age of AI, the temptation to generate essays is high. However, true learning comes from the struggle to articulate your own thoughts. Use tools to assist, not replace, your critical thinking. If you are caught submitting work that is not your own, you face sanctions ranging from a failing grade to expulsion.\n\nWe uphold these standards to ensure that every graduate of this university represents the highest caliber of knowledge and ethics. Your integrity is your most valuable asset. Protect it fiercely.', variant: 40),
+      
+      AIContentBlock.letter('THE ART OF PROGRAMMING\n\nProgramming is often called a science, but it is equally an art. Like a poet chooses words to evoke emotion, a programmer chooses logic to evoke action. A well-written function is elegant, concise, and serves a singular purpose. It flows logically, guiding the reader—be it a machine or another human—through its intent without confusion.\n\nSpaghetti code, on the other hand, is chaos. It is the result of rushing, of patching without understanding, of neglecting the structure for the sake of the output. As you progress in your career, you will learn that writing code that works is the easy part. Writing code that is maintainable, readable, and scalable is the true challenge.\n\nTake pride in your craft. Comment your complex logic, refactor correctly, and never stop learning. The landscape of technology changes daily, but the principles of clean code remain timeless.', variant: 41),
+      
+      AIContentBlock.letter('STUDY TECHNIQUES FOR RETENTION\n\nCramming is the enemy of long-term retention. To truly master a subject, one must employ active recall and spaced repetition. Passive reading—glancing over notes expecting them to stick—is the least effective method of study. Instead, close the book and try to explain the concept to an empty chair.\n\nIf you cannot explain it simply, you do not understand it well enough. Use flashcards for facts, but use mind maps for connections. Sleep is also a crucial part of the learning process; it is during deep sleep that the brain consolidates short-term memories into long-term ones.\n\nPlan your study schedule backwards from the exam date. Break large topics into manageable chunks. And remember to take breaks—the Pomodoro technique suggests 25 minutes of focus followed by 5 minutes of rest. Your brain needs this downtime to process information.', variant: 42),
+      
+      AIContentBlock.letter('INSTITUTIONAL HISTORY\n\nFounded in 1895, this institution began as a small vocational school with just three classrooms. It has since grown into a premier research university, home to five Nobel laureates and countless pioneers in their fields. The original brick building, Old Main, still stands at the center of campus as a testament to our enduring legacy.\n\nOver the decades, we have weathered wars, economic depressions, and social upheavals, always remaining a beacon of light and learning. Our motto, "Veritas et Lux" (Truth and Light), guides every decision we make. We believe that education is the key to unlocking human potential and solving the world\'s most pressing problems.\n\nAs you walk these halls, remember that you walk in the footsteps of giants. You are part of a tradition that stretches back over a century. Contribute to it, honor it, and leave your own mark for future generations.', variant: 43),
+      
+      AIContentBlock.letter('THE FUTURE OF AI IN ACADEMIA\n\nArtificial Intelligence is reshaping the landscape of education. From personalized tutors that adapt to a student\'s learning pace to sophisticated research tools that analyze vast datasets in seconds, the potential is limitless. However, we must approach this integration with caution.\n\nWe must ensure that AI serves to augment human intelligence, not replace it. Critical thinking, creativity, and empathy are skills that algorithms cannot replicate. The classroom of the future will not be a room of students staring at screens, but a collaborative space where AI handles the rote memorization, freeing humans to debate, create, and innovate.\n\nWe are preparing students not just for the jobs of today, but for a future we can specifically imagine. Adaptability is the new literacy. Embrace these tools, understand their limitations, and use them to build a better world.', variant: 44),
+      
+      AIContentBlock.letter('DEBUGGING MANIFESTO\n\nDebugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it. - Brian Kernighan.\n\nWhen you encounter a bug, do not panic. It is simply the computer doing exactly what you told it to do, not what you wanted it to do. Isolate the variable. Check your assumptions. Print the state. Walk away for five minutes.\n\nRubber duck debugging works: explain your code line-by-line to an inanimate object. You will often find the error in your own explanation. Remember, every error is a lesson. A cleanly solved bug is a heavy lift for your understanding of the system. Embrace the red text, for it leads to the green checkmark.', variant: 45),
+      
+      AIContentBlock.letter('SEMESTER SYLLABUS OVERVIEW\n\nThis course is designed to challenge your understanding of macroeconomics. We will begin with the fundamental principles of supply and demand, moving quickly into fiscal policy, monetary theory, and international trade. There will be three midterms and one cumulative final exam.\n\nParticipation is mandatory. Economics is not a spectator sport; it requires engagement, debate, and the application of theory to real-world scenarios. Read the Wall Street Journal daily. Come to class prepared to discuss current events through the lens of economic theory.\n\nOffice hours are open to all. Do not wait until you are drowning to ask for a life raft. I am here to help you succeed, but you must take the first step. Let us make this a productive and enlightening semester.', variant: 46),
+      
+      AIContentBlock.letter('LABORATORY PROTOCOL v2.0\n\nSafety is our top priority. Before entering the lab, verify that you are wearing closed-toe shoes, long pants, and a lab coat. Long hair must be tied back. No food or drink is permitted in the lab area under any circumstances.\n\nWhen handling volatile substances, work exclusively under the fume hood. Label every beaker and test tube clearly with the contents, date, and your initials. Unlabeled chemicals are a hazard to everyone. In the event of a spill, alert the instructor immediately; do not attempt to clean it up yourself.\n\nDispose of chemical waste in the designated containers, never down the drain. Wash your hands thoroughly before leaving. Your compliance ensures that we can all continue to learn and discover in a safe environment.', variant: 47),
+      
+      AIContentBlock.letter('ETHICS IN ENGINEERING\n\nAs engineers, we hold the safety of the public in our hands. A bridge designed poorly can collapse; software with a loophole can be exploited; a medical device that fails can costs lives. Technical competence is only half the job; ethical responsibility is the other half.\n\nWe must refuse to cut corners. We must speak up when we see unsafe practices. We must consider the environmental and societal impact of our designs. The Code of Ethics is not just a document to memorize for the exam; it is a vow to society.\n\nWhen you design, ask yourself: Would I feel safe using this? Would I want my family to use this? If the answer is no, go back to the drawing board. Determine the right thing to do, and then do it, even if it is the harder path.', variant: 48),
+      
+      AIContentBlock.letter('FINAL THESIS GUIDELINES\n\nYour thesis is the culmination of your undergraduate journey. It is an opportunity to contribute original thought to your field of study. Choose a topic that ignites your curiosity, for you will be living with it for the next year.\n\nStart with a strong thesis statement. Conduct rigorous research, citing primary sources wherever possible. Structure your argument logically, leading the reader from premise to conclusion. Revise, revise, revise. Good writing is rewriting.\n\nMeet with your advisor regularly. They are your guide through the wilderness of academic research. Do not fear feedback; welcome it. It makes your work stronger. This document will live in the university archives long after you graduate. Make it something you are proud of.', variant: 49),
+    ];
+  }
+
+
+
+  List<AIContentBlock> _generateCodeVariantsShowcase() {
+    return [
+      AIContentBlock.text('💻 CODE & IDE THEME COLLECTION\n20 Developer-Focused Variants (50-69)'),
+      
+      AIContentBlock.letter('// VS Code Dark (Default)\nfunction init() {\n  console.log("Hello World");\n}', variant: 50),
+      AIContentBlock.letter('# Dracula Theme\nbody {\n  background-color: #282a36;\n  color: #f8f8f2;\n}', variant: 51),
+      AIContentBlock.letter('"""Monokai Classic"""\nclass User:\n    def __init__(self, name):\n        self.name = name', variant: 52),
+      AIContentBlock.letter('// Solarized Dark\nvar solarized = true;\nif (solarized) {\n  return "Eye Comfort";\n}', variant: 53),
+      AIContentBlock.letter('// Solarized Light\n// Good for bright environments\nlet contrast = "low";', variant: 54),
+      AIContentBlock.letter('# GitHub Dark\ngit commit -m "Initial commit"\ngit push origin main', variant: 55),
+      AIContentBlock.letter('// GitHub Light\n// Classic open source feel\nconst repo = "scduleme";', variant: 56),
+      AIContentBlock.letter('> MATRIX TERMINAL\n> WAKE UP NEO...\n> FOLLOW THE WHITE RABBIT.', variant: 57),
+      AIContentBlock.letter('\$ RETRO AMBER CRT\n\$ sudo apt-get update\n\$ installing packages...', variant: 58),
+      AIContentBlock.letter('PS C:\\> PowerShell\nGet-Process | Where-Object {\$_.CPU -gt 10}\n# System Administration', variant: 59),
+      AIContentBlock.letter('user@ubuntu:~\$ \n# Ubuntu Terminal\nsudo service nginx restart\n[OK] Service started.', variant: 60),
+      AIContentBlock.letter('/* HIGH CONTRAST */\ndisplay: block;\nvisibility: visible;\n// Maximum readability', variant: 61),
+      AIContentBlock.letter('// CYBERPUNK 2077\nNET_RUNNER_INTERFACE_V2\nSTATUS: CONNECTED\nSIGNAL: 100%', variant: 62),
+      AIContentBlock.letter('<!-- BLUEPRINT -->\n<div class="wireframe">\n  <header>Prototype</header>\n</div>', variant: 63),
+      AIContentBlock.letter('Sublime Text (Molokai)\nimport "fmt"\nfunc main() {\n\tfmt.Println("Speed")\n}', variant: 64),
+      AIContentBlock.letter('// Atom One Dark\nconst atom = "Discontinued";\nconsole.warn(atom);', variant: 65),
+      AIContentBlock.letter('/* Nord Theme */\n.arctic {\n  color: #D8DEE9;\n  background: #2E3440;\n}', variant: 66),
+      AIContentBlock.letter('Gruvbox Style\nlet warm_tone = true;\n// Retro groove aesthetic', variant: 67),
+      AIContentBlock.letter('// SYNTHWAVE \'84\nconst neon = "GLOWING";\n// Retrowave vibes only', variant: 68),
+      AIContentBlock.letter('// Cobalt 2\nconst wes_bos = true;\n// Deep blue hues', variant: 69),
+    ];
+  }
+
+  List<List<AIContentBlock>> _generatePythonCheatsheetResponse() {
+    return [
+      // RESPONSE 1: VARIABLES & TYPES
+      [
+        AIContentBlock.text('🐍 PYTHON BASICS: VARIABLES & DATA TYPES'),
+        AIContentBlock.letter('CONCEPT: DYNAMIC TYPING\n\nPython is dynamically typed, meaning you don\'t need to declare variable types explicitly. The interpreter infers the type at runtime.', variant: 14), // Learner variant
+        AIContentBlock.letter('# Variables & Types\nname = "Alice"       # String\nage = 30             # Integer\nheight = 5.9         # Float\nis_student = True    # Boolean\n\n# Lists & Dicts\nskills = ["Python", "Dart"]\nstats = {"hp": 100, "mp": 50}', variant: 50), // VS Code Code variant
+        AIContentBlock.text('PRO TIP: Use type hints for better code clarity in larger projects.'),
+        AIContentBlock.letter('REFERENCE: TYPE HINTS\n\ndef greet(name: str) -> str:\n    return f"Hello, {name}"', variant: 64), // Sublime Text Code variant
+      ],
+
+      // RESPONSE 2: CONTROL FLOW
+      [
+        AIContentBlock.text('twisted_rightwards_arrows CONTROL FLOW: DECISIONS & LOOPS'),
+        AIContentBlock.letter('EXPLANATION: INDENTATION\n\nUnlike many other languages that use curly braces {}, Python uses indentation (whitespace) to define blocks of code. Consistency is key!', variant: 11), // Academic Note variant
+        AIContentBlock.letter('# If-Else Statement\nscore = 85\n\nif score >= 90:\n    print("Grade: A")\nelif score >= 80:\n    print("Grade: B")\nelse:\n    print("Grade: C")', variant: 51), // Dracula Code variant
+        AIContentBlock.letter('# Loops (For & While)\n\n# Iterate over a list\nfor i in range(5):\n    print(f"Count: {i}")\n\n# While loop\nwhile is_running:\n    check_status()', variant: 59), // PowerShell Code variant (System admin feel)
+      ],
+
+      // RESPONSE 3: FUNCTIONS & MODULES
+      [
+        AIContentBlock.text('📦 FUNCTIONS & MODULARITY'),
+        AIContentBlock.letter('DEV NOTE: DRY PRINCIPLE\n\nDon\'t Repeat Yourself. If you find yourself copying and pasting code, wrap it in a function. Functions make code reusable and easier to debug.', variant: 12), // Dev Sketch variant
+        AIContentBlock.letter('def calculate_area(radius):\n    """Calculates circle area."""\n    import math\n    return math.pi * (radius ** 2)\n\n# Main execution\nif __name__ == "__main__":\n    print(calculate_area(5))', variant: 52), // Monokai Code variant
+        AIContentBlock.letter('IMPORTING MODULES\n\nimport math\nfrom datetime import datetime\nimport pandas as pd  # Alias', variant: 60), // Ubuntu Terminal variant
+      ]
+    ];
+  }
   List<AIContentBlock> _generateLineChartResponse() => [
     AIContentBlock.text('Here\'s your grade progression:'),
     AIContentBlock.lineChart(
@@ -1697,6 +1986,25 @@ print(f"Average: {avg}")''',
           ),
           // Spacer to push icon to right
           const Spacer(),
+          // Hashtag Button - Dev Testing
+          GestureDetector(
+            onTap: () => _showHashtagsBottomSheet(),
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16161E),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF27272A)),
+              ),
+              child: Icon(
+                Icons.terminal_rounded, // Dev/Terminal icon
+                color: Colors.grey[400],
+                size: 20,
+              ),
+            ),
+          ),
           // Thunder Button - Quick Actions
           GestureDetector(
             onTap: () => _showQuickActionsSheet(),
@@ -1716,6 +2024,104 @@ print(f"Average: {avg}")''',
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showHashtagsBottomSheet() {
+    final hashtags = [
+      '#all', '#multi', '#papernotesall', '#pynotes', '#textstyles',
+      '#note', '#paper', '#letter', '#lettervariants', '#newletterstyles', '#morelettervariants', '#playwritevariants', '#codevariants', '#pycs',
+      '#code', '#flash', '#bar', '#pie', '#line', '#radar',
+      '#img3', '#audio', '#video', '#cards',
+      '#map', '#timeline', '#quiz', '#checklist',
+      '#contact', '#event', '#weather', '#countdown', '#actions',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        decoration: const BoxDecoration(
+          color: Color(0xFF16161E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3F3F46),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Icon(Icons.terminal, color: Colors.blue, size: 24),
+                const SizedBox(width: 12),
+                const Text(
+                  'Dev Hashtags',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.grey),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+               'Tap to fill, Send icon to auto-send',
+               style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+             const SizedBox(height: 16),
+            Expanded(
+              child: ListView.separated(
+                itemCount: hashtags.length,
+                separatorBuilder: (c, i) => const Divider(color: Color(0xFF27272A), height: 1),
+                itemBuilder: (context, index) {
+                  final tag = hashtags[index];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: const Color(0xFF27272A),
+                            borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.tag, color: Colors.blueGrey, size: 18),
+                    ),
+                    title: Text(tag, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _messageController.text = tag;
+                    },
+                    trailing: IconButton(
+                        icon: const Icon(Icons.send_rounded, color: Colors.blue),
+                        onPressed: () {
+                             Navigator.pop(context);
+                             _messageController.text = tag;
+                             _sendMessage();
+                        },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -5677,6 +6083,11 @@ print(f"Average: {avg}")''',
     IconData sealIcon = Icons.stars;
     Color sealColor = const Color(0xFFB91C1C);
     Color textColor = const Color(0xFF3F2E18);
+    
+    // Default font styles
+    String? fontFamily = 'Serif';
+    FontStyle fontStyle = FontStyle.normal;
+    FontWeight fontWeight = FontWeight.normal;
 
     if (variant == 1) {
       // Royal
@@ -5702,6 +6113,406 @@ print(f"Average: {avg}")''',
       sealIcon = Icons.nightlight_round;
       sealColor = const Color(0xFF71717A);
       textColor = const Color(0xFFE4E4E7);
+      fontFamily = null; // System font
+    } else if (variant == 5) {
+      // Cyber / Holographic
+      paperColor = const Color(0xFF0F172A); // Slate 900
+      borderColor = const Color(0xFF22D3EE); // Cyan 400
+      sealIcon = Icons.security;
+      sealColor = const Color(0xFF06B6D4); // Cyan 500
+      textColor = const Color(0xFFE0F2FE); // Sky 100
+      fontFamily = 'monospace';
+    } else if (variant == 6) {
+      // Formal / Diplomatic
+      paperColor = const Color(0xFFFDFBF7); // Warm white
+      borderColor = const Color(0xFF1E3A8A); // Blue 900
+      sealIcon = Icons.account_balance;
+      sealColor = const Color(0xFF1E40AF); // Blue 800
+      textColor = const Color(0xFF0F172A); // Slate 900
+      fontFamily = 'Serif';
+      fontWeight = FontWeight.w500;
+    } else if (variant == 7) {
+      // Natural / Eco
+      paperColor = const Color(0xFFF1F8E9); // Light Green
+      borderColor = const Color(0xFF33691E); // Dark Green
+      sealIcon = Icons.eco;
+      sealColor = const Color(0xFF558B2F); // Light Green
+      textColor = const Color(0xFF1B5E20); // Dark Green
+      fontFamily = null;
+    } else if (variant == 8) {
+      // Urgent / Redacted
+      paperColor = const Color(0xFFFFFFFF);
+      borderColor = const Color(0xFFEF4444); // Red 500
+      sealIcon = Icons.warning_amber_rounded;
+      sealColor = const Color(0xFFDC2626); // Red 600
+      textColor = const Color(0xFF000000);
+      fontFamily = 'monospace';
+      fontWeight = FontWeight.bold;
+    } else if (variant == 9) {
+      // Magic / Mystic
+      paperColor = const Color(0xFF2E1065); // Violet 950
+      borderColor = const Color(0xFFF59E0B); // Amber 500
+      sealIcon = Icons.auto_awesome;
+      sealColor = const Color(0xFFD97706); // Amber 600
+      textColor = const Color(0xFFFEF3C7); // Amber 100
+      fontFamily = 'Serif';
+      fontStyle = FontStyle.italic;
+    } else if (variant == 10) {
+      // Playful Sticky
+      paperColor = const Color(0xFFFEF08A); // Yellow 200
+      borderColor = const Color(0xFFEAB308); // Yellow 500
+      sealIcon = Icons.push_pin;
+      sealColor = const Color(0xFFEF4444); // Red pin
+      textColor = const Color(0xFF422006); // Brown
+      fontFamily = 'Cursive';
+    } else if (variant == 11) {
+      // Academic Notebook
+      paperColor = const Color(0xFFF1F5F9); // Slate 100
+      borderColor = const Color(0xFFCBD5E1); // Slate 300
+      sealIcon = Icons.book;
+      sealColor = const Color(0xFF3B82F6); 
+      textColor = const Color(0xFF334155); 
+      fontFamily = 'Cursive';
+    } else if (variant == 12) {
+      // Dev Sketch
+      paperColor = const Color(0xFF27272A); // Zinc 800
+      borderColor = const Color(0xFF4ADE80); // Green 400
+      sealIcon = Icons.code;
+      sealColor = const Color(0xFF22C55E);
+      textColor = const Color(0xFF4ADE80); // Terminal Green
+      fontFamily = 'Cursive'; // Handwritten code look
+    } else if (variant == 13) {
+      // Corporate Note (Handwritten signature feel)
+      paperColor = const Color(0xFFFAFAF9); // Stone 50
+      borderColor = const Color(0xFFA8A29E); // Stone 400
+      sealIcon = Icons.business_center;
+      sealColor = const Color(0xFF57534E);
+      textColor = const Color(0xFF292524);
+      fontFamily = 'Cursive'; 
+    } else if (variant == 14) {
+      // Learner Flashcard
+      paperColor = const Color(0xFFE0E7FF); // Indigo 100
+      borderColor = const Color(0xFF818CF8); // Indigo 400
+      sealIcon = Icons.school;
+      sealColor = const Color(0xFF6366F1);
+      textColor = const Color(0xFF312E81);
+      fontFamily = 'Cursive';
+      fontWeight = FontWeight.bold;
+    } else if (variant == 15) {
+      // Tech Blueprint
+      paperColor = const Color(0xFF172554); // Blue 950
+      borderColor = const Color(0xFF60A5FA); // Blue 400
+      sealIcon = Icons.architecture;
+      sealColor = const Color(0xFF93C5FD);
+      textColor = const Color(0xFFDBEAFE);
+      fontFamily = 'Cursive'; // Architect handwriting
+    } else if (variant == 16) {
+      // Journal Entry
+      paperColor = const Color(0xFFFFF7ED); // Orange 50
+      borderColor = const Color(0xFFFDBA74); // Orange 300
+      sealIcon = Icons.edit;
+      sealColor = const Color(0xFFF97316);
+      textColor = const Color(0xFF7C2D12);
+      fontFamily = 'Cursive';
+    } else if (variant == 17) {
+      // Code Review
+      paperColor = const Color(0xFFFEF2F2); // Red 50
+      borderColor = const Color(0xFFFCA5A5); // Red 300
+      sealIcon = Icons.bug_report;
+      sealColor = const Color(0xFFEF4444);
+      textColor = const Color(0xFF991B1B);
+      fontFamily = 'Cursive'; 
+    } else if (variant == 18) {
+      // Brainstorming
+      paperColor = const Color(0xFFFFFFFF);
+      borderColor = const Color(0xFFA3A3A3); // Neutral border
+      sealIcon = Icons.lightbulb;
+      sealColor = const Color(0xFFEAB308);
+      textColor = const Color(0xFF000000);
+      fontFamily = 'Cursive';
+    } else if (variant == 19) {
+       // Love Note 2
+      paperColor = const Color(0xFFFCE7F3); // Pink 100
+      borderColor = const Color(0xFFF472B6); // Pink 400
+      sealIcon = Icons.favorite_border;
+      sealColor = const Color(0xFFEC4899);
+      textColor = const Color(0xFF831843);
+      fontFamily = 'Cursive';
+    } else if (variant >= 20 && variant <= 49) {
+      // PLAYWRITE AESTHETIC COLLECTION (20-49)
+      // "Two different fonts in a single card"
+      // Use "Guides" variants if possible, mixed with compatible pairings.
+      
+      // Defaults for the collection
+      fontStyle = FontStyle.normal;
+      fontWeight = FontWeight.normal;
+      
+      // Themes cycling based on variant
+      // 20-29: Short (10-20 words)
+      // 30-39: Medium (20-50 words)
+      // 40-49: Long (~200 words)
+      
+      // Determine specific style based on modulus
+      int styleIndex = variant % 3; // 0, 1, 2
+      
+      if (styleIndex == 0) {
+        // STYLE A: Institutional / England Joined
+        paperColor = const Color(0xFFF5F5F4); // Stone 100
+        borderColor = const Color(0xFF78716C); // Stone 500
+        sealIcon = Icons.account_balance;
+        sealColor = const Color(0xFF44403C); // Stone 700
+        textColor = const Color(0xFF1C1917); // Stone 900
+        // We will assign specific fonts in the build method logic below
+      } else if (styleIndex == 1) {
+        // STYLE B: Academic / India
+        paperColor = const Color(0xFFECFEFF); // Cyan 50
+        borderColor = const Color(0xFF06B6D4); // Cyan 500
+        sealIcon = Icons.school;
+        sealColor = const Color(0xFF0E7490); // Cyan 700
+        textColor = const Color(0xFF164E63); // Cyan 900
+      } else {
+        // STYLE C: Study/Programming / Australia Tasmania
+        paperColor = const Color(0xFFFFF7ED); // Orange 50
+        borderColor = const Color(0xFFF97316); // Orange 500
+        sealIcon = Icons.code;
+        sealColor = const Color(0xFFC2410C); // Orange 700
+        textColor = const Color(0xFF7C2D12); // Orange 900
+      }
+    }
+
+    // Custom build for Dual-Font variants
+    if (variant >= 20 && variant <= 49) {
+        // Logic to split text: First line (or up to \n\n) is Header. Rest is Body.
+        List<String> parts = text.split('\n\n');
+        String header = parts.length > 1 ? parts[0] : text.split('\n')[0];
+        String body = parts.length > 1 ? parts.sublist(1).join('\n\n') : (text.contains('\n') ? text.substring(text.indexOf('\n') + 1) : '');
+        
+        if (parts.length == 1 && !text.contains('\n')) {
+          header = "NOTE";
+          body = text;
+        }
+
+        // Font Assignment
+        TextStyle headerStyle;
+        TextStyle bodyStyle;
+        
+        int styleIndex = variant % 3;
+        
+        if (styleIndex == 0) {
+           // England Joined Guides + Serif
+           headerStyle = GoogleFonts.getFont('Playfair Display', fontWeight: FontWeight.bold, fontSize: 18, color: textColor);
+           bodyStyle = GoogleFonts.getFont('Playwrite GB S', fontSize: 15, color: textColor.withOpacity(0.9), height: 1.8);
+        } else if (styleIndex == 1) {
+           // India + Sans
+           headerStyle = GoogleFonts.getFont('Lato', fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5, color: textColor);
+           bodyStyle = GoogleFonts.getFont('Playwrite IN', fontSize: 14, color: textColor, height: 1.6);
+        } else {
+           // Australia Tasmania + Monospace
+           headerStyle = GoogleFonts.getFont('JetBrains Mono', fontWeight: FontWeight.bold, fontSize: 14, color: textColor);
+           bodyStyle = GoogleFonts.getFont('Playwrite AU TAS', fontSize: 16, color: textColor, height: 2.0); // Spaced out
+        }
+
+        return Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: paperColor,
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(color: borderColor.withOpacity(0.5), width: 1),
+            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: const Offset(2, 4))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Expanded(child: Text(header, style: headerStyle)),
+                   Icon(sealIcon, color: sealColor, size: 20),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(height: 1, width: 40, color: borderColor),
+              const SizedBox(height: 16),
+              Text(body, style: bodyStyle),
+            ],
+          ),
+        );
+    } else if (variant >= 50 && variant <= 69) {
+      // CODE / IDE AESTHETIC COLLECTION (50-69)
+      
+      // Default Code Font
+      String? codeFontFamily = 'JetBrains Mono';
+      Color codeBg = const Color(0xFF1E1E1E); // Default Dark
+      Color codeColor = const Color(0xFFD4D4D4); // Default Light Text
+      Color accentColor = const Color(0xFF569CD6); // Blue
+      IconData langIcon = Icons.code;
+      
+      switch (variant) {
+        case 50: // VS Code Dark
+          codeBg = const Color(0xFF1E1E1E);
+          codeColor = const Color(0xFFD4D4D4);
+          accentColor = const Color(0xFF007ACC);
+          langIcon = Icons.javascript;
+          break;
+        case 51: // Dracula
+          codeBg = const Color(0xFF282A36);
+          codeColor = const Color(0xFFF8F8F2);
+          accentColor = const Color(0xFFBD93F9); // Purple
+          langIcon = Icons.nightlight_round;
+          break;
+        case 52: // Monokai
+          codeBg = const Color(0xFF272822);
+          codeColor = const Color(0xFFF8F8F2);
+          accentColor = const Color(0xFFA6E22E); // Green
+          langIcon = Icons.api;
+          break;
+        case 53: // Solarized Dark
+          codeBg = const Color(0xFF002B36);
+          codeColor = const Color(0xFF839496);
+          accentColor = const Color(0xFFB58900); // Yellow
+          break;
+        case 54: // Solarized Light
+          codeBg = const Color(0xFFFDF6E3);
+          codeColor = const Color(0xFF657B83);
+          accentColor = const Color(0xFFB58900);
+          langIcon = Icons.wb_sunny;
+          break;
+        case 55: // GitHub Dark
+          codeBg = const Color(0xFF0D1117);
+          codeColor = const Color(0xFFC9D1D9);
+          accentColor = const Color(0xFF58A6FF);
+          langIcon = Icons.source;
+          break;
+        case 56: // GitHub Light
+          codeBg = const Color(0xFFFFFFFF);
+          codeColor = const Color(0xFF24292E);
+          accentColor = const Color(0xFF0366D6);
+          break;
+        case 57: // Matrix
+          codeBg = const Color(0xFF000000);
+          codeColor = const Color(0xFF00FF00);
+          accentColor = const Color(0xFF003300);
+          langIcon = Icons.terminal;
+          codeFontFamily = 'Fira Code';
+          break;
+        case 58: // Retro Amber
+          codeBg = const Color(0xFF1B1B1B);
+          codeColor = const Color(0xFFFFB000); // Amber
+          accentColor = const Color(0xFF332200);
+          langIcon = Icons.tv;
+          codeFontFamily = 'Courier Prime';
+          break;
+        case 59: // PowerShell
+          codeBg = const Color(0xFF012456);
+          codeColor = const Color(0xFFEEE8D5);
+          accentColor = const Color(0xFF00BCF2);
+          langIcon = Icons.window;
+          break;
+        case 60: // Ubuntu
+          codeBg = const Color(0xFF300A24);
+          codeColor = const Color(0xFFFFFFFF);
+          accentColor = const Color(0xFFE95420); // Orange
+          langIcon = Icons.computer; // Replaced invalid icon
+          break;
+        case 61: // High Contrast
+          codeBg = const Color(0xFF000000);
+          codeColor = const Color(0xFFFFFFFF);
+          accentColor = const Color(0xFFFFFF00); // Yellow
+          break;
+        case 62: // Cyberpunk
+          codeBg = const Color(0xFF0a0b1e);
+          codeColor = const Color(0xFF00f0ff);
+          accentColor = const Color(0xFFff003c);
+          langIcon = Icons.bolt;
+          break;
+        case 63: // Blueprint
+          codeBg = const Color(0xFF154c79);
+          codeColor = const Color(0xFFffffff);
+          accentColor = const Color(0xFF87CEFA);
+          langIcon = Icons.grid_on;
+          break;
+        case 64: // Sublime Molokai
+          codeBg = const Color(0xFF272822);
+          codeColor = const Color(0xFFFD971F); // Orange
+          accentColor = const Color(0xFF66D9EF); // Blue
+          break;
+        case 65: // Atom One Dark
+          codeBg = const Color(0xFF282C34);
+          codeColor = const Color(0xFFABB2BF);
+          accentColor = const Color(0xFF61AFEF);
+          break;
+        case 66: // Nord
+          codeBg = const Color(0xFF2E3440);
+          codeColor = const Color(0xFFD8DEE9);
+          accentColor = const Color(0xFF88C0D0);
+          langIcon = Icons.snowing;
+          break;
+        case 67: // Gruvbox
+          codeBg = const Color(0xFF282828);
+          codeColor = const Color(0xFFEBDBB2);
+          accentColor = const Color(0xFFFE8019); // Orange
+          break;
+        case 68: // Synthwave
+          codeBg = const Color(0xFF2b213a);
+          codeColor = const Color(0xFF0fff95);
+          accentColor = const Color(0xFFff00c1); // Magenta
+          langIcon = Icons.music_note;
+          break;
+        case 69: // Cobalt2
+          codeBg = const Color(0xFF193549);
+          codeColor = const Color(0xFFFFC600); // Yellow
+          accentColor = const Color(0xFF193549);
+          break;
+      }
+
+      return Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), // Full bleed
+          decoration: BoxDecoration(
+            color: codeBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: accentColor.withOpacity(0.3), width: 1),
+            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6, offset: const Offset(0, 4))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Code Header/Title Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.2),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(7)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(langIcon, color: accentColor, size: 14),
+                    const SizedBox(width: 8),
+                    Text(
+                      'main.code',
+                      style: TextStyle( color: accentColor, fontSize: 11, fontFamily: 'monospace'),
+                    ),
+                    const Spacer(),
+                    Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.red.withOpacity(0.7), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.yellow.withOpacity(0.7), shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.green.withOpacity(0.7), shape: BoxShape.circle)),
+                  ],
+                ),
+              ),
+              // Code Content
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  text,
+                  style: GoogleFonts.getFont(codeFontFamily!, fontSize: 13, color: codeColor, height: 1.5),
+                ),
+              )
+            ],
+          ),
+        );
     }
 
     return Container(
@@ -5720,13 +6531,7 @@ print(f"Average: {avg}")''',
             offset: const Offset(0, 4),
           ),
         ],
-        image: const DecorationImage(
-          image: NetworkImage(
-            'https://www.transparenttextures.com/patterns/aged-paper.png',
-          ), // Subtle texture attempt
-          repeat: ImageRepeat.repeat,
-          opacity: 0.1,
-        ),
+        // Texture removed to prevent 404 crash
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -5755,24 +6560,15 @@ print(f"Average: {avg}")''',
             text,
             style: TextStyle(
               fontSize: 16,
-              color: textColor, // Dark brown
-              fontFamily: 'Serif',
+              color: textColor,
+              fontFamily: fontFamily,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle,
               height: 1.6,
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Text(
-              'Nexus AI',
-              style: TextStyle(
-                fontSize: 12,
-                color: textColor.withOpacity(0.6),
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
+          // Watermark removed as requested
         ],
       ),
     );
