@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -13,11 +14,27 @@ class AiChatPage extends StatefulWidget {
   State<AiChatPage> createState() => _AiChatPageState();
 }
 
+// Helper class for Dev Test Mode
+class TestItem {
+  final String id;
+  final String description;
+  final List<AIContentBlock> blocks;
+
+  TestItem({required this.id, required this.description, required this.blocks});
+}
+
 class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = []; // Start with empty chat
   bool _isTyping = false;
+
+  // -- DEV TEST MODE STATE --
+  bool _isTestMode = false;
+  int _currentTestIndex = 0;
+  List<TestItem> _testQueue = [];
+  Map<String, String> _testResults = {}; // id -> response (keep/delete/more)
+
 
   // Attachment state
   final List<PendingAttachment> _pendingAttachments = [];
@@ -182,6 +199,40 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
 
     // Check for #pycs
     bool usePythonCheatsheet = text.toLowerCase().contains('#pycs');
+
+    // Check for Dev Test Mode
+    if (text.toLowerCase() == '#starttesto1') {
+      _startDevTestMode();
+      return; 
+    }
+
+    // Check for #keywords
+    if (text.toLowerCase() == '#keywords') {
+      setState(() {
+         // User message
+        _messages.add(
+          ChatMessage(
+            isAi: false,
+            sender: 'User',
+            message: text,
+          ),
+        );
+        // AI Response
+        for (var blockList in _generateKeywordsResponse()) {
+          _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: blockList,
+              ),
+            );
+        }
+      });
+      _messageController.clear();
+      _scrollToBottom();
+      return;
+    }
 
     // Add user message
     setState(() {
@@ -1418,6 +1469,68 @@ while guess != secret_number:
     ];
   }
 
+  List<List<AIContentBlock>> _generateKeywordsResponse() {
+    return [
+      [
+        AIContentBlock.text('🔍 **AVAILABLE KEYWORDS**\nTap any button to execute the command.'),
+        
+        // VISUALIZATIONS
+        AIContentBlock.text('📊 **Data Visualizations**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Bar Chart', icon: Icons.bar_chart, action: '#bar', color: Colors.blue),
+          ActionButton(label: 'Pie Chart', icon: Icons.pie_chart, action: '#pie', color: Colors.purple),
+          ActionButton(label: 'Line Chart', icon: Icons.show_chart, action: '#line', color: Colors.green),
+          ActionButton(label: 'Radar Chart', icon: Icons.radar, action: '#radar', color: Colors.orange),
+        ]),
+
+        // INTERACTIVE
+        AIContentBlock.text('✨ **Interactive Elements**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Quiz', icon: Icons.quiz, action: '#quiz', color: Colors.amber),
+          ActionButton(label: 'Checklist', icon: Icons.checklist, action: '#checklist', color: Colors.teal),
+          ActionButton(label: 'Table', icon: Icons.table_chart, action: '#table', color: Colors.indigo),
+          ActionButton(label: 'Cards', icon: Icons.view_carousel, action: '#cards', color: Colors.cyan),
+          ActionButton(label: 'Flashcards', icon: Icons.flip, action: '#flash', color: Colors.pink),
+        ]),
+        
+        // MEDIA
+        AIContentBlock.text('🎬 **Media & Files**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Audio', icon: Icons.audiotrack, action: '#audio', color: Colors.deepPurple),
+          ActionButton(label: 'Video', icon: Icons.videocam, action: '#video', color: Colors.red),
+          ActionButton(label: 'Images', icon: Icons.image, action: '#img3', color: Colors.lightBlue),
+          ActionButton(label: 'Map', icon: Icons.map, action: '#map', color: Colors.greenAccent),
+        ]),
+
+         // HANDWRITTEN & CODE
+        AIContentBlock.text('✍️ **Styles & Themes**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Note', icon: Icons.note, action: '#note', color: Colors.brown),
+          ActionButton(label: 'Paper', icon: Icons.description, action: '#paper', color: Colors.grey),
+          ActionButton(label: 'Handwriting', icon: Icons.create, action: '#playwritevariants', color: Colors.deepOrange),
+          ActionButton(label: 'Code Themes', icon: Icons.code, action: '#codevariants', color: Colors.blueGrey),
+          ActionButton(label: 'PyCheats', icon: Icons.terminal, action: '#pycs', color: Colors.yellow),
+        ]),
+
+        // UTILITIES
+        AIContentBlock.text('🛠️ **Utilities**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Timeline', icon: Icons.timeline, action: '#timeline', color: Colors.blue),
+          ActionButton(label: 'Contact', icon: Icons.contact_page, action: '#contact', color: Colors.lightGreen),
+          ActionButton(label: 'Event', icon: Icons.event, action: '#event', color: Colors.redAccent),
+          ActionButton(label: 'Weather', icon: Icons.wb_sunny, action: '#weather', color: Colors.orangeAccent),
+          ActionButton(label: 'Timer', icon: Icons.timer, action: '#countdown', color: Colors.purpleAccent),
+        ]),
+        
+        // DEV
+        AIContentBlock.text('👨‍💻 **Developer**'),
+        AIContentBlock.quickActions(actionButtons: [
+          ActionButton(label: 'Dev Test Mode', icon: Icons.bug_report, action: '#starttesto1', color: Colors.amber),
+        ]),
+      ]
+    ];
+  }
+
   List<List<AIContentBlock>> _generatePythonCheatsheetResponse() {
     return [
       // RESPONSE 1: VARIABLES & TYPES
@@ -1917,38 +2030,98 @@ print(f"Average: {avg}")''',
             _buildAppBar(),
             // Main Chat Area
             Expanded(
-              child: ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              child: Stack(
                 children: [
-                  // Feature Highlight Card
-                  _buildFeatureCard(),
-                  const SizedBox(height: 20),
-                  // Date Separator
-                  if (_messages.isNotEmpty) ...[
-                    _buildDateSeparator('Today'),
-                    const SizedBox(height: 16),
-                  ],
-                  // Messages
-                  ..._messages.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final msg = entry.value;
-                    // Check if this is the latest AI message
-                    final isLatestAi =
-                        msg.isAi &&
-                        index == _messages.lastIndexWhere((m) => m.isAi);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildMessage(msg, isLatest: isLatestAi),
-                    );
-                  }),
-                  // Typing Indicator (only when AI is "thinking")
-                  if (_isTyping) _buildTypingIndicator(),
+                  ListView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                    children: [
+                      // Feature Highlight Card
+                      _buildFeatureCard(),
+                      const SizedBox(height: 20),
+                      // Date Separator
+                      if (_messages.isNotEmpty) ...[
+                        _buildDateSeparator('Today'),
+                        const SizedBox(height: 16),
+                      ],
+                      // Messages
+                      ..._messages.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final msg = entry.value;
+                        // Check if this is the latest AI message
+                        final isLatestAi =
+                            msg.isAi &&
+                            index == _messages.lastIndexWhere((m) => m.isAi);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildMessage(msg, isLatest: isLatestAi),
+                        );
+                      }),
+                      // Typing Indicator (only when AI is "thinking")
+                      if (_isTyping) _buildTypingIndicator(),
+                    ],
+                  ),
+                  // Test Mode Overlay (Counter)
+                  if (_isTestMode)
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.amber),
+                        ),
+                        child: Text(
+                          'TEST MODE: ${_currentTestIndex + 1} / ${_testQueue.length}',
+                          style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            // Bottom Input Bar
-            _buildInputBar(),
+            // Bottom Input Bar (or Test Controls)
+            if (_isTestMode)
+               Container(
+              color: const Color(0xFF1E1E1E),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                   Text(
+                      _testQueue.isNotEmpty ? _testQueue[_currentTestIndex].description : 'Loading...',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                   ),
+                   const SizedBox(height: 12),
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.delete, color: Colors.white),
+                        label: const Text('DELETE'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        onPressed: () => _nextTestItem('delete'),
+                      ),
+                       ElevatedButton.icon(
+                        icon: const Icon(Icons.check, color: Colors.white),
+                        label: const Text('KEEP'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                        onPressed: () => _nextTestItem('keep'),
+                      ),
+                       ElevatedButton.icon(
+                        icon: const Icon(Icons.more_horiz, color: Colors.white),
+                        label: const Text('MORE'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                        onPressed: () => _nextTestItem('more'),
+                      ),
+                    ],
+                   ),
+                ],
+              ),
+            )
+            else
+              _buildInputBar(),
           ],
         ),
       ),
@@ -2001,6 +2174,25 @@ print(f"Average: {avg}")''',
               child: Icon(
                 Icons.terminal_rounded, // Dev/Terminal icon
                 color: Colors.grey[400],
+                size: 20,
+              ),
+            ),
+          ),
+          // Dev Test Mode Button
+          GestureDetector(
+            onTap: _startDevTestMode,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16161E),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.amber.withOpacity(0.5)),
+              ),
+              child: const Icon(
+                Icons.bug_report_rounded,
+                color: Colors.amber, 
                 size: 20,
               ),
             ),
@@ -2087,7 +2279,7 @@ print(f"Average: {avg}")''',
                style: TextStyle(color: Colors.grey, fontSize: 13),
             ),
              const SizedBox(height: 16),
-            Expanded(
+             Expanded(
               child: ListView.separated(
                 itemCount: hashtags.length,
                 separatorBuilder: (c, i) => const Divider(color: Color(0xFF27272A), height: 1),
@@ -2124,6 +2316,97 @@ print(f"Average: {avg}")''',
         ),
       ),
     );
+  }
+
+  // ========== DESIGN SELECTOR ==========
+
+  void _startDevTestMode() {
+    setState(() {
+      _isTestMode = true;
+      _currentTestIndex = 0;
+      _testResults = {};
+      _messages.clear(); // Clear chat for focus
+      
+      // Generate Test Queue
+      _testQueue = [
+        TestItem(id: 'text_basic', description: 'Simple Text Message', blocks: [AIContentBlock.text('Hello World! This is a simple text.')]),
+        TestItem(id: 'markdown_basic', description: 'Markdown Formatting', blocks: [AIContentBlock.markdown(markdownContent: '# Header\n* Bullet\n* List')]),
+        // Charts
+        TestItem(id: 'chart_bar', description: 'Bar Chart', blocks: _generateBarChartResponse()),
+        TestItem(id: 'chart_line', description: 'Line Chart', blocks: _generateLineChartResponse()),
+        TestItem(id: 'chart_pie', description: 'Pie Chart', blocks: _generatePieChartResponse()),
+        TestItem(id: 'chart_radar', description: 'Radar Chart', blocks: _generateRadarChartResponse()),
+        // Interactive
+        TestItem(id: 'inter_quiz', description: 'Quiz Widget', blocks: _generateQuizResponse()),
+        TestItem(id: 'inter_checklist', description: 'Checklist Widget', blocks: _generateChecklistResponse()),
+        TestItem(id: 'inter_table', description: 'Data Table', blocks: _generateTableResponse()),
+        // Media
+        TestItem(id: 'media_audio', description: 'Audio Player', blocks: _generateAudioResponse()),
+        TestItem(id: 'media_video', description: 'Video Player', blocks: _generateVideoResponse()),
+         // Letters - Samples
+        TestItem(id: 'letter_base', description: 'Base Letter', blocks: [AIContentBlock.letter('Standard Letter Format', variant: 0)]),
+        TestItem(id: 'letter_hand_10', description: 'Handwritten Style 1', blocks: [AIContentBlock.letter('Handwritten Note', variant: 10)]),
+        TestItem(id: 'letter_playwrite_20', description: 'Playwrite Dual Font', blocks: [AIContentBlock.letter('Playwrite Aesthetic', variant: 20)]),
+        TestItem(id: 'letter_code_50', description: 'Code VS Dark', blocks: [AIContentBlock.letter('function test() {}', variant: 50)]),
+         // New PyCS
+        TestItem(id: 'pycs_sample', description: 'Python Cheatsheet', blocks: _generatePythonCheatsheetResponse()[0]),
+      ];
+      
+      // Load first item
+      _loadCurrentTestItem();
+    });
+  }
+
+  void _loadCurrentTestItem() {
+    if (_currentTestIndex < _testQueue.length) {
+      setState(() {
+         _messages.add(
+            ChatMessage(
+              isAi: true,
+              sender: 'Dev Bot',
+              message: '',
+              contentBlocks: _testQueue[_currentTestIndex].blocks,
+            ),
+         );
+      });
+    }
+  }
+
+  void _nextTestItem(String response) {
+    if (_currentTestIndex >= _testQueue.length) return;
+    
+    // Save result
+    _testResults[_testQueue[_currentTestIndex].id] = response;
+    
+    setState(() {
+      _currentTestIndex++;
+      _messages.clear(); // Clear previous for focus
+      
+      if (_currentTestIndex < _testQueue.length) {
+        _loadCurrentTestItem();
+      } else {
+        _finishTestMode();
+      }
+    });
+  }
+
+  void _finishTestMode() {
+    String jsonReport = const JsonEncoder.withIndent('  ').convert(_testResults);
+    
+    setState(() {
+      _isTestMode = false;
+      _messages.add(
+        ChatMessage(
+          isAi: true,
+          sender: 'Test System', 
+          message: 'Test Complete! Here is your report:',
+          contentBlocks: [
+            AIContentBlock.code(jsonReport, language: 'json'),
+            AIContentBlock.text('Copy this JSON to analyze your preferences.')
+          ]
+        )
+      );
+    });
   }
 
   // ========== DESIGN SELECTOR ==========

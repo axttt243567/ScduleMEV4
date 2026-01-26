@@ -74,12 +74,30 @@ The AI chat features a powerful **multi-block response system** supporting 24+ c
 | PDF Preview | Document preview with actions | — |
 | Interactive Map | Zoomable map with markers | `#map` |
 
-### Developer Testing
+### Developer Tools
+Use the dedicated tools for rapid testing and feature discovery.
 
-Use these keywords in the chat to test content types:
+#### 1. Quick Navigation (`#keywords`)
+Type `#keywords` to open a menu of clickable action buttons for every supported feature.
+- **Visualizations**: Charts, Graphs
+- **Interactive**: Quizzes, Checklists, Tables
+- **Media**: Audio, Video, Maps
+- **Styles**: Handwritten notes, Themes, Code styles
+
+#### 2. Automated Test Suite (`#starttesto1`)
+Type `#starttesto1` or tap the **Bug Report Icon** (🪲) in the app bar to start the sequential test mode.
+- Walks through 20+ response types
+- Interactive Keep/Delete/More sorting
+- Generates a JSON report of your preferences
+
+#### 3. Direct Keywords
+Use these keywords to trigger specific content blocks directly:
 
 ```
 #all        → Shows ALL 24 content types with labels
+#keywords   → Show clickable command menu
+#starttesto1 → Start sequential test mode
+
 #bar        → Bar chart demo
 #pie        → Pie chart demo
 #line       → Line chart demo
@@ -102,6 +120,9 @@ Use these keywords in the chat to test content types:
 #code       → Code block demo
 #imgN       → N images (e.g., #img3)
 #multi      → Mixed text/images
+#pycs       → Python Cheatsheet (3 parts)
+#codevariants → 20 Dev/IDE Code Themes
+#playwritevariants → 30 Handwritten Fonts
 ```
 
 ---
