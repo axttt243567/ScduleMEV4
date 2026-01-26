@@ -70,14 +70,27 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     if (!shouldIncludeImages) return null;
 
     final imageCount = random.nextInt(4) + 1; // 1-4 images
-    final sampleTitles = ['Schedule Overview', 'Class Analysis', 'Attendance Chart', 'Course Statistics'];
-    final sampleCaptions = ['Your weekly schedule breakdown', 'Performance analytics for this semester', 'Monthly attendance trends', 'Subject-wise distribution'];
-    
-    return List.generate(imageCount, (i) => AIResponseImage(
-      url: 'placeholder_${i + 1}', // Placeholder - will show demo image
-      title: sampleTitles[i % sampleTitles.length],
-      caption: sampleCaptions[i % sampleCaptions.length],
-    ));
+    final sampleTitles = [
+      'Schedule Overview',
+      'Class Analysis',
+      'Attendance Chart',
+      'Course Statistics',
+    ];
+    final sampleCaptions = [
+      'Your weekly schedule breakdown',
+      'Performance analytics for this semester',
+      'Monthly attendance trends',
+      'Subject-wise distribution',
+    ];
+
+    return List.generate(
+      imageCount,
+      (i) => AIResponseImage(
+        url: 'placeholder_${i + 1}', // Placeholder - will show demo image
+        title: sampleTitles[i % sampleTitles.length],
+        caption: sampleCaptions[i % sampleCaptions.length],
+      ),
+    );
   }
 
   void _sendMessage() {
@@ -91,34 +104,34 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     int? devImageCount;
     bool useMultiBlock = false;
     bool useCodeBlock = false;
-    
+
     // Check for #imgN keyword
     final imgRegex = RegExp(r'#img(\d+)', caseSensitive: false);
     final imgMatch = imgRegex.firstMatch(text);
     if (imgMatch != null) {
       devImageCount = int.tryParse(imgMatch.group(1) ?? '');
     }
-    
+
     // Check for #multi keyword for multi-block testing
     if (text.toLowerCase().contains('#multi')) {
       useMultiBlock = true;
     }
-    
+
     // Check for #code keyword for code block testing
     if (text.toLowerCase().contains('#code')) {
       useCodeBlock = true;
     }
-    
+
     // Check for #map keyword for map block testing
     bool useMapBlock = text.toLowerCase().contains('#map');
-    
+
     // Check for chart keywords
     bool useBarChart = text.toLowerCase().contains('#bar');
     bool usePieChart = text.toLowerCase().contains('#pie');
-    
+
     // Check for #all keyword to show all content types
     bool useAllBlocks = text.toLowerCase().contains('#all');
-    
+
     // Check for individual new keywords
     bool useLineChart = text.toLowerCase().contains('#line');
     bool useRadarChart = text.toLowerCase().contains('#radar');
@@ -136,20 +149,33 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
     bool useCountdown = text.toLowerCase().contains('#countdown');
     bool useFlash = text.toLowerCase().contains('#flash');
     bool useActions = text.toLowerCase().contains('#actions');
-    
+
     // Check for new paper/note styles
     bool useNote = text.toLowerCase().contains('#note');
     bool usePaper = text.toLowerCase().contains('#paper');
     bool useLetter = text.toLowerCase().contains('#letter');
 
+    // Check for #papernotesall
+    bool usePaperNotesAll = text.toLowerCase().contains('#papernotesall');
+
+    // Check for #pynotes
+    bool usePyNotes = text.toLowerCase().contains('#pynotes');
+
+    // Check for #textstyles (20 styles showcase)
+    bool useTextStyles = text.toLowerCase().contains('#textstyles');
+
     // Add user message
     setState(() {
-      _messages.add(ChatMessage(
-        isAi: false,
-        sender: 'You',
-        message: text.isNotEmpty ? text : _getAttachmentSummary(attachmentsCopy),
-        pendingAttachments: attachmentsCopy,
-      ));
+      _messages.add(
+        ChatMessage(
+          isAi: false,
+          sender: 'You',
+          message: text.isNotEmpty
+              ? text
+              : _getAttachmentSummary(attachmentsCopy),
+          pendingAttachments: attachmentsCopy,
+        ),
+      );
       _messageController.clear();
       _pendingAttachments.clear();
       _isTyping = true;
@@ -163,73 +189,293 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
       if (mounted) {
         setState(() {
           _isTyping = false;
-          
+
           if (useAllBlocks) {
             // #all - Show ALL content types in one response
-            _messages.add(ChatMessage(
-              isAi: true,
-              sender: 'Nexus AI',
-              message: '',
-              contentBlocks: _generateAllBlocksResponse(),
-            ));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateAllBlocksResponse(),
+              ),
+            );
+          } else if (usePaperNotesAll) {
+            // #papernotesall - Show 5 variants
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generatePaperNotesAllResponse(),
+              ),
+            );
+          } else if (usePyNotes) {
+            // #pynotes - Show rich "magazine style" Python tutorial
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generatePyNotesResponse(),
+              ),
+            );
+          } else if (useTextStyles) {
+            // #textstyles - Show 20 showcase text blocks
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateTextStylesResponse(),
+              ),
+            );
           } else if (useLineChart) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateLineChartResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateLineChartResponse(),
+              ),
+            );
           } else if (useRadarChart) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateRadarChartResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateRadarChartResponse(),
+              ),
+            );
           } else if (useProgress) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateProgressResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateProgressResponse(),
+              ),
+            );
           } else if (useTimeline) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateTimelineResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateTimelineResponse(),
+              ),
+            );
           } else if (useQuiz) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateQuizResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateQuizResponse(),
+              ),
+            );
           } else if (useChecklist) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateChecklistResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateChecklistResponse(),
+              ),
+            );
           } else if (useTable) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateTableResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateTableResponse(),
+              ),
+            );
           } else if (useCarousel) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCarouselResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateCarouselResponse(),
+              ),
+            );
           } else if (useAudio) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateAudioResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateAudioResponse(),
+              ),
+            );
           } else if (useVideo) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateVideoResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateVideoResponse(),
+              ),
+            );
           } else if (useContact) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateContactResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateContactResponse(),
+              ),
+            );
           } else if (useEvent) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateEventResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateEventResponse(),
+              ),
+            );
           } else if (useActions) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateActionsResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateActionsResponse(),
+              ),
+            );
           } else if (useWeather) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateWeatherResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateWeatherResponse(),
+              ),
+            );
           } else if (useCountdown) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCountdownResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateCountdownResponse(),
+              ),
+            );
           } else if (useFlash) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateFlashcardsResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateFlashcardsResponse(),
+              ),
+            );
           } else if (useBarChart) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateBarChartResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateBarChartResponse(),
+              ),
+            );
           } else if (usePieChart) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generatePieChartResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generatePieChartResponse(),
+              ),
+            );
           } else if (useMapBlock) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateMapBlockResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateMapBlockResponse(),
+              ),
+            );
           } else if (useCodeBlock) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateCodeBlockResponse()));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateCodeBlockResponse(),
+              ),
+            );
           } else if (useMultiBlock) {
-            _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3)));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: _generateMultiBlockResponse(devImageCount ?? 3),
+              ),
+            );
           } else if (useNote) {
-             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.note(text.replaceAll('#note', '').trim().isEmpty ? 'Don\'t forget to study for the exam tomorrow!' : text.replaceAll('#note', '').trim())]));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: [
+                  AIContentBlock.note(
+                    text.replaceAll('#note', '').trim().isEmpty
+                        ? 'Don\'t forget to study for the exam tomorrow!'
+                        : text.replaceAll('#note', '').trim(),
+                  ),
+                ],
+              ),
+            );
           } else if (usePaper) {
-             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.paper(text.replaceAll('#paper', '').trim().isEmpty ? 'Chapter 1 Notes:\n\n1. Introduction to Physics\n2. Newton\'s Laws\n3. Kinetic Energy' : text.replaceAll('#paper', '').trim())]));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: [
+                  AIContentBlock.paper(
+                    text.replaceAll('#paper', '').trim().isEmpty
+                        ? 'Chapter 1 Notes:\n\n1. Introduction to Physics\n2. Newton\'s Laws\n3. Kinetic Energy'
+                        : text.replaceAll('#paper', '').trim(),
+                  ),
+                ],
+              ),
+            );
           } else if (useLetter) {
-             _messages.add(ChatMessage(isAi: true, sender: 'Nexus AI', message: '', contentBlocks: [AIContentBlock.letter(text.replaceAll('#letter', '').trim().isEmpty ? 'Dear Student,\n\nWe are pleased to inform you that your application for the advanced research program has been accepted.\n\nSincerely,\nThe Dean' : text.replaceAll('#letter', '').trim())]));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: '',
+                contentBlocks: [
+                  AIContentBlock.letter(
+                    text.replaceAll('#letter', '').trim().isEmpty
+                        ? 'Dear Student,\n\nWe are pleased to inform you that your application for the advanced research program has been accepted.\n\nSincerely,\nThe Dean'
+                        : text.replaceAll('#letter', '').trim(),
+                  ),
+                ],
+              ),
+            );
           } else {
             // Standard response (backward compatible)
-            _messages.add(ChatMessage(
-              isAi: true,
-              sender: 'Nexus AI',
-              message: _generateLoremIpsum(),
-              images: devImageCount != null 
-                  ? _generateTestImages(devImageCount) 
-                  : _generateSampleImages(),
-            ));
+            _messages.add(
+              ChatMessage(
+                isAi: true,
+                sender: 'Nexus AI',
+                message: _generateLoremIpsum(),
+                images: devImageCount != null
+                    ? _generateTestImages(devImageCount)
+                    : _generateSampleImages(),
+              ),
+            );
           }
         });
         _scrollToBottom();
@@ -241,14 +487,15 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
   List<AIContentBlock> _generateMapBlockResponse() {
     final blocks = <AIContentBlock>[];
     final random = Random();
-    
+
     // Sample locations (universities and landmarks)
     final sampleLocations = [
       MapLocation(
         latitude: 28.6139,
         longitude: 77.2090,
         title: 'India Gate, New Delhi',
-        description: 'A historic war memorial located in the heart of New Delhi, India.',
+        description:
+            'A historic war memorial located in the heart of New Delhi, India.',
       ),
       MapLocation(
         latitude: 19.0760,
@@ -275,30 +522,36 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
         description: 'One of the longest urban beaches in the world.',
       ),
     ];
-    
+
     // Pick a random location
     final location = sampleLocations[random.nextInt(sampleLocations.length)];
-    
+
     // Intro text
     blocks.add(AIContentBlock.text('Here\'s the location you asked about:'));
-    
+
     // Map block
-    blocks.add(AIContentBlock.map(
-      mapCenter: location,
-      mapMarkers: [location],
-      mapZoom: 14.0,
-    ));
-    
+    blocks.add(
+      AIContentBlock.map(
+        mapCenter: location,
+        mapMarkers: [location],
+        mapZoom: 14.0,
+      ),
+    );
+
     // Follow-up text
-    blocks.add(AIContentBlock.text('You can zoom and pan the map to explore the area. Tap the marker for more details.'));
-    
+    blocks.add(
+      AIContentBlock.text(
+        'You can zoom and pan the map to explore the area. Tap the marker for more details.',
+      ),
+    );
+
     return blocks;
   }
 
   /// Dev testing: Generate response with bar chart
   List<AIContentBlock> _generateBarChartResponse() {
     final blocks = <AIContentBlock>[];
-    
+
     // Sample data for bar chart (course scores)
     final chartData = [
       ChartDataItem(label: 'Math', value: 85),
@@ -307,26 +560,34 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
       ChartDataItem(label: 'English', value: 88),
       ChartDataItem(label: 'History', value: 74),
     ];
-    
+
     // Intro text
-    blocks.add(AIContentBlock.text('Here\'s your performance analysis across subjects:'));
-    
+    blocks.add(
+      AIContentBlock.text('Here\'s your performance analysis across subjects:'),
+    );
+
     // Bar chart
-    blocks.add(AIContentBlock.barChart(
-      chartData: chartData,
-      chartTitle: 'Subject-wise Scores',
-    ));
-    
+    blocks.add(
+      AIContentBlock.barChart(
+        chartData: chartData,
+        chartTitle: 'Subject-wise Scores',
+      ),
+    );
+
     // Analysis text
-    blocks.add(AIContentBlock.text('Chemistry shows your best performance at 92%. Consider focusing more on History to improve your overall average.'));
-    
+    blocks.add(
+      AIContentBlock.text(
+        'Chemistry shows your best performance at 92%. Consider focusing more on History to improve your overall average.',
+      ),
+    );
+
     return blocks;
   }
 
   /// Dev testing: Generate response with pie chart
   List<AIContentBlock> _generatePieChartResponse() {
     final blocks = <AIContentBlock>[];
-    
+
     // Sample data for pie chart (time allocation)
     final chartData = [
       ChartDataItem(label: 'Classes', value: 35),
@@ -335,132 +596,298 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
       ChartDataItem(label: 'Breaks', value: 12),
       ChartDataItem(label: 'Other', value: 8),
     ];
-    
+
     // Intro text
-    blocks.add(AIContentBlock.text('Here\'s how your time is distributed this week:'));
-    
+    blocks.add(
+      AIContentBlock.text('Here\'s how your time is distributed this week:'),
+    );
+
     // Pie chart
-    blocks.add(AIContentBlock.pieChart(
-      chartData: chartData,
-      chartTitle: 'Weekly Time Allocation',
-    ));
-    
+    blocks.add(
+      AIContentBlock.pieChart(
+        chartData: chartData,
+        chartTitle: 'Weekly Time Allocation',
+      ),
+    );
+
     // Analysis text
-    blocks.add(AIContentBlock.text('You\'re spending 35% of your time in classes. Consider allocating more time to self-study for better exam preparation.'));
-    
+    blocks.add(
+      AIContentBlock.text(
+        'You\'re spending 35% of your time in classes. Consider allocating more time to self-study for better exam preparation.',
+      ),
+    );
+
     return blocks;
   }
 
   /// Dev testing: Generate response with ALL content types (with labels)
   List<AIContentBlock> _generateAllBlocksResponse() {
     return [
-      AIContentBlock.text('🎉 ALL AI Response Content Types Showcase\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━'),
-      
+      AIContentBlock.text(
+        '🎉 ALL AI Response Content Types Showcase\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+      ),
+
       // New Styles
       AIContentBlock.text('📝 NOTE BLOCK  →  #note'),
       AIContentBlock.note("This is a sticky note. Don't forget to buy milk!"),
-      
+
       AIContentBlock.text('📄 PAPER BLOCK  →  #paper'),
-      AIContentBlock.paper("This is a lined paper block.\nIt looks like a notebook page."),
-      
+      AIContentBlock.paper(
+        "This is a lined paper block.\nIt looks like a notebook page.",
+      ),
+
       AIContentBlock.text('✉️ LETTER BLOCK  →  #letter'),
-      AIContentBlock.letter("My Dearest Friend,\n\nI hope this letter finds you well. The weather here has been quite peculiar lately...\n\nSincerely,\nNexus AI"),
+      AIContentBlock.letter(
+        "My Dearest Friend,\n\nI hope this letter finds you well. The weather here has been quite peculiar lately...\n\nSincerely,\nNexus AI",
+      ),
 
       // Bar Chart
       AIContentBlock.text('📊 BAR CHART  →  #bar'),
-      AIContentBlock.barChart(chartData: [ChartDataItem(label: 'Mon', value: 85), ChartDataItem(label: 'Tue', value: 72), ChartDataItem(label: 'Wed', value: 90), ChartDataItem(label: 'Thu', value: 68)], chartTitle: 'Weekly Progress'),
-      
+      AIContentBlock.barChart(
+        chartData: [
+          ChartDataItem(label: 'Mon', value: 85),
+          ChartDataItem(label: 'Tue', value: 72),
+          ChartDataItem(label: 'Wed', value: 90),
+          ChartDataItem(label: 'Thu', value: 68),
+        ],
+        chartTitle: 'Weekly Progress',
+      ),
+
       // Pie Chart
       AIContentBlock.text('🥧 PIE CHART  →  #pie'),
-      AIContentBlock.pieChart(chartData: [ChartDataItem(label: 'Study', value: 40), ChartDataItem(label: 'Class', value: 30), ChartDataItem(label: 'Break', value: 30)], chartTitle: 'Time Split'),
-      
+      AIContentBlock.pieChart(
+        chartData: [
+          ChartDataItem(label: 'Study', value: 40),
+          ChartDataItem(label: 'Class', value: 30),
+          ChartDataItem(label: 'Break', value: 30),
+        ],
+        chartTitle: 'Time Split',
+      ),
+
       // Line Chart
       AIContentBlock.text('📈 LINE CHART  →  #line'),
-      AIContentBlock.lineChart(lineData: [ChartDataPoint(x: 0, y: 60, label: 'Jan'), ChartDataPoint(x: 1, y: 75, label: 'Feb'), ChartDataPoint(x: 2, y: 85, label: 'Mar'), ChartDataPoint(x: 3, y: 90, label: 'Apr')], chartTitle: 'Grade Trend'),
-      
+      AIContentBlock.lineChart(
+        lineData: [
+          ChartDataPoint(x: 0, y: 60, label: 'Jan'),
+          ChartDataPoint(x: 1, y: 75, label: 'Feb'),
+          ChartDataPoint(x: 2, y: 85, label: 'Mar'),
+          ChartDataPoint(x: 3, y: 90, label: 'Apr'),
+        ],
+        chartTitle: 'Grade Trend',
+      ),
+
       // Radar Chart
       AIContentBlock.text('🎯 RADAR CHART  →  #radar'),
-      AIContentBlock.radarChart(chartData: [ChartDataItem(label: 'Math', value: 80), ChartDataItem(label: 'Science', value: 70), ChartDataItem(label: 'English', value: 90), ChartDataItem(label: 'History', value: 65), ChartDataItem(label: 'Art', value: 85)], chartTitle: 'Skill Radar'),
-      
+      AIContentBlock.radarChart(
+        chartData: [
+          ChartDataItem(label: 'Math', value: 80),
+          ChartDataItem(label: 'Science', value: 70),
+          ChartDataItem(label: 'English', value: 90),
+          ChartDataItem(label: 'History', value: 65),
+          ChartDataItem(label: 'Art', value: 85),
+        ],
+        chartTitle: 'Skill Radar',
+      ),
+
       // Progress Bars
       AIContentBlock.text('📶 PROGRESS BARS  →  #progress'),
-      AIContentBlock.progressBars(progressItems: [ProgressItem(label: 'Assignment 1', value: 80), ProgressItem(label: 'Assignment 2', value: 45), ProgressItem(label: 'Project', value: 100)], chartTitle: 'Task Progress'),
-      
+      AIContentBlock.progressBars(
+        progressItems: [
+          ProgressItem(label: 'Assignment 1', value: 80),
+          ProgressItem(label: 'Assignment 2', value: 45),
+          ProgressItem(label: 'Project', value: 100),
+        ],
+        chartTitle: 'Task Progress',
+      ),
+
       // Timeline
       AIContentBlock.text('⏱️ TIMELINE  →  #timeline'),
-      AIContentBlock.timeline(timelineEvents: [TimelineEvent(title: 'Class Start', date: '9:00 AM'), TimelineEvent(title: 'Lunch Break', date: '12:00 PM'), TimelineEvent(title: 'Lab Session', date: '2:00 PM')]),
-      
+      AIContentBlock.timeline(
+        timelineEvents: [
+          TimelineEvent(title: 'Class Start', date: '9:00 AM'),
+          TimelineEvent(title: 'Lunch Break', date: '12:00 PM'),
+          TimelineEvent(title: 'Lab Session', date: '2:00 PM'),
+        ],
+      ),
+
       // Quiz
       AIContentBlock.text('❓ QUIZ  →  #quiz'),
-      AIContentBlock.quiz(quizData: QuizData(question: 'What is 2 + 2?', options: ['3', '4', '5', '6'], correctIndex: 1)),
-      
+      AIContentBlock.quiz(
+        quizData: QuizData(
+          question: 'What is 2 + 2?',
+          options: ['3', '4', '5', '6'],
+          correctIndex: 1,
+        ),
+      ),
+
       // Checklist
       AIContentBlock.text('✅ CHECKLIST  →  #checklist'),
-      AIContentBlock.checklist(checklistItems: [ChecklistItem(text: 'Review notes'), ChecklistItem(text: 'Complete HW', checked: true), ChecklistItem(text: 'Study for exam')], chartTitle: 'To-Do'),
-      
+      AIContentBlock.checklist(
+        checklistItems: [
+          ChecklistItem(text: 'Review notes'),
+          ChecklistItem(text: 'Complete HW', checked: true),
+          ChecklistItem(text: 'Study for exam'),
+        ],
+        chartTitle: 'To-Do',
+      ),
+
       // Collapsible
       AIContentBlock.text('🔽 COLLAPSIBLE  →  (no keyword)'),
-      AIContentBlock.collapsible(collapsibleTitle: 'Click to expand details', collapsibleContent: 'This is the hidden content that appears when you tap on the header! Great for FAQs or additional info.'),
-      
+      AIContentBlock.collapsible(
+        collapsibleTitle: 'Click to expand details',
+        collapsibleContent:
+            'This is the hidden content that appears when you tap on the header! Great for FAQs or additional info.',
+      ),
+
       // Data Table
       AIContentBlock.text('📋 DATA TABLE  →  #table'),
-      AIContentBlock.dataTable(tableData: TableData(headers: ['Subject', 'Grade', 'Credits'], rows: [['Math', 'A', '4'], ['Physics', 'B+', '3'], ['English', 'A-', '3']]), chartTitle: 'Grades'),
-      
+      AIContentBlock.dataTable(
+        tableData: TableData(
+          headers: ['Subject', 'Grade', 'Credits'],
+          rows: [
+            ['Math', 'A', '4'],
+            ['Physics', 'B+', '3'],
+            ['English', 'A-', '3'],
+          ],
+        ),
+        chartTitle: 'Grades',
+      ),
+
       // Carousel
       AIContentBlock.text('🎠 CARDS CAROUSEL  →  #cards'),
-      AIContentBlock.carousel(carouselItems: [InfoCard(title: 'Physics 101', subtitle: 'Room 204', icon: Icons.science), InfoCard(title: 'Math 201', subtitle: 'Room 105', icon: Icons.calculate), InfoCard(title: 'English 101', subtitle: 'Room 302', icon: Icons.book)]),
-      
+      AIContentBlock.carousel(
+        carouselItems: [
+          InfoCard(
+            title: 'Physics 101',
+            subtitle: 'Room 204',
+            icon: Icons.science,
+          ),
+          InfoCard(
+            title: 'Math 201',
+            subtitle: 'Room 105',
+            icon: Icons.calculate,
+          ),
+          InfoCard(
+            title: 'English 101',
+            subtitle: 'Room 302',
+            icon: Icons.book,
+          ),
+        ],
+      ),
+
       // Audio Player
       AIContentBlock.text('🎵 AUDIO PLAYER  →  #audio'),
-      AIContentBlock.audioPlayer(mediaUrl: 'lecture.mp3', mediaTitle: 'Lecture Recording', mediaDuration: const Duration(minutes: 45)),
-      
+      AIContentBlock.audioPlayer(
+        mediaUrl: 'lecture.mp3',
+        mediaTitle: 'Lecture Recording',
+        mediaDuration: const Duration(minutes: 45),
+      ),
+
       // Video Player
       AIContentBlock.text('🎬 VIDEO PLAYER  →  #video'),
-      AIContentBlock.videoPlayer(mediaUrl: 'tutorial.mp4', mediaTitle: 'Video Tutorial'),
-      
+      AIContentBlock.videoPlayer(
+        mediaUrl: 'tutorial.mp4',
+        mediaTitle: 'Video Tutorial',
+      ),
+
       // File Attachment
       AIContentBlock.text('📎 FILE ATTACHMENT  →  (no keyword)'),
-      AIContentBlock.fileAttachment(mediaUrl: 'notes.pdf', mediaTitle: 'Study_Notes.pdf'),
-      
+      AIContentBlock.fileAttachment(
+        mediaUrl: 'notes.pdf',
+        mediaTitle: 'Study_Notes.pdf',
+      ),
+
       // Voice Message
       AIContentBlock.text('🎤 VOICE MESSAGE  →  (no keyword)'),
       AIContentBlock.voiceMessage(mediaDuration: const Duration(seconds: 32)),
-      
+
       // Quick Actions
       AIContentBlock.text('⚡ QUICK ACTIONS  →  #actions'),
-      AIContentBlock.quickActions(actionButtons: [ActionButton(label: 'Calendar', icon: Icons.calendar_today, color: const Color(0xFF3B82F6)), ActionButton(label: 'Reminder', icon: Icons.alarm, color: const Color(0xFFF59E0B)), ActionButton(label: 'Share', icon: Icons.share, color: const Color(0xFF10B981))]),
-      
+      AIContentBlock.quickActions(
+        actionButtons: [
+          ActionButton(
+            label: 'Calendar',
+            icon: Icons.calendar_today,
+            color: const Color(0xFF3B82F6),
+          ),
+          ActionButton(
+            label: 'Reminder',
+            icon: Icons.alarm,
+            color: const Color(0xFFF59E0B),
+          ),
+          ActionButton(
+            label: 'Share',
+            icon: Icons.share,
+            color: const Color(0xFF10B981),
+          ),
+        ],
+      ),
+
       // Contact Card
       AIContentBlock.text('👤 CONTACT CARD  →  #contact'),
-      AIContentBlock.contactCard(contactData: ContactData(name: 'Prof. Johnson', role: 'Mathematics', phone: '+1234567890', email: 'prof.j@edu.com')),
-      
+      AIContentBlock.contactCard(
+        contactData: ContactData(
+          name: 'Prof. Johnson',
+          role: 'Mathematics',
+          phone: '+1234567890',
+          email: 'prof.j@edu.com',
+        ),
+      ),
+
       // Calendar Event
       AIContentBlock.text('📅 CALENDAR EVENT  →  #event'),
-      AIContentBlock.calendarEvent(eventData: CalendarEventData(title: 'Final Exam', date: 'Jan 28', time: '10:00 AM', location: 'Hall A')),
-      
+      AIContentBlock.calendarEvent(
+        eventData: CalendarEventData(
+          title: 'Final Exam',
+          date: 'Jan 28',
+          time: '10:00 AM',
+          location: 'Hall A',
+        ),
+      ),
+
       // Math Equation
       AIContentBlock.text('🧮 MATH EQUATION  →  (no keyword)'),
       AIContentBlock.mathEquation(mathEquation: 'E = mc² + ∫f(x)dx'),
-      
+
       // Weather
       AIContentBlock.text('🌤️ WEATHER WIDGET  →  #weather'),
-      AIContentBlock.weather(weatherData: WeatherData(location: 'Campus', temperature: 24, condition: 'Sunny', icon: Icons.wb_sunny)),
-      
+      AIContentBlock.weather(
+        weatherData: WeatherData(
+          location: 'Campus',
+          temperature: 24,
+          condition: 'Sunny',
+          icon: Icons.wb_sunny,
+        ),
+      ),
+
       // Countdown
       AIContentBlock.text('⏳ COUNTDOWN TIMER  →  #countdown'),
-      AIContentBlock.countdown(countdownData: CountdownData(title: 'Exam in...', targetDate: DateTime.now().add(const Duration(days: 5)))),
-      
+      AIContentBlock.countdown(
+        countdownData: CountdownData(
+          title: 'Exam in...',
+          targetDate: DateTime.now().add(const Duration(days: 5)),
+        ),
+      ),
+
       // Flashcards
       AIContentBlock.text('🃏 FLASHCARDS  →  #flash'),
-      AIContentBlock.flashcards(flashcards: [FlashcardData(front: 'H₂O', back: 'Water molecule'), FlashcardData(front: 'F = ma', back: 'Force = mass × acceleration')]),
-      
+      AIContentBlock.flashcards(
+        flashcards: [
+          FlashcardData(front: 'H₂O', back: 'Water molecule'),
+          FlashcardData(front: 'F = ma', back: 'Force = mass × acceleration'),
+        ],
+      ),
+
       // PDF Preview
       AIContentBlock.text('📄 PDF PREVIEW  →  (no keyword)'),
-      AIContentBlock.pdfPreview(mediaUrl: 'syllabus.pdf', mediaTitle: 'Course Syllabus'),
-      
+      AIContentBlock.pdfPreview(
+        mediaUrl: 'syllabus.pdf',
+        mediaTitle: 'Course Syllabus',
+      ),
+
       // Map (separate keyword)
       AIContentBlock.text('🗺️ MAP  →  #map'),
-      
+
       // Code Block (separate keyword)
       AIContentBlock.text('💻 CODE BLOCK  →  #code'),
 
@@ -470,66 +897,535 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
 
       // Paper Block
       AIContentBlock.text('📓 LINED PAPER → #paper'),
-      AIContentBlock.paper('History Notes:\n- World War II started in 1939\n- Ended in 1945\n- Major powers: Allies vs Axis'),
+      AIContentBlock.paper(
+        'History Notes:\n- World War II started in 1939\n- Ended in 1945\n- Major powers: Allies vs Axis',
+      ),
 
       // Letter Block
       AIContentBlock.text('📜 VINTAGE LETTER → #letter'),
-      AIContentBlock.letter('Dear Student,\n\nCongratulations on your excellent performance this semester. Keep up the great work!\n\nBest,\nDean of Students'),
-      
-      AIContentBlock.text('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 27 content types!\nUse individual #keywords to test each one.'),
+      AIContentBlock.letter(
+        'Dear Student,\n\nCongratulations on your excellent performance this semester. Keep up the great work!\n\nBest,\nDean of Students',
+      ),
+
+      AIContentBlock.text(
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 27 content types!\nUse individual #keywords to test each one.',
+      ),
+      AIContentBlock.text(
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✨ Total: 27 content types!\nUse individual #keywords to test each one.',
+      ),
     ];
   }
 
-  List<AIContentBlock> _generateLineChartResponse() => [AIContentBlock.text('Here\'s your grade progression:'), AIContentBlock.lineChart(lineData: [ChartDataPoint(x: 0, y: 65, label: 'Week 1'), ChartDataPoint(x: 1, y: 72, label: 'Week 2'), ChartDataPoint(x: 2, y: 78, label: 'Week 3'), ChartDataPoint(x: 3, y: 85, label: 'Week 4'), ChartDataPoint(x: 4, y: 88, label: 'Week 5')], chartTitle: 'Grade Trend'), AIContentBlock.text('Great improvement! You\'ve gained 23 points over 5 weeks.')];
-  
-  List<AIContentBlock> _generateRadarChartResponse() => [AIContentBlock.text('Here\'s your skill assessment:'), AIContentBlock.radarChart(chartData: [ChartDataItem(label: 'Problem Solving', value: 85), ChartDataItem(label: 'Communication', value: 70), ChartDataItem(label: 'Creativity', value: 90), ChartDataItem(label: 'Leadership', value: 65), ChartDataItem(label: 'Teamwork', value: 80)], chartTitle: 'Skills Radar')];
-  
-  List<AIContentBlock> _generateProgressResponse() => [AIContentBlock.text('Here\'s your assignment progress:'), AIContentBlock.progressBars(progressItems: [ProgressItem(label: 'Math Homework', value: 100), ProgressItem(label: 'Science Project', value: 75), ProgressItem(label: 'Essay Draft', value: 40), ProgressItem(label: 'Lab Report', value: 60)], chartTitle: 'Assignments')];
-  
-  List<AIContentBlock> _generateTimelineResponse() => [AIContentBlock.text('Here\'s today\'s schedule:'), AIContentBlock.timeline(timelineEvents: [TimelineEvent(title: 'Morning Lecture', description: 'Introduction to Calculus', date: '9:00 AM'), TimelineEvent(title: 'Lab Session', description: 'Chemistry Lab B', date: '11:00 AM'), TimelineEvent(title: 'Study Group', description: 'Library Room 3', date: '2:00 PM'), TimelineEvent(title: 'Office Hours', description: 'Prof. Smith', date: '4:00 PM')])];
-  
-  List<AIContentBlock> _generateQuizResponse() => [AIContentBlock.text('Quick Quiz Time! 📝'), AIContentBlock.quiz(quizData: QuizData(question: 'Which planet is known as the Red Planet?', options: ['Venus', 'Mars', 'Jupiter', 'Saturn'], correctIndex: 1))];
-  
-  List<AIContentBlock> _generateChecklistResponse() => [AIContentBlock.text('Here\'s your study checklist:'), AIContentBlock.checklist(checklistItems: [ChecklistItem(text: 'Read Chapter 5', checked: true), ChecklistItem(text: 'Complete practice problems'), ChecklistItem(text: 'Review lecture notes'), ChecklistItem(text: 'Prepare questions for class')], chartTitle: 'Study Tasks')];
-  
-  List<AIContentBlock> _generateTableResponse() => [AIContentBlock.text('Here\'s your grade summary:'), AIContentBlock.dataTable(tableData: TableData(headers: ['Subject', 'Midterm', 'Final', 'Grade'], rows: [['Mathematics', '88', '92', 'A'], ['Physics', '75', '82', 'B+'], ['Chemistry', '90', '88', 'A-'], ['English', '85', '90', 'A']]), chartTitle: 'Term Grades')];
-  
-  List<AIContentBlock> _generateCarouselResponse() => [AIContentBlock.text('Your enrolled courses:'), AIContentBlock.carousel(carouselItems: [InfoCard(title: 'Calculus II', subtitle: 'MWF 9:00 AM', description: 'Room 201', icon: Icons.calculate, color: const Color(0xFF3B82F6)), InfoCard(title: 'Physics 101', subtitle: 'TTH 11:00 AM', description: 'Lab B', icon: Icons.science, color: const Color(0xFF8B5CF6)), InfoCard(title: 'English Lit', subtitle: 'MWF 2:00 PM', description: 'Room 305', icon: Icons.book, color: const Color(0xFF10B981))])];
-  
-  List<AIContentBlock> _generateAudioResponse() => [AIContentBlock.text('Here\'s the lecture recording:'), AIContentBlock.audioPlayer(mediaUrl: 'lecture.mp3', mediaTitle: 'Calculus Lecture - Week 4', mediaDuration: const Duration(minutes: 52, seconds: 30))];
-  
-  List<AIContentBlock> _generateVideoResponse() => [AIContentBlock.text('Watch this tutorial:'), AIContentBlock.videoPlayer(mediaUrl: 'tutorial.mp4', mediaTitle: 'Quadratic Equations Explained')];
-  
-  List<AIContentBlock> _generateContactResponse() => [AIContentBlock.text('Here\'s your professor\'s contact info:'), AIContentBlock.contactCard(contactData: ContactData(name: 'Dr. Sarah Miller', role: 'Professor of Mathematics', phone: '+1 (555) 123-4567', email: 'smiller@university.edu'))];
-  
-  List<AIContentBlock> _generateEventResponse() => [AIContentBlock.text('Upcoming event:'), AIContentBlock.calendarEvent(eventData: CalendarEventData(title: 'Midterm Exam', date: 'Feb 15', time: '10:00 AM - 12:00 PM', location: 'Examination Hall A', color: const Color(0xFFEF4444)))];
-  
-  List<AIContentBlock> _generateActionsResponse() => [AIContentBlock.text('Quick actions available:'), AIContentBlock.quickActions(actionButtons: [ActionButton(label: 'Add to Calendar', icon: Icons.calendar_today, color: const Color(0xFF3B82F6)), ActionButton(label: 'Set Reminder', icon: Icons.alarm, color: const Color(0xFFF59E0B)), ActionButton(label: 'Share', icon: Icons.share, color: const Color(0xFF10B981)), ActionButton(label: 'Download', icon: Icons.download, color: const Color(0xFF8B5CF6))])];
-  
-  List<AIContentBlock> _generateWeatherResponse() => [AIContentBlock.text('Current campus weather:'), AIContentBlock.weather(weatherData: WeatherData(location: 'University Campus', temperature: 22, condition: 'Partly Cloudy', icon: Icons.cloud))];
-  
-  List<AIContentBlock> _generateCountdownResponse() => [AIContentBlock.text('Exam countdown:'), AIContentBlock.countdown(countdownData: CountdownData(title: 'Final Exam - Mathematics', targetDate: DateTime.now().add(const Duration(days: 7, hours: 5)), color: const Color(0xFFEF4444)))];
-  
-  List<AIContentBlock> _generateFlashcardsResponse() => [AIContentBlock.text('Study flashcards:'), AIContentBlock.flashcards(flashcards: [FlashcardData(front: 'What is the derivative of x²?', back: '2x'), FlashcardData(front: '∫sin(x)dx = ?', back: '-cos(x) + C'), FlashcardData(front: 'lim(x→0) sin(x)/x = ?', back: '1')])];
+  /// Dev testing: Generate response with 5 variants of Note, Paper, and Letter
+  List<AIContentBlock> _generatePaperNotesAllResponse() {
+    return [
+      AIContentBlock.text('📝 NOTES SHOWCASE (5 Styles)\n━━━━━━━━━━━━━━━━'),
+      AIContentBlock.note('Variant 0: Default Yellow', variant: 0),
+      AIContentBlock.note('Variant 1: Pink', variant: 1),
+      AIContentBlock.note('Variant 2: Blue', variant: 2),
+      AIContentBlock.note('Variant 3: Green', variant: 3),
+      AIContentBlock.note('Variant 4: Orange', variant: 4),
+
+      AIContentBlock.text('📄 PAPER SHOWCASE (5 Styles)\n━━━━━━━━━━━━━━━━'),
+      AIContentBlock.paper('Variant 0: Standard Lined', variant: 0),
+      AIContentBlock.paper('Variant 1: Grid / Graph', variant: 1),
+      AIContentBlock.paper('Variant 2: Legal Pad', variant: 2),
+      AIContentBlock.paper('Variant 3: Blueprint', variant: 3),
+      AIContentBlock.paper('Variant 4: Dot Grid', variant: 4),
+
+      AIContentBlock.text('✉️ LETTER SHOWCASE (5 Styles)\n━━━━━━━━━━━━━━━━'),
+      AIContentBlock.letter('Variant 0: Parchment', variant: 0),
+      AIContentBlock.letter('Variant 1: Royal / Formal', variant: 1),
+      AIContentBlock.letter('Variant 2: Love Letter', variant: 2),
+      AIContentBlock.letter('Variant 3: Ancient', variant: 3),
+      AIContentBlock.letter('Variant 4: Dark / Mysterious', variant: 4),
+    ];
+  }
+
+  /// Dev testing: Generate structured "magazine style" Python tutorial
+  List<AIContentBlock> _generatePyNotesResponse() {
+    return [
+      // --- HEADER & INTRO ---
+      AIContentBlock.text('# 🐍 The Pythonic Way\n*A Journey into Clean Code*'),
+
+      AIContentBlock.letter(
+        'To the Aspiring Developer,\n\nLong ago, in the late 1980s, a man named Guido van Rossum set out to create a language that was not only powerful, but beautiful to read. He named it "Python," not after the snake, but after the British comedy troupe "Monty Python\'s Flying Circus".\n\nToday, we embark on a quest to master its elegance.\n\nYours in Code,\nNexus AI',
+        variant: 3,
+      ), // Ancient variant
+
+      AIContentBlock.note(
+        '💡 FUN FACT:\nPython uses indentation to define code blocks instead of curly braces {} like C++ or Java. This forces you to write clean, readable code!',
+        variant: 4,
+      ), // Orange variant (Highlight)
+      // --- THEORY SECTION ---
+      AIContentBlock.text('## ONE: The Basics'),
+
+      AIContentBlock.paper(
+        'CONCEPT: VARIABLES\n\nThink of a variable as a labeled box where you store data.\n\nname = "Alice"  <-- The Box Label\n\nInside the box is the string "Alice".\n\nWe can change what\'s in the box:\nname = "Bob"',
+        variant: 2,
+      ), // Legal Pad variant
+
+      AIContentBlock.text('### Control Flow Logic:'),
+      AIContentBlock.markdown(markdownContent: '''
+```mermaid
+graph TD;
+    A[Start] --> B{Is Hungry?};
+    B -- Yes --> C[Eat Pizza];
+    B -- No --> D[Code Python];
+    C --> D;
+    D --> E[Sleep];
+```
+'''),
+
+      // --- CODE SECTION ---
+      AIContentBlock.text('## TWO: The Blueprint'),
+
+      AIContentBlock.paper(
+        'SPECIFICATION: GUESSING GAME\n\nObjective: The computer picks a random number. The user guesses it.\n\nRequirements:\n1. Import random module\n2. Generate number 1-10\n3. Loop until correct',
+        variant: 3,
+      ), // Blueprint variant
+
+      AIContentBlock.code('''import random
+
+secret_number = random.randint(1, 10)
+guess = None
+
+print("I am thinking of a number between 1 and 10.")
+
+while guess != secret_number:
+    guess = int(input("Take a guess: "))
+    
+    if guess < secret_number:
+        print("Too low!")
+    elif guess > secret_number:
+        print("Too high!")
+    else:
+        print("You got it!")''', language: 'python'),
+
+      // --- VISUAL SUMMARY ---
+      AIContentBlock.text('## THREE: Key Takeaways'),
+
+      AIContentBlock.carousel(
+        carouselItems: [
+          InfoCard(
+            title: 'Readability',
+            subtitle: 'Clean & Clear',
+            description: 'Code is read more often than it is written.',
+            icon: Icons.visibility,
+            color: Colors.blue,
+          ),
+          InfoCard(
+            title: 'Batteries Included',
+            subtitle: 'Standard Lib',
+            description: 'Huge library of pre-built tools for everything.',
+            icon: Icons.battery_charging_full,
+            color: Colors.green,
+          ),
+          InfoCard(
+            title: 'Community',
+            subtitle: 'Massive Support',
+            description: 'Millions of devs ready to help you learn.',
+            icon: Icons.group,
+            color: Colors.orange,
+          ),
+        ],
+      ),
+
+      AIContentBlock.note(
+        '📝 HOMEWORK:\n1. Install Python from python.org\n2. Write a script to print your name 100 times!\n3. Have fun!',
+        variant: 1,
+      ), // Pink variant (Urgent/Action)
+    ];
+  }
+
+  List<AIContentBlock> _generateTextStylesResponse() {
+    return [
+      AIContentBlock.text(
+        'Here is a showcase of 20 distinct text styles for Typography, Readability, and Structure:',
+        variant: 0,
+      ),
+
+      // 1. Modern Minimal
+      AIContentBlock.text(
+        '1. Modern Minimal\nClean, light weight, wide letter spacing. Ideal for modern UI aesthetics.',
+        variant: 1,
+      ),
+
+      // 2. Classic Serif
+      AIContentBlock.text(
+        '2. Classic Serif\nTraditional, elegant, and trustworthy. Uses Georgia font on a cream background.',
+        variant: 2,
+      ),
+
+      // 3. Terminal
+      AIContentBlock.text(
+        '3. Terminal / Code\n> SYSTEM_READY\n> EXECUTE_PROTOCOL_7\nMonospaced, green on black. Perfect for logs and technical output.',
+        variant: 3,
+      ),
+
+      // 4. Editorial
+      AIContentBlock.text(
+        '4. Editorial Quote\n"Design is not just what it looks like and feels like. Design is how it works."\n- Steve Jobs',
+        variant: 4,
+      ),
+
+      // 5. Handwritten
+      AIContentBlock.text(
+        '5. Handwritten Note\nJust a quick reminder to pick up groceries and call mom later!',
+        variant: 5,
+      ),
+
+      // 6. Bold Headline
+      AIContentBlock.text('6. BOLD HEADLINE STYLE', variant: 6),
+
+      // 7. Technical/Blue
+      AIContentBlock.text(
+        '7. Technical Log\nScanning system architecture...\nOptimization complete. Latency reduced by 14%.',
+        variant: 7,
+      ),
+
+      // 8. Neon
+      AIContentBlock.text('8. NEON NIGHTS\nGlowing text effect.', variant: 8),
+
+      // 9. Typewriter
+      AIContentBlock.text(
+        '9. Vintage Typewriter\nThe quick brown fox jumps over the lazy dog.\nCourier New font for a retro feel.',
+        variant: 9,
+      ),
+
+      // 10. Review/Quote
+      AIContentBlock.text(
+        '10. Review Block\nAn absolute masterpiece of design and functionality. Five stars.',
+        variant: 10,
+      ),
+
+      // 11. Warning
+      AIContentBlock.text(
+        '11. Warning Alert\nCaution: Unsaved changes will be lost if you proceed without saving.',
+        variant: 11,
+      ),
+
+      // 12. Success
+      AIContentBlock.text(
+        '12. Success Message\nOperation completed successfully. All files have been uploaded.',
+        variant: 12,
+      ),
+
+      // 13. Info
+      AIContentBlock.text(
+        '13. Information Panel\nDid you know? You can swipe left on messages to see timestamp details.',
+        variant: 13,
+      ),
+
+      // 14. Luxury
+      AIContentBlock.text(
+        '14. Luxury / Premium\nExclusive member benefits unlocked. Welcome to the elite circle.',
+        variant: 14,
+      ),
+
+      // 15. Brutalism
+      AIContentBlock.text(
+        '15. BRUTALIST\nRAW. UNFILTERED. BOLD.',
+        variant: 15,
+      ),
+
+      // 16. Pastel
+      AIContentBlock.text(
+        '16. Soft Pastel\nGentle, calming colors for a stress-free reading experience.',
+        variant: 16,
+      ),
+
+      // 17. Accessibility
+      AIContentBlock.text(
+        '17. High Contrast\nMaximum readability for accessibility compliance.',
+        variant: 17,
+      ),
+
+       // 18. Retro Computer
+      AIContentBlock.text(
+         '18. Retro BIOS\nInitializing memory...\n640K RAM OK.',
+         variant: 18,
+      ),
+
+      // 19. Blueprint
+      AIContentBlock.text(
+         '19. Blueprint Spec\nwidth: 100%;\nheight: auto;\ndisplay: flex;',
+         variant: 19,
+      ),
+      
+      AIContentBlock.text('End of Showcase.', variant: 0),
+    ];
+  }
+
+  List<AIContentBlock> _generateLineChartResponse() => [
+    AIContentBlock.text('Here\'s your grade progression:'),
+    AIContentBlock.lineChart(
+      lineData: [
+        ChartDataPoint(x: 0, y: 65, label: 'Week 1'),
+        ChartDataPoint(x: 1, y: 72, label: 'Week 2'),
+        ChartDataPoint(x: 2, y: 78, label: 'Week 3'),
+        ChartDataPoint(x: 3, y: 85, label: 'Week 4'),
+        ChartDataPoint(x: 4, y: 88, label: 'Week 5'),
+      ],
+      chartTitle: 'Grade Trend',
+    ),
+    AIContentBlock.text(
+      'Great improvement! You\'ve gained 23 points over 5 weeks.',
+    ),
+  ];
+
+  List<AIContentBlock> _generateRadarChartResponse() => [
+    AIContentBlock.text('Here\'s your skill assessment:'),
+    AIContentBlock.radarChart(
+      chartData: [
+        ChartDataItem(label: 'Problem Solving', value: 85),
+        ChartDataItem(label: 'Communication', value: 70),
+        ChartDataItem(label: 'Creativity', value: 90),
+        ChartDataItem(label: 'Leadership', value: 65),
+        ChartDataItem(label: 'Teamwork', value: 80),
+      ],
+      chartTitle: 'Skills Radar',
+    ),
+  ];
+
+  List<AIContentBlock> _generateProgressResponse() => [
+    AIContentBlock.text('Here\'s your assignment progress:'),
+    AIContentBlock.progressBars(
+      progressItems: [
+        ProgressItem(label: 'Math Homework', value: 100),
+        ProgressItem(label: 'Science Project', value: 75),
+        ProgressItem(label: 'Essay Draft', value: 40),
+        ProgressItem(label: 'Lab Report', value: 60),
+      ],
+      chartTitle: 'Assignments',
+    ),
+  ];
+
+  List<AIContentBlock> _generateTimelineResponse() => [
+    AIContentBlock.text('Here\'s today\'s schedule:'),
+    AIContentBlock.timeline(
+      timelineEvents: [
+        TimelineEvent(
+          title: 'Morning Lecture',
+          description: 'Introduction to Calculus',
+          date: '9:00 AM',
+        ),
+        TimelineEvent(
+          title: 'Lab Session',
+          description: 'Chemistry Lab B',
+          date: '11:00 AM',
+        ),
+        TimelineEvent(
+          title: 'Study Group',
+          description: 'Library Room 3',
+          date: '2:00 PM',
+        ),
+        TimelineEvent(
+          title: 'Office Hours',
+          description: 'Prof. Smith',
+          date: '4:00 PM',
+        ),
+      ],
+    ),
+  ];
+
+  List<AIContentBlock> _generateQuizResponse() => [
+    AIContentBlock.text('Quick Quiz Time! 📝'),
+    AIContentBlock.quiz(
+      quizData: QuizData(
+        question: 'Which planet is known as the Red Planet?',
+        options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+        correctIndex: 1,
+      ),
+    ),
+  ];
+
+  List<AIContentBlock> _generateChecklistResponse() => [
+    AIContentBlock.text('Here\'s your study checklist:'),
+    AIContentBlock.checklist(
+      checklistItems: [
+        ChecklistItem(text: 'Read Chapter 5', checked: true),
+        ChecklistItem(text: 'Complete practice problems'),
+        ChecklistItem(text: 'Review lecture notes'),
+        ChecklistItem(text: 'Prepare questions for class'),
+      ],
+      chartTitle: 'Study Tasks',
+    ),
+  ];
+
+  List<AIContentBlock> _generateTableResponse() => [
+    AIContentBlock.text('Here\'s your grade summary:'),
+    AIContentBlock.dataTable(
+      tableData: TableData(
+        headers: ['Subject', 'Midterm', 'Final', 'Grade'],
+        rows: [
+          ['Mathematics', '88', '92', 'A'],
+          ['Physics', '75', '82', 'B+'],
+          ['Chemistry', '90', '88', 'A-'],
+          ['English', '85', '90', 'A'],
+        ],
+      ),
+      chartTitle: 'Term Grades',
+    ),
+  ];
+
+  List<AIContentBlock> _generateCarouselResponse() => [
+    AIContentBlock.text('Your enrolled courses:'),
+    AIContentBlock.carousel(
+      carouselItems: [
+        InfoCard(
+          title: 'Calculus II',
+          subtitle: 'MWF 9:00 AM',
+          description: 'Room 201',
+          icon: Icons.calculate,
+          color: const Color(0xFF3B82F6),
+        ),
+        InfoCard(
+          title: 'Physics 101',
+          subtitle: 'TTH 11:00 AM',
+          description: 'Lab B',
+          icon: Icons.science,
+          color: const Color(0xFF8B5CF6),
+        ),
+        InfoCard(
+          title: 'English Lit',
+          subtitle: 'MWF 2:00 PM',
+          description: 'Room 305',
+          icon: Icons.book,
+          color: const Color(0xFF10B981),
+        ),
+      ],
+    ),
+  ];
+
+  List<AIContentBlock> _generateAudioResponse() => [
+    AIContentBlock.text('Here\'s the lecture recording:'),
+    AIContentBlock.audioPlayer(
+      mediaUrl: 'lecture.mp3',
+      mediaTitle: 'Calculus Lecture - Week 4',
+      mediaDuration: const Duration(minutes: 52, seconds: 30),
+    ),
+  ];
+
+  List<AIContentBlock> _generateVideoResponse() => [
+    AIContentBlock.text('Watch this tutorial:'),
+    AIContentBlock.videoPlayer(
+      mediaUrl: 'tutorial.mp4',
+      mediaTitle: 'Quadratic Equations Explained',
+    ),
+  ];
+
+  List<AIContentBlock> _generateContactResponse() => [
+    AIContentBlock.text('Here\'s your professor\'s contact info:'),
+    AIContentBlock.contactCard(
+      contactData: ContactData(
+        name: 'Dr. Sarah Miller',
+        role: 'Professor of Mathematics',
+        phone: '+1 (555) 123-4567',
+        email: 'smiller@university.edu',
+      ),
+    ),
+  ];
+
+  List<AIContentBlock> _generateEventResponse() => [
+    AIContentBlock.text('Upcoming event:'),
+    AIContentBlock.calendarEvent(
+      eventData: CalendarEventData(
+        title: 'Midterm Exam',
+        date: 'Feb 15',
+        time: '10:00 AM - 12:00 PM',
+        location: 'Examination Hall A',
+        color: const Color(0xFFEF4444),
+      ),
+    ),
+  ];
+
+  List<AIContentBlock> _generateActionsResponse() => [
+    AIContentBlock.text('Quick actions available:'),
+    AIContentBlock.quickActions(
+      actionButtons: [
+        ActionButton(
+          label: 'Add to Calendar',
+          icon: Icons.calendar_today,
+          color: const Color(0xFF3B82F6),
+        ),
+        ActionButton(
+          label: 'Set Reminder',
+          icon: Icons.alarm,
+          color: const Color(0xFFF59E0B),
+        ),
+        ActionButton(
+          label: 'Share',
+          icon: Icons.share,
+          color: const Color(0xFF10B981),
+        ),
+        ActionButton(
+          label: 'Download',
+          icon: Icons.download,
+          color: const Color(0xFF8B5CF6),
+        ),
+      ],
+    ),
+  ];
+
+  List<AIContentBlock> _generateWeatherResponse() => [
+    AIContentBlock.text('Current campus weather:'),
+    AIContentBlock.weather(
+      weatherData: WeatherData(
+        location: 'University Campus',
+        temperature: 22,
+        condition: 'Partly Cloudy',
+        icon: Icons.cloud,
+      ),
+    ),
+  ];
+
+  List<AIContentBlock> _generateCountdownResponse() => [
+    AIContentBlock.text('Exam countdown:'),
+    AIContentBlock.countdown(
+      countdownData: CountdownData(
+        title: 'Final Exam - Mathematics',
+        targetDate: DateTime.now().add(const Duration(days: 7, hours: 5)),
+        color: const Color(0xFFEF4444),
+      ),
+    ),
+  ];
+
+  List<AIContentBlock> _generateFlashcardsResponse() => [
+    AIContentBlock.text('Study flashcards:'),
+    AIContentBlock.flashcards(
+      flashcards: [
+        FlashcardData(front: 'What is the derivative of x²?', back: '2x'),
+        FlashcardData(front: '∫sin(x)dx = ?', back: '-cos(x) + C'),
+        FlashcardData(front: 'lim(x→0) sin(x)/x = ?', back: '1'),
+      ],
+    ),
+  ];
 
   /// Dev testing: Generate response with code blocks
   List<AIContentBlock> _generateCodeBlockResponse() {
     final blocks = <AIContentBlock>[];
     final random = Random();
-    
+
     // Intro text
-    blocks.add(AIContentBlock.text('Here\'s an example of how you can implement this:'));
-    
+    blocks.add(
+      AIContentBlock.text('Here\'s an example of how you can implement this:'),
+    );
+
     // Sample code snippets
     final sampleCodes = [
-      ('''void main() {
+      (
+        '''void main() {
   print('Hello, World!');
   
   final numbers = [1, 2, 3, 4, 5];
   final doubled = numbers.map((n) => n * 2);
   print(doubled.toList());
-}''', 'dart'),
-      ('''def calculate_average(numbers):
+}''',
+        'dart',
+      ),
+      (
+        '''def calculate_average(numbers):
     if not numbers:
         return 0
     return sum(numbers) / len(numbers)
@@ -537,8 +1433,11 @@ class _AiChatPageState extends State<AiChatPage> with TickerProviderStateMixin {
 # Example usage
 scores = [85, 92, 78, 90, 88]
 avg = calculate_average(scores)
-print(f"Average: {avg}")''', 'python'),
-      ('''async function fetchUserData(userId) {
+print(f"Average: {avg}")''',
+        'python',
+      ),
+      (
+        '''async function fetchUserData(userId) {
   try {
     const response = await fetch(\`/api/users/\${userId}\`);
     const data = await response.json();
@@ -547,17 +1446,23 @@ print(f"Average: {avg}")''', 'python'),
     console.error('Error:', error);
     throw error;
   }
-}''', 'javascript'),
+}''',
+        'javascript',
+      ),
     ];
-    
+
     // Pick a random code sample
     final codeIndex = random.nextInt(sampleCodes.length);
     final (code, lang) = sampleCodes[codeIndex];
     blocks.add(AIContentBlock.code(code, language: lang));
-    
+
     // Explanation text
-    blocks.add(AIContentBlock.text('This code demonstrates the basic pattern. You can modify it according to your specific requirements.'));
-    
+    blocks.add(
+      AIContentBlock.text(
+        'This code demonstrates the basic pattern. You can modify it according to your specific requirements.',
+      ),
+    );
+
     return blocks;
   }
 
@@ -565,45 +1470,66 @@ print(f"Average: {avg}")''', 'python'),
   List<AIContentBlock> _generateMultiBlockResponse(int imageCount) {
     final blocks = <AIContentBlock>[];
     final random = Random();
-    
+
     // First text block
     blocks.add(AIContentBlock.text(_generateLoremIpsum()));
-    
+
     // First image set (half of requested images)
     final firstImageCount = (imageCount / 2).ceil();
     if (firstImageCount > 0) {
       blocks.add(AIContentBlock.images(_generateTestImages(firstImageCount)));
     }
-    
+
     // Second text block
     blocks.add(AIContentBlock.text(_generateLoremIpsum()));
-    
+
     // Second image set (remaining images)
     final secondImageCount = imageCount - firstImageCount;
     if (secondImageCount > 0) {
       blocks.add(AIContentBlock.images(_generateTestImages(secondImageCount)));
     }
-    
+
     // Third text block (conclusion)
     if (random.nextBool()) {
       blocks.add(AIContentBlock.text(_generateLoremIpsum()));
     }
-    
+
     return blocks;
   }
 
   /// Dev testing: Generate exact number of images for #imgN keyword
   List<AIResponseImage>? _generateTestImages(int count) {
     if (count <= 0) return null;
-    
-    final sampleTitles = ['Schedule Overview', 'Class Analysis', 'Attendance Chart', 'Course Statistics', 'Grade Report', 'Study Plan', 'Exam Timeline', 'Notes Summary'];
-    final sampleCaptions = ['Your weekly schedule breakdown', 'Performance analytics for this semester', 'Monthly attendance trends', 'Subject-wise distribution', 'Term grade overview', 'Weekly study goals', 'Upcoming exam dates', 'Lecture notes compilation'];
-    
-    return List.generate(count, (i) => AIResponseImage(
-      url: 'test_image_${i + 1}',
-      title: sampleTitles[i % sampleTitles.length],
-      caption: sampleCaptions[i % sampleCaptions.length],
-    ));
+
+    final sampleTitles = [
+      'Schedule Overview',
+      'Class Analysis',
+      'Attendance Chart',
+      'Course Statistics',
+      'Grade Report',
+      'Study Plan',
+      'Exam Timeline',
+      'Notes Summary',
+    ];
+    final sampleCaptions = [
+      'Your weekly schedule breakdown',
+      'Performance analytics for this semester',
+      'Monthly attendance trends',
+      'Subject-wise distribution',
+      'Term grade overview',
+      'Weekly study goals',
+      'Upcoming exam dates',
+      'Lecture notes compilation',
+    ];
+
+    return List.generate(
+      count,
+      (i) => AIResponseImage(
+        url: 'test_image_${i + 1}',
+        title: sampleTitles[i % sampleTitles.length],
+        caption: sampleCaptions[i % sampleCaptions.length],
+      ),
+    );
   }
 
   String _getAttachmentSummary(List<PendingAttachment> attachments) {
@@ -614,11 +1540,13 @@ print(f"Average: {avg}")''', 'python'),
 
   void _addAttachment(AttachmentType type, String name) {
     setState(() {
-      _pendingAttachments.add(PendingAttachment(
-        type: type,
-        name: name,
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-      ));
+      _pendingAttachments.add(
+        PendingAttachment(
+          type: type,
+          name: name,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+        ),
+      );
     });
   }
 
@@ -648,7 +1576,10 @@ print(f"Average: {avg}")''', 'python'),
       _recordingDuration = 0;
     });
     // Add voice recording as attachment
-    _addAttachment(AttachmentType.voice, 'Voice (${_formatDuration(duration)})');
+    _addAttachment(
+      AttachmentType.voice,
+      'Voice (${_formatDuration(duration)})',
+    );
   }
 
   void _cancelRecording() {
@@ -686,7 +1617,6 @@ print(f"Average: {avg}")''', 'python'),
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -715,7 +1645,8 @@ print(f"Average: {avg}")''', 'python'),
                     final index = entry.key;
                     final msg = entry.value;
                     // Check if this is the latest AI message
-                    final isLatestAi = msg.isAi && 
+                    final isLatestAi =
+                        msg.isAi &&
                         index == _messages.lastIndexWhere((m) => m.isAi);
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -777,7 +1708,11 @@ print(f"Average: {avg}")''', 'python'),
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFF27272A)),
               ),
-              child: Icon(Icons.bolt_rounded, color: Colors.grey[400], size: 22),
+              child: Icon(
+                Icons.bolt_rounded,
+                color: Colors.grey[400],
+                size: 22,
+              ),
             ),
           ),
         ],
@@ -810,7 +1745,11 @@ print(f"Average: {avg}")''', 'python'),
             const SizedBox(height: 20),
             const Text(
               'Choose Bottom Sheet Design',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -818,16 +1757,46 @@ print(f"Average: {avg}")''', 'python'),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildDesignOption('Design 1', 'Minimal Cards', () { Navigator.pop(context); _showDesign1(); }),
-                    _buildDesignOption('Design 2', 'Icon Grid', () { Navigator.pop(context); _showDesign2(); }),
-                    _buildDesignOption('Design 3', 'Glassmorphism', () { Navigator.pop(context); _showDesign3(); }),
-                    _buildDesignOption('Design 4', 'Compact List', () { Navigator.pop(context); _showDesign4(); }),
-                    _buildDesignOption('Design 5', 'Gradient Cards', () { Navigator.pop(context); _showDesign5(); }),
-                    _buildDesignOption('Design 6', 'Schedule Cards', () { Navigator.pop(context); _showDesign6(); }),
-                    _buildDesignOption('Design 7', 'Stats Dashboard', () { Navigator.pop(context); _showDesign7(); }),
-                    _buildDesignOption('Design 8', 'Progress Rings', () { Navigator.pop(context); _showDesign8(); }),
-                    _buildDesignOption('Design 9', 'Active Accent', () { Navigator.pop(context); _showDesign9(); }),
-                    _buildDesignOption('Design 10', 'Technical Style', () { Navigator.pop(context); _showDesign10(); }),
+                    _buildDesignOption('Design 1', 'Minimal Cards', () {
+                      Navigator.pop(context);
+                      _showDesign1();
+                    }),
+                    _buildDesignOption('Design 2', 'Icon Grid', () {
+                      Navigator.pop(context);
+                      _showDesign2();
+                    }),
+                    _buildDesignOption('Design 3', 'Glassmorphism', () {
+                      Navigator.pop(context);
+                      _showDesign3();
+                    }),
+                    _buildDesignOption('Design 4', 'Compact List', () {
+                      Navigator.pop(context);
+                      _showDesign4();
+                    }),
+                    _buildDesignOption('Design 5', 'Gradient Cards', () {
+                      Navigator.pop(context);
+                      _showDesign5();
+                    }),
+                    _buildDesignOption('Design 6', 'Schedule Cards', () {
+                      Navigator.pop(context);
+                      _showDesign6();
+                    }),
+                    _buildDesignOption('Design 7', 'Stats Dashboard', () {
+                      Navigator.pop(context);
+                      _showDesign7();
+                    }),
+                    _buildDesignOption('Design 8', 'Progress Rings', () {
+                      Navigator.pop(context);
+                      _showDesign8();
+                    }),
+                    _buildDesignOption('Design 9', 'Active Accent', () {
+                      Navigator.pop(context);
+                      _showDesign9();
+                    }),
+                    _buildDesignOption('Design 10', 'Technical Style', () {
+                      Navigator.pop(context);
+                      _showDesign10();
+                    }),
                   ],
                 ),
               ),
@@ -852,9 +1821,19 @@ print(f"Average: {avg}")''', 'python'),
         ),
         child: Row(
           children: [
-            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(width: 8),
-            Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            ),
             const Spacer(),
             Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[600]),
           ],
@@ -878,7 +1857,16 @@ print(f"Average: {avg}")''', 'python'),
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: Colors.grey[800], borderRadius: BorderRadius.circular(2)))),
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             _design1Item(Icons.psychology_outlined, 'Memory'),
             _design1Item(Icons.description_outlined, 'Instructions'),
@@ -903,7 +1891,10 @@ print(f"Average: {avg}")''', 'python'),
         children: [
           Icon(icon, color: Colors.white, size: 20),
           const SizedBox(width: 12),
-          Text(title, style: const TextStyle(fontSize: 14, color: Colors.white)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
         ],
       ),
     );
@@ -923,21 +1914,52 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF3F3F46), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3F3F46),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 24),
             Row(
               children: [
-                Expanded(child: _design2Item(Icons.psychology_outlined, 'Memory', const Color(0xFF8B5CF6))),
+                Expanded(
+                  child: _design2Item(
+                    Icons.psychology_outlined,
+                    'Memory',
+                    const Color(0xFF8B5CF6),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _design2Item(Icons.description_outlined, 'Instructions', const Color(0xFF3B82F6))),
+                Expanded(
+                  child: _design2Item(
+                    Icons.description_outlined,
+                    'Instructions',
+                    const Color(0xFF3B82F6),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: _design2Item(Icons.history_rounded, 'History', const Color(0xFF10B981))),
+                Expanded(
+                  child: _design2Item(
+                    Icons.history_rounded,
+                    'History',
+                    const Color(0xFF10B981),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _design2Item(Icons.tune_rounded, 'Agent', const Color(0xFFF59E0B))),
+                Expanded(
+                  child: _design2Item(
+                    Icons.tune_rounded,
+                    'Agent',
+                    const Color(0xFFF59E0B),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -959,7 +1981,14 @@ print(f"Average: {avg}")''', 'python'),
         children: [
           Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
-          Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
         ],
       ),
     );
@@ -976,18 +2005,40 @@ print(f"Average: {avg}")''', 'python'),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color(0xFF1E1E2E).withOpacity(0.95), const Color(0xFF0A0A0C)],
+            colors: [
+              const Color(0xFF1E1E2E).withOpacity(0.95),
+              const Color(0xFF0A0A0C),
+            ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 24),
-            _design3Item(Icons.psychology_outlined, 'Memory', 'Context & Memory'),
-            _design3Item(Icons.description_outlined, 'Instructions', 'Custom Instructions'),
-            _design3Item(Icons.history_rounded, 'Chat History', 'Past Conversations'),
+            _design3Item(
+              Icons.psychology_outlined,
+              'Memory',
+              'Context & Memory',
+            ),
+            _design3Item(
+              Icons.description_outlined,
+              'Instructions',
+              'Custom Instructions',
+            ),
+            _design3Item(
+              Icons.history_rounded,
+              'Chat History',
+              'Past Conversations',
+            ),
             _design3Item(Icons.tune_rounded, 'Agent', 'Customizations'),
             const SizedBox(height: 8),
           ],
@@ -1008,8 +2059,12 @@ print(f"Average: {avg}")''', 'python'),
       child: Row(
         children: [
           Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Icon(icon, color: Colors.white70, size: 20),
           ),
           const SizedBox(width: 12),
@@ -1017,8 +2072,18 @@ print(f"Average: {avg}")''', 'python'),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                ),
               ],
             ),
           ),
@@ -1042,7 +2107,14 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 32, height: 3, decoration: BoxDecoration(color: const Color(0xFF3F3F46), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 32,
+              height: 3,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3F3F46),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 16),
             _design4Item(Icons.psychology_outlined, 'Memory'),
             Divider(color: Colors.grey[800], height: 1),
@@ -1064,7 +2136,10 @@ print(f"Average: {avg}")''', 'python'),
         children: [
           Icon(icon, color: const Color(0xFF3B82F6), size: 22),
           const SizedBox(width: 14),
-          Text(title, style: const TextStyle(fontSize: 15, color: Colors.white)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 15, color: Colors.white),
+          ),
           const Spacer(),
           Icon(Icons.chevron_right, size: 20, color: Colors.grey[600]),
         ],
@@ -1086,12 +2161,31 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            _design5Item(Icons.psychology_outlined, 'Memory', [const Color(0xFF8B5CF6), const Color(0xFF6366F1)]),
-            _design5Item(Icons.description_outlined, 'Instructions', [const Color(0xFF3B82F6), const Color(0xFF0EA5E9)]),
-            _design5Item(Icons.history_rounded, 'Chat History', [const Color(0xFF10B981), const Color(0xFF14B8A6)]),
-            _design5Item(Icons.tune_rounded, 'Agent Customizations', [const Color(0xFFF59E0B), const Color(0xFFF97316)]),
+            _design5Item(Icons.psychology_outlined, 'Memory', [
+              const Color(0xFF8B5CF6),
+              const Color(0xFF6366F1),
+            ]),
+            _design5Item(Icons.description_outlined, 'Instructions', [
+              const Color(0xFF3B82F6),
+              const Color(0xFF0EA5E9),
+            ]),
+            _design5Item(Icons.history_rounded, 'Chat History', [
+              const Color(0xFF10B981),
+              const Color(0xFF14B8A6),
+            ]),
+            _design5Item(Icons.tune_rounded, 'Agent Customizations', [
+              const Color(0xFFF59E0B),
+              const Color(0xFFF97316),
+            ]),
             const SizedBox(height: 8),
           ],
         ),
@@ -1103,7 +2197,12 @@ print(f"Average: {avg}")''', 'python'),
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [gradientColors[0].withOpacity(0.15), gradientColors[1].withOpacity(0.05)]),
+        gradient: LinearGradient(
+          colors: [
+            gradientColors[0].withOpacity(0.15),
+            gradientColors[1].withOpacity(0.05),
+          ],
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: gradientColors[0].withOpacity(0.3)),
       ),
@@ -1112,7 +2211,8 @@ print(f"Average: {avg}")''', 'python'),
         child: Row(
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: gradientColors),
                 borderRadius: BorderRadius.circular(8),
@@ -1120,7 +2220,14 @@ print(f"Average: {avg}")''', 'python'),
               child: Icon(icon, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 12),
-            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
             const Spacer(),
             Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[600]),
           ],
@@ -1143,15 +2250,46 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            _design6Card(Icons.psychology_outlined, 'Memory', '08:30 - 10:00', 'CONTEXT_MANAGER', false),
+            _design6Card(
+              Icons.psychology_outlined,
+              'Memory',
+              '08:30 - 10:00',
+              'CONTEXT_MANAGER',
+              false,
+            ),
             const SizedBox(height: 10),
-            _design6Card(Icons.description_outlined, 'Instructions', '10:30 - 12:00', 'PROMPT_ACTIVE', true),
+            _design6Card(
+              Icons.description_outlined,
+              'Instructions',
+              '10:30 - 12:00',
+              'PROMPT_ACTIVE',
+              true,
+            ),
             const SizedBox(height: 10),
-            _design6Card(Icons.history_rounded, 'Chat History', '14:00 - 15:30', 'CONVERSATION_LOG', false),
+            _design6Card(
+              Icons.history_rounded,
+              'Chat History',
+              '14:00 - 15:30',
+              'CONVERSATION_LOG',
+              false,
+            ),
             const SizedBox(height: 10),
-            _design6Card(Icons.tune_rounded, 'Agent', '16:00 - 17:00', 'CUSTOMIZATIONS', false),
+            _design6Card(
+              Icons.tune_rounded,
+              'Agent',
+              '16:00 - 17:00',
+              'CUSTOMIZATIONS',
+              false,
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1159,13 +2297,24 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _design6Card(IconData icon, String title, String time, String label, bool isActive) {
+  Widget _design6Card(
+    IconData icon,
+    String title,
+    String time,
+    String label,
+    bool isActive,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF16161E) : const Color(0xFF0F0F14),
         borderRadius: BorderRadius.circular(14),
-        border: isActive ? Border.all(color: const Color(0xFF3B82F6).withOpacity(0.5), width: 1.5) : null,
+        border: isActive
+            ? Border.all(
+                color: const Color(0xFF3B82F6).withOpacity(0.5),
+                width: 1.5,
+              )
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1173,8 +2322,12 @@ print(f"Average: {avg}")''', 'python'),
           Row(
             children: [
               Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Icon(icon, color: const Color(0xFF3B82F6), size: 18),
               ),
               const SizedBox(width: 12),
@@ -1182,12 +2335,33 @@ print(f"Average: {avg}")''', 'python'),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                    if (isActive) Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: Color(0xFF22D3EE), letterSpacing: 1)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (isActive)
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF22D3EE),
+                          letterSpacing: 1,
+                        ),
+                      ),
                   ],
                 ),
               ),
-              if (isActive) const Icon(Icons.auto_awesome, color: Color(0xFF3B82F6), size: 16),
+              if (isActive)
+                const Icon(
+                  Icons.auto_awesome,
+                  color: Color(0xFF3B82F6),
+                  size: 16,
+                ),
             ],
           ),
           if (isActive) ...[
@@ -1196,7 +2370,10 @@ print(f"Average: {avg}")''', 'python'),
               children: [
                 Icon(Icons.access_time, color: Colors.grey[500], size: 14),
                 const SizedBox(width: 6),
-                Text(time, style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+                Text(
+                  time,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -1205,10 +2382,24 @@ print(f"Average: {avg}")''', 'python'),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(color: const Color(0xFF3B82F6), borderRadius: BorderRadius.circular(20)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3B82F6),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [Icon(Icons.check_circle, color: Colors.white, size: 16), SizedBox(width: 6), Text('OPEN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white))],
+                      children: const [
+                        Icon(Icons.check_circle, color: Colors.white, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'OPEN',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1216,10 +2407,28 @@ print(f"Average: {avg}")''', 'python'),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(20)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF27272A),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Icon(Icons.visibility, color: Colors.grey[400], size: 16), const SizedBox(width: 6), Text('VIEW', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400]))],
+                      children: [
+                        Icon(
+                          Icons.visibility,
+                          color: Colors.grey[400],
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'VIEW',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1245,19 +2454,48 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _design7StatCard('MEMORY', '24', 'Items Stored', const Color(0xFF3B82F6))),
+                Expanded(
+                  child: _design7StatCard(
+                    'MEMORY',
+                    '24',
+                    'Items Stored',
+                    const Color(0xFF3B82F6),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _design7StatCard('HISTORY', '128', 'Conversations', const Color(0xFF8B5CF6))),
+                Expanded(
+                  child: _design7StatCard(
+                    'HISTORY',
+                    '128',
+                    'Conversations',
+                    const Color(0xFF8B5CF6),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
-            _design7ListItem(Icons.description_outlined, 'Instructions', 'Custom prompts'),
+            _design7ListItem(
+              Icons.description_outlined,
+              'Instructions',
+              'Custom prompts',
+            ),
             const SizedBox(height: 8),
-            _design7ListItem(Icons.tune_rounded, 'Agent Customizations', 'Behavior settings'),
+            _design7ListItem(
+              Icons.tune_rounded,
+              'Agent Customizations',
+              'Behavior settings',
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1265,7 +2503,12 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _design7StatCard(String label, String value, String subtitle, Color accentColor) {
+  Widget _design7StatCard(
+    String label,
+    String value,
+    String subtitle,
+    Color accentColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1275,13 +2518,38 @@ print(f"Average: {avg}")''', 'python'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[500], letterSpacing: 1.2)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[500],
+              letterSpacing: 1.2,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(value, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 4),
-          Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))),
+          Container(
+            height: 3,
+            width: 40,
+            decoration: BoxDecoration(
+              color: accentColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+          Text(
+            subtitle,
+            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+          ),
         ],
       ),
     );
@@ -1290,16 +2558,32 @@ print(f"Average: {avg}")''', 'python'),
   Widget _design7ListItem(IconData icon, String title, String subtitle) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
         children: [
           Icon(icon, color: const Color(0xFF3B82F6), size: 22),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-              Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                ),
+              ],
+            ),
           ),
           Icon(Icons.chevron_right, color: Colors.grey[600], size: 20),
         ],
@@ -1321,12 +2605,39 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            _design8Item(Icons.psychology_outlined, 'Memory', 85, const Color(0xFF3B82F6)),
-            _design8Item(Icons.description_outlined, 'Instructions', 92, const Color(0xFF3B82F6)),
-            _design8Item(Icons.history_rounded, 'Chat History', 68, const Color(0xFF8B5CF6)),
-            _design8Item(Icons.tune_rounded, 'Agent Customizations', 45, const Color(0xFFEF4444)),
+            _design8Item(
+              Icons.psychology_outlined,
+              'Memory',
+              85,
+              const Color(0xFF3B82F6),
+            ),
+            _design8Item(
+              Icons.description_outlined,
+              'Instructions',
+              92,
+              const Color(0xFF3B82F6),
+            ),
+            _design8Item(
+              Icons.history_rounded,
+              'Chat History',
+              68,
+              const Color(0xFF8B5CF6),
+            ),
+            _design8Item(
+              Icons.tune_rounded,
+              'Agent Customizations',
+              45,
+              const Color(0xFFEF4444),
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1334,27 +2645,50 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _design8Item(IconData icon, String title, int percentage, Color ringColor) {
+  Widget _design8Item(
+    IconData icon,
+    String title,
+    int percentage,
+    Color ringColor,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
         children: [
           Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(8)),
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFF27272A),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Icon(icon, color: Colors.grey[400], size: 18),
           ),
           const SizedBox(width: 14),
-          Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white))),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
           SizedBox(
-            width: 40, height: 40,
+            width: 40,
+            height: 40,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  width: 36, height: 36,
+                  width: 36,
+                  height: 36,
                   child: CircularProgressIndicator(
                     value: percentage / 100,
                     strokeWidth: 3,
@@ -1362,7 +2696,14 @@ print(f"Average: {avg}")''', 'python'),
                     valueColor: AlwaysStoppedAnimation<Color>(ringColor),
                   ),
                 ),
-                Text('$percentage', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: ringColor)),
+                Text(
+                  '$percentage',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: ringColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1385,12 +2726,39 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            _design9Item(Icons.psychology_outlined, 'Memory', 'MEMORY_ACTIVE', true),
-            _design9Item(Icons.description_outlined, 'Instructions', 'PROMPT_READY', false),
-            _design9Item(Icons.history_rounded, 'Chat History', 'HISTORY_LOG', false),
-            _design9Item(Icons.tune_rounded, 'Agent Customizations', 'AGENT_CONFIG', false),
+            _design9Item(
+              Icons.psychology_outlined,
+              'Memory',
+              'MEMORY_ACTIVE',
+              true,
+            ),
+            _design9Item(
+              Icons.description_outlined,
+              'Instructions',
+              'PROMPT_READY',
+              false,
+            ),
+            _design9Item(
+              Icons.history_rounded,
+              'Chat History',
+              'HISTORY_LOG',
+              false,
+            ),
+            _design9Item(
+              Icons.tune_rounded,
+              'Agent Customizations',
+              'AGENT_CONFIG',
+              false,
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1398,38 +2766,78 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _design9Item(IconData icon, String title, String status, bool isActive) {
+  Widget _design9Item(
+    IconData icon,
+    String title,
+    String status,
+    bool isActive,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFF16161E),
         borderRadius: BorderRadius.circular(14),
-        border: isActive ? Border.all(color: const Color(0xFF22D3EE).withOpacity(0.4)) : null,
+        border: isActive
+            ? Border.all(color: const Color(0xFF22D3EE).withOpacity(0.4))
+            : null,
       ),
       child: Row(
         children: [
           Container(
-            width: 40, height: 40,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: isActive ? const Color(0xFF22D3EE).withOpacity(0.15) : const Color(0xFF27272A),
+              color: isActive
+                  ? const Color(0xFF22D3EE).withOpacity(0.15)
+                  : const Color(0xFF27272A),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: isActive ? const Color(0xFF22D3EE) : Colors.grey[500], size: 20),
+            child: Icon(
+              icon,
+              color: isActive ? const Color(0xFF22D3EE) : Colors.grey[500],
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: isActive ? const Color(0xFF22D3EE) : Colors.grey[600], letterSpacing: 1)),
+                Text(
+                  status,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: isActive
+                        ? const Color(0xFF22D3EE)
+                        : Colors.grey[600],
+                    letterSpacing: 1,
+                  ),
+                ),
               ],
             ),
           ),
-          if (isActive) Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFF22D3EE), shape: BoxShape.circle)),
-          if (!isActive) Icon(Icons.chevron_right, color: Colors.grey[600], size: 18),
+          if (isActive)
+            Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: Color(0xFF22D3EE),
+                shape: BoxShape.circle,
+              ),
+            ),
+          if (!isActive)
+            Icon(Icons.chevron_right, color: Colors.grey[600], size: 18),
         ],
       ),
     );
@@ -1449,7 +2857,14 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16),
@@ -1461,7 +2876,14 @@ print(f"Average: {avg}")''', 'python'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('// Quick Actions', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.grey[600])),
+                  Text(
+                    '// Quick Actions',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'monospace',
+                      color: Colors.grey[600],
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   _design10Item('memory', '--context'),
                   _design10Item('instructions', '--prompt'),
@@ -1471,7 +2893,17 @@ print(f"Average: {avg}")''', 'python'),
               ),
             ),
             const SizedBox(height: 12),
-            Center(child: Text('CYCLE_COMPLETE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600], letterSpacing: 2))),
+            Center(
+              child: Text(
+                'CYCLE_COMPLETE',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1484,9 +2916,30 @@ print(f"Average: {avg}")''', 'python'),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Text('> ', style: TextStyle(fontSize: 14, fontFamily: 'monospace', color: const Color(0xFF3B82F6))),
-          Text(cmd, style: const TextStyle(fontSize: 14, fontFamily: 'monospace', color: Colors.white)),
-          Text(' $flag', style: TextStyle(fontSize: 14, fontFamily: 'monospace', color: Colors.grey[500])),
+          Text(
+            '> ',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'monospace',
+              color: const Color(0xFF3B82F6),
+            ),
+          ),
+          Text(
+            cmd,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'monospace',
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            ' $flag',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'monospace',
+              color: Colors.grey[500],
+            ),
+          ),
           const Spacer(),
           Icon(Icons.play_arrow, color: const Color(0xFF3B82F6), size: 16),
         ],
@@ -1508,19 +2961,54 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildStatCard('MEMORY', '24', 'Items Stored', const Color(0xFF3B82F6), Icons.psychology_outlined, () => Navigator.pop(context))),
+                Expanded(
+                  child: _buildStatCard(
+                    'MEMORY',
+                    '24',
+                    'Items Stored',
+                    const Color(0xFF3B82F6),
+                    Icons.psychology_outlined,
+                    () => Navigator.pop(context),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('HISTORY', '128', 'Conversations', const Color(0xFF8B5CF6), Icons.history_rounded, () => Navigator.pop(context))),
+                Expanded(
+                  child: _buildStatCard(
+                    'HISTORY',
+                    '128',
+                    'Conversations',
+                    const Color(0xFF8B5CF6),
+                    Icons.history_rounded,
+                    () => Navigator.pop(context),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
-            _buildActionListItem(Icons.description_outlined, 'Instructions', 'Custom prompts', () => Navigator.pop(context)),
+            _buildActionListItem(
+              Icons.description_outlined,
+              'Instructions',
+              'Custom prompts',
+              () => Navigator.pop(context),
+            ),
             const SizedBox(height: 8),
-            _buildActionListItem(Icons.tune_rounded, 'Agent Customizations', 'Behavior settings', () => Navigator.pop(context)),
+            _buildActionListItem(
+              Icons.tune_rounded,
+              'Agent Customizations',
+              'Behavior settings',
+              () => Navigator.pop(context),
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1528,7 +3016,14 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _buildStatCard(String label, String value, String subtitle, Color accentColor, IconData icon, VoidCallback onTap) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    String subtitle,
+    Color accentColor,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1540,34 +3035,80 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[500], letterSpacing: 1.2)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[500],
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 4),
-            Container(height: 3, width: 40, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(2))),
+            Container(
+              height: 3,
+              width: 40,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 6),
-            Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionListItem(IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _buildActionListItem(
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
           children: [
             Icon(icon, color: const Color(0xFF3B82F6), size: 22),
             const SizedBox(width: 12),
             Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
-              ]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
             ),
             Icon(Icons.chevron_right, color: Colors.grey[600], size: 20),
           ],
@@ -1575,7 +3116,6 @@ print(f"Average: {avg}")''', 'python'),
       ),
     );
   }
-
 
   Widget _buildFeatureCard() {
     return Container(
@@ -1673,7 +3213,8 @@ print(f"Average: {avg}")''', 'python'),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // New: Render content blocks if available
-              if (message.contentBlocks != null && message.contentBlocks!.isNotEmpty) ...[
+              if (message.contentBlocks != null &&
+                  message.contentBlocks!.isNotEmpty) ...[
                 ...message.contentBlocks!.asMap().entries.map((entry) {
                   final index = entry.key;
                   final block = entry.value;
@@ -1733,92 +3274,571 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildContentBlock(AIContentBlock block) {
     if (block.type == AIContentBlockType.text && block.text != null) {
-      return Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF16161E),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-            bottomRight: Radius.circular(16),
-            bottomLeft: Radius.circular(4),
-          ),
-          border: Border.all(color: const Color(0xFF27272A)),
-        ),
-        child: Text(
-          block.text!,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-            height: 1.4,
-          ),
-        ),
-      );
-    } else if (block.type == AIContentBlockType.images && block.images != null) {
+      return _buildStyledText(block.text!, block.variant);
+    } else if (block.type == AIContentBlockType.images &&
+        block.images != null) {
       return _buildImageGallery(block.images!);
     } else if (block.type == AIContentBlockType.code && block.code != null) {
       return _buildCodeBlock(block.code!, block.language ?? 'code');
-    } else if (block.type == AIContentBlockType.map && block.mapCenter != null) {
-      return _buildMapBlock(block.mapCenter!, block.mapMarkers, block.mapZoom ?? 15.0);
-    } else if (block.type == AIContentBlockType.barChart && block.chartData != null) {
+    } else if (block.type == AIContentBlockType.map &&
+        block.mapCenter != null) {
+      return _buildMapBlock(
+        block.mapCenter!,
+        block.mapMarkers,
+        block.mapZoom ?? 15.0,
+      );
+    } else if (block.type == AIContentBlockType.barChart &&
+        block.chartData != null) {
       return _buildBarChart(block.chartData!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.pieChart && block.chartData != null) {
+    } else if (block.type == AIContentBlockType.pieChart &&
+        block.chartData != null) {
       return _buildPieChart(block.chartData!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.lineChart && block.lineData != null) {
+    } else if (block.type == AIContentBlockType.lineChart &&
+        block.lineData != null) {
       return _buildLineChart(block.lineData!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.radarChart && block.chartData != null) {
+    } else if (block.type == AIContentBlockType.radarChart &&
+        block.chartData != null) {
       return _buildRadarChart(block.chartData!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.progressBars && block.progressItems != null) {
+    } else if (block.type == AIContentBlockType.progressBars &&
+        block.progressItems != null) {
       return _buildProgressBars(block.progressItems!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.timeline && block.timelineEvents != null) {
+    } else if (block.type == AIContentBlockType.timeline &&
+        block.timelineEvents != null) {
       return _buildTimeline(block.timelineEvents!);
-    } else if (block.type == AIContentBlockType.quiz && block.quizData != null) {
+    } else if (block.type == AIContentBlockType.quiz &&
+        block.quizData != null) {
       return _buildQuiz(block.quizData!);
-    } else if (block.type == AIContentBlockType.checklist && block.checklistItems != null) {
+    } else if (block.type == AIContentBlockType.checklist &&
+        block.checklistItems != null) {
       return _buildChecklist(block.checklistItems!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.collapsible && block.collapsibleTitle != null) {
-      return _buildCollapsible(block.collapsibleTitle!, block.collapsibleContent ?? '');
-    } else if (block.type == AIContentBlockType.dataTable && block.tableData != null) {
+    } else if (block.type == AIContentBlockType.collapsible &&
+        block.collapsibleTitle != null) {
+      return _buildCollapsible(
+        block.collapsibleTitle!,
+        block.collapsibleContent ?? '',
+      );
+    } else if (block.type == AIContentBlockType.dataTable &&
+        block.tableData != null) {
       return _buildDataTable(block.tableData!, block.chartTitle);
-    } else if (block.type == AIContentBlockType.carousel && block.carouselItems != null) {
+    } else if (block.type == AIContentBlockType.carousel &&
+        block.carouselItems != null) {
       return _buildCarousel(block.carouselItems!);
-    } else if (block.type == AIContentBlockType.audioPlayer && block.mediaUrl != null) {
-      return _buildAudioPlayer(block.mediaUrl!, block.mediaTitle, block.mediaDuration);
-    } else if (block.type == AIContentBlockType.videoPlayer && block.mediaUrl != null) {
-      return _buildVideoPlayer(block.mediaUrl!, block.mediaTitle, block.thumbnailUrl);
-    } else if (block.type == AIContentBlockType.fileAttachment && block.mediaUrl != null) {
+    } else if (block.type == AIContentBlockType.audioPlayer &&
+        block.mediaUrl != null) {
+      return _buildAudioPlayer(
+        block.mediaUrl!,
+        block.mediaTitle,
+        block.mediaDuration,
+      );
+    } else if (block.type == AIContentBlockType.videoPlayer &&
+        block.mediaUrl != null) {
+      return _buildVideoPlayer(
+        block.mediaUrl!,
+        block.mediaTitle,
+        block.thumbnailUrl,
+      );
+    } else if (block.type == AIContentBlockType.fileAttachment &&
+        block.mediaUrl != null) {
       return _buildFileAttachment(block.mediaUrl!, block.mediaTitle ?? 'File');
     } else if (block.type == AIContentBlockType.voiceMessage) {
       return _buildVoiceMessage(block.mediaDuration);
-    } else if (block.type == AIContentBlockType.quickActions && block.actionButtons != null) {
+    } else if (block.type == AIContentBlockType.quickActions &&
+        block.actionButtons != null) {
       return _buildQuickActions(block.actionButtons!);
-    } else if (block.type == AIContentBlockType.contactCard && block.contactData != null) {
+    } else if (block.type == AIContentBlockType.contactCard &&
+        block.contactData != null) {
       return _buildContactCard(block.contactData!);
-    } else if (block.type == AIContentBlockType.calendarEvent && block.eventData != null) {
+    } else if (block.type == AIContentBlockType.calendarEvent &&
+        block.eventData != null) {
       return _buildCalendarEvent(block.eventData!);
-    } else if (block.type == AIContentBlockType.markdown && block.markdownContent != null) {
+    } else if (block.type == AIContentBlockType.markdown &&
+        block.markdownContent != null) {
       return _buildMarkdown(block.markdownContent!);
-    } else if (block.type == AIContentBlockType.mathEquation && block.mathEquation != null) {
+    } else if (block.type == AIContentBlockType.mathEquation &&
+        block.mathEquation != null) {
       return _buildMathEquation(block.mathEquation!);
-    } else if (block.type == AIContentBlockType.weather && block.weatherData != null) {
+    } else if (block.type == AIContentBlockType.weather &&
+        block.weatherData != null) {
       return _buildWeather(block.weatherData!);
-    } else if (block.type == AIContentBlockType.countdown && block.countdownData != null) {
+    } else if (block.type == AIContentBlockType.countdown &&
+        block.countdownData != null) {
       return _buildCountdown(block.countdownData!);
-    } else if (block.type == AIContentBlockType.flashcards && block.flashcards != null) {
+    } else if (block.type == AIContentBlockType.flashcards &&
+        block.flashcards != null) {
       return _buildFlashcards(block.flashcards!);
-    } else if (block.type == AIContentBlockType.pdfPreview && block.mediaUrl != null) {
+    } else if (block.type == AIContentBlockType.pdfPreview &&
+        block.mediaUrl != null) {
       return _buildPdfPreview(block.mediaUrl!, block.mediaTitle);
     } else if (block.type == AIContentBlockType.note && block.text != null) {
-      return _buildNote(block.text!);
+      return _buildNote(block.text!, block.variant);
     } else if (block.type == AIContentBlockType.paper && block.text != null) {
-      return _buildPaper(block.text!);
+      return _buildPaper(block.text!, block.variant);
     } else if (block.type == AIContentBlockType.letter && block.text != null) {
-      return _buildLetter(block.text!);
+      return _buildLetter(block.text!, block.variant);
     }
     return const SizedBox.shrink();
+  }
+
+  Widget _buildStyledText(String text, int variant) {
+    // 20 Styles for Showcase
+    switch (variant) {
+      case 1: // Modern Minimal
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border(left: BorderSide(color: Colors.grey[700]!, width: 2)),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+              color: Colors.white,
+              height: 1.6,
+              letterSpacing: 0.5,
+            ),
+          ),
+        );
+      case 2: // Classic Serif
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5DC).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Georgia',
+              color: Color(0xFFE8E8E8),
+              height: 1.5,
+              wordSpacing: 1.0,
+            ),
+          ),
+        );
+      case 3: // Terminal
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            border: Border.all(color: Colors.greenAccent.withOpacity(0.5)),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'monospace',
+              color: Colors.greenAccent,
+              height: 1.2,
+            ),
+          ),
+        );
+      case 4: // Editorial
+        return Container(
+          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: Color(0xFF3B82F6), width: 4)),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 18,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+              height: 1.4,
+            ),
+          ),
+        );
+      case 5: // Handwritten
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFFFE0).withOpacity(0.9),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(255),
+              bottomRight: Radius.circular(255),
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+                offset: const Offset(2, 2),
+              ),
+            ],
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Cursive', // Fallback will be messy but okay
+              color: Colors.black87,
+              height: 1.5,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        );
+      case 6: // Bold Headline
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16161E),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            text.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
+          ),
+        );
+      case 7: // Technical/Blue
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: const Color(0xFF1E293B)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '// TECHNICAL_LOG',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.blue[400],
+                  fontFamily: 'monospace',
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.blue[100],
+                  fontFamily: 'monospace',
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      case 8: // Neon
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.purpleAccent, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.purpleAccent.withOpacity(0.5),
+                blurRadius: 10,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              height: 1.4,
+              shadows: [
+                Shadow(
+                  color: Colors.purpleAccent,
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+          ),
+        );
+      case 9: // Typewriter
+        return Container(
+          padding: const EdgeInsets.all(24),
+          color: const Color(0xFFF5F5F5),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 15,
+              fontFamily: 'Courier New',
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      case 10: // Review/Quote
+        return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF27272A),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.format_quote, color: Colors.grey, size: 32),
+                const SizedBox(height: 8),
+                Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.white,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ));
+      case 11: // Warning
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF7F1D1D).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFEF4444)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Color(0xFFEF4444)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    color: Color(0xFFFCA5A5),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      case 12: // Success
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF064E3B).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFF10B981)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.check_circle_outline, color: Color(0xFF10B981)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    color: Color(0xFF6EE7B7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      case 13: // Info
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E3A8A).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFF3B82F6)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.info_outline, color: Color(0xFF3B82F6), size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'INFORMATION',
+                    style: TextStyle(
+                      color: Color(0xFF3B82F6),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                text,
+                style: const TextStyle(color: Color(0xFFBFDBFE)),
+              ),
+            ],
+          ),
+        );
+      case 14: // Luxury
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFF1C1917), const Color(0xFF292524)],
+            ),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color(0xFFD4AF37), width: 1),
+          ),
+          child: Column(
+            children: [
+              Text(
+                '✦',
+                style: TextStyle(color: Color(0xFFD4AF37), fontSize: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Serif',
+                  fontSize: 16,
+                  color: Color(0xFFE5E7EB),
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '✦',
+                style: TextStyle(color: Color(0xFFD4AF37), fontSize: 24),
+              ),
+            ],
+          ),
+        );
+      case 15: // Brutalism
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE5E7EB),
+            border: Border.all(color: Colors.black, width: 3),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black,
+                offset: Offset(4, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        );
+      case 16: // Pastel
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFDF2F8), // Pink tint
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFF831843),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      case 17: // Accessibility
+        return Container(
+          padding: const EdgeInsets.all(20),
+          color: Colors.white,
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              height: 1.3,
+            ),
+          ),
+        );
+        case 18: // Retro Computer
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+             color: Color(0xFF000080), // Navy Blue
+             border: Border(
+                top: BorderSide(color: Colors.white, width: 2),
+                left: BorderSide(color: Colors.white, width: 2),
+                right: BorderSide(color: Colors.grey, width: 2),
+                bottom: BorderSide(color: Colors.grey, width: 2),
+             ),
+          ),
+          child: Text(
+             text,
+             style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold
+             ),
+          ),
+        );
+        case 19: // Blueprint
+        return Container(
+           padding: const EdgeInsets.all(20),
+           decoration: BoxDecoration(
+              color: Color(0xFF1E3A8A),
+              image: DecorationImage(
+                 image: NetworkImage("https://www.transparenttextures.com/patterns/graphy.png"), // Simulated pattern
+                 fit: BoxFit.cover,
+                 colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.1), BlendMode.dstATop),
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.3))
+           ),
+           child: Text(
+              text,
+              style: const TextStyle(
+                 fontFamily: 'monospace',
+                 color: Colors.white,
+                 letterSpacing: 1.0
+              ),
+           )
+        );
+
+      default: // Default (0)
+        return Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16161E),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+              bottomLeft: Radius.circular(4),
+            ),
+            border: Border.all(color: const Color(0xFF27272A)),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              height: 1.4,
+            ),
+          ),
+        );
+    }
   }
 
   Widget _buildBarChart(List<ChartDataItem> data, String? title) {
@@ -1830,7 +3850,7 @@ print(f"Average: {avg}")''', 'python'),
       const Color(0xFFEF4444),
       const Color(0xFF06B6D4),
     ];
-    
+
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -1853,11 +3873,19 @@ print(f"Average: {avg}")''', 'python'),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.bar_chart_rounded, size: 16, color: Color(0xFF3B82F6)),
+                  const Icon(
+                    Icons.bar_chart_rounded,
+                    size: 16,
+                    color: Color(0xFF3B82F6),
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -1870,7 +3898,9 @@ print(f"Average: {avg}")''', 'python'),
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
-                  maxY: data.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2,
+                  maxY:
+                      data.map((e) => e.value).reduce((a, b) => a > b ? a : b) *
+                      1.2,
                   barGroups: data.asMap().entries.map((entry) {
                     final i = entry.key;
                     final item = entry.value;
@@ -1879,23 +3909,33 @@ print(f"Average: {avg}")''', 'python'),
                       barRods: [
                         BarChartRodData(
                           toY: item.value,
-                          color: item.color ?? chartColors[i % chartColors.length],
+                          color:
+                              item.color ?? chartColors[i % chartColors.length],
                           width: 22,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6),
+                          ),
                         ),
                       ],
                     );
                   }).toList(),
                   titlesData: FlTitlesData(
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 35,
                         getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),
-                          style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[500],
+                          ),
                         ),
                       ),
                     ),
@@ -1906,7 +3946,10 @@ print(f"Average: {avg}")''', 'python'),
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
                             data[value.toInt()].label,
-                            style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey[400],
+                            ),
                           ),
                         ),
                       ),
@@ -1915,10 +3958,8 @@ print(f"Average: {avg}")''', 'python'),
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: const Color(0xFF27272A),
-                      strokeWidth: 1,
-                    ),
+                    getDrawingHorizontalLine: (value) =>
+                        FlLine(color: const Color(0xFF27272A), strokeWidth: 1),
                   ),
                   borderData: FlBorderData(show: false),
                 ),
@@ -1939,7 +3980,7 @@ print(f"Average: {avg}")''', 'python'),
       const Color(0xFFEF4444),
       const Color(0xFF06B6D4),
     ];
-    
+
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -1962,11 +4003,19 @@ print(f"Average: {avg}")''', 'python'),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.pie_chart_rounded, size: 16, color: Color(0xFF8B5CF6)),
+                  const Icon(
+                    Icons.pie_chart_rounded,
+                    size: 16,
+                    color: Color(0xFF8B5CF6),
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -1990,10 +4039,16 @@ print(f"Average: {avg}")''', 'python'),
                           final item = entry.value;
                           return PieChartSectionData(
                             value: item.value,
-                            color: item.color ?? chartColors[i % chartColors.length],
+                            color:
+                                item.color ??
+                                chartColors[i % chartColors.length],
                             radius: 45,
                             title: '${item.value.toInt()}%',
-                            titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           );
                         }).toList(),
                       ),
@@ -2018,7 +4073,9 @@ print(f"Average: {avg}")''', 'python'),
                               width: 10,
                               height: 10,
                               decoration: BoxDecoration(
-                                color: item.color ?? chartColors[i % chartColors.length],
+                                color:
+                                    item.color ??
+                                    chartColors[i % chartColors.length],
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -2026,7 +4083,10 @@ print(f"Average: {avg}")''', 'python'),
                             Expanded(
                               child: Text(
                                 item.label,
-                                style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[400],
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -2048,17 +4108,61 @@ print(f"Average: {avg}")''', 'python'),
   // ============== PHASE 1: DATA VISUALIZATION ==============
 
   Widget _buildLineChart(List<ChartDataPoint> data, String? title) {
-    return _buildChartContainer(title, Icons.show_chart, const Color(0xFF10B981), 
+    return _buildChartContainer(
+      title,
+      Icons.show_chart,
+      const Color(0xFF10B981),
       SizedBox(
         height: 160,
         child: LineChart(
           LineChartData(
-            gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (v) => FlLine(color: const Color(0xFF27272A), strokeWidth: 1)),
-            titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: (v, m) => Text(v.toInt().toString(), style: TextStyle(fontSize: 10, color: Colors.grey[500])))),
-              bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, m) => Text(data[v.toInt() < data.length ? v.toInt() : 0].label ?? '', style: TextStyle(fontSize: 10, color: Colors.grey[400]))))),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              getDrawingHorizontalLine: (v) =>
+                  FlLine(color: const Color(0xFF27272A), strokeWidth: 1),
+            ),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 30,
+                  getTitlesWidget: (v, m) => Text(
+                    v.toInt().toString(),
+                    style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                  ),
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (v, m) => Text(
+                    data[v.toInt() < data.length ? v.toInt() : 0].label ?? '',
+                    style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                  ),
+                ),
+              ),
+            ),
             borderData: FlBorderData(show: false),
-            lineBarsData: [LineChartBarData(spots: data.map((p) => FlSpot(p.x, p.y)).toList(), isCurved: true, color: const Color(0xFF10B981), barWidth: 3, dotData: const FlDotData(show: true), belowBarData: BarAreaData(show: true, color: const Color(0xFF10B981).withOpacity(0.1)))],
+            lineBarsData: [
+              LineChartBarData(
+                spots: data.map((p) => FlSpot(p.x, p.y)).toList(),
+                isCurved: true,
+                color: const Color(0xFF10B981),
+                barWidth: 3,
+                dotData: const FlDotData(show: true),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -2066,7 +4170,10 @@ print(f"Average: {avg}")''', 'python'),
   }
 
   Widget _buildRadarChart(List<ChartDataItem> data, String? title) {
-    return _buildChartContainer(title, Icons.radar, const Color(0xFF8B5CF6),
+    return _buildChartContainer(
+      title,
+      Icons.radar,
+      const Color(0xFF8B5CF6),
       SizedBox(
         height: 180,
         child: RadarChart(
@@ -2076,7 +4183,16 @@ print(f"Average: {avg}")''', 'python'),
             ticksTextStyle: TextStyle(color: Colors.grey[600], fontSize: 8),
             tickBorderData: const BorderSide(color: Color(0xFF27272A)),
             gridBorderData: const BorderSide(color: Color(0xFF27272A)),
-            dataSets: [RadarDataSet(dataEntries: data.map((d) => RadarEntry(value: d.value)).toList(), fillColor: const Color(0xFF8B5CF6).withOpacity(0.3), borderColor: const Color(0xFF8B5CF6), borderWidth: 2)],
+            dataSets: [
+              RadarDataSet(
+                dataEntries: data
+                    .map((d) => RadarEntry(value: d.value))
+                    .toList(),
+                fillColor: const Color(0xFF8B5CF6).withOpacity(0.3),
+                borderColor: const Color(0xFF8B5CF6),
+                borderWidth: 2,
+              ),
+            ],
             getTitle: (i, a) => RadarChartTitle(text: data[i].label, angle: a),
             titleTextStyle: TextStyle(color: Colors.grey[400], fontSize: 10),
           ),
@@ -2086,120 +4202,358 @@ print(f"Average: {avg}")''', 'python'),
   }
 
   Widget _buildProgressBars(List<ProgressItem> items, String? title) {
-    final colors = [const Color(0xFF3B82F6), const Color(0xFF10B981), const Color(0xFF8B5CF6), const Color(0xFFF59E0B), const Color(0xFFEF4444)];
-    return _buildChartContainer(title, Icons.trending_up, const Color(0xFF3B82F6),
-      Column(children: items.asMap().entries.map((e) {
-        final i = e.key; final item = e.value;
-        return Padding(padding: const EdgeInsets.only(bottom: 12),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(item.label, style: TextStyle(fontSize: 12, color: Colors.grey[300])), Text('${item.value.toInt()}/${item.max.toInt()}', style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
-            const SizedBox(height: 6),
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: item.value / item.max, backgroundColor: const Color(0xFF27272A), valueColor: AlwaysStoppedAnimation(item.color ?? colors[i % colors.length]), minHeight: 8)),
-          ]),
-        );
-      }).toList()),
+    final colors = [
+      const Color(0xFF3B82F6),
+      const Color(0xFF10B981),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
+    ];
+    return _buildChartContainer(
+      title,
+      Icons.trending_up,
+      const Color(0xFF3B82F6),
+      Column(
+        children: items.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      item.label,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[300]),
+                    ),
+                    Text(
+                      '${item.value.toInt()}/${item.max.toInt()}',
+                      style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: item.value / item.max,
+                    backgroundColor: const Color(0xFF27272A),
+                    valueColor: AlwaysStoppedAnimation(
+                      item.color ?? colors[i % colors.length],
+                    ),
+                    minHeight: 8,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildTimeline(List<TimelineEvent> events) {
-    final colors = [const Color(0xFF3B82F6), const Color(0xFF10B981), const Color(0xFF8B5CF6), const Color(0xFFF59E0B)];
+    final colors = [
+      const Color(0xFF3B82F6),
+      const Color(0xFF10B981),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFF59E0B),
+    ];
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Column(children: events.asMap().entries.map((e) {
-        final i = e.key; final ev = e.value; final isLast = i == events.length - 1;
-        return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Column(children: [
-            Container(width: 12, height: 12, decoration: BoxDecoration(color: ev.color ?? colors[i % colors.length], shape: BoxShape.circle)),
-            if (!isLast) Container(width: 2, height: 50, color: const Color(0xFF27272A)),
-          ]),
-          const SizedBox(width: 12),
-          Expanded(child: Padding(padding: EdgeInsets.only(bottom: isLast ? 0 : 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(ev.date, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
-            const SizedBox(height: 2),
-            Text(ev.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-            if (ev.description != null) Text(ev.description!, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
-          ]))),
-        ]);
-      }).toList()),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        children: events.asMap().entries.map((e) {
+          final i = e.key;
+          final ev = e.value;
+          final isLast = i == events.length - 1;
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: ev.color ?? colors[i % colors.length],
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  if (!isLast)
+                    Container(
+                      width: 2,
+                      height: 50,
+                      color: const Color(0xFF27272A),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ev.date,
+                        style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ev.title,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      if (ev.description != null)
+                        Text(
+                          ev.description!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
   // ============== PHASE 2: INTERACTIVE CONTENT ==============
 
   Widget _buildQuiz(QuizData quiz) {
-    return StatefulBuilder(builder: (context, setState) {
-      int? selected;
-      bool revealed = false;
-      return Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Icon(Icons.quiz, size: 16, color: Color(0xFFF59E0B)), const SizedBox(width: 8), const Text('Quiz', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFF59E0B)))]),
-          const SizedBox(height: 12),
-          Text(quiz.question, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-          const SizedBox(height: 12),
-          ...quiz.options.asMap().entries.map((e) {
-            final i = e.key; final opt = e.value;
-            final isCorrect = i == quiz.correctIndex;
-            final isSelected = selected == i;
-            return GestureDetector(
-              onTap: () => setState(() { selected = i; revealed = true; }),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: revealed ? (isCorrect ? const Color(0xFF10B981).withOpacity(0.2) : isSelected ? const Color(0xFFEF4444).withOpacity(0.2) : const Color(0xFF1E1E26)) : const Color(0xFF1E1E26),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: revealed ? (isCorrect ? const Color(0xFF10B981) : isSelected ? const Color(0xFFEF4444) : const Color(0xFF27272A)) : const Color(0xFF27272A))),
-                child: Row(children: [
-                  Container(width: 20, height: 20, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[600]!)), child: revealed && isCorrect ? const Icon(Icons.check, size: 14, color: Color(0xFF10B981)) : null),
-                  const SizedBox(width: 10), Expanded(child: Text(opt, style: TextStyle(fontSize: 13, color: Colors.grey[300]))),
-                ]),
+    return StatefulBuilder(
+      builder: (context, setState) {
+        int? selected;
+        bool revealed = false;
+        return Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16161E),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF27272A)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.quiz, size: 16, color: Color(0xFFF59E0B)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Quiz',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFF59E0B),
+                    ),
+                  ),
+                ],
               ),
-            );
-          }),
-        ]),
-      );
-    });
+              const SizedBox(height: 12),
+              Text(
+                quiz.question,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...quiz.options.asMap().entries.map((e) {
+                final i = e.key;
+                final opt = e.value;
+                final isCorrect = i == quiz.correctIndex;
+                final isSelected = selected == i;
+                return GestureDetector(
+                  onTap: () => setState(() {
+                    selected = i;
+                    revealed = true;
+                  }),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: revealed
+                          ? (isCorrect
+                                ? const Color(0xFF10B981).withOpacity(0.2)
+                                : isSelected
+                                ? const Color(0xFFEF4444).withOpacity(0.2)
+                                : const Color(0xFF1E1E26))
+                          : const Color(0xFF1E1E26),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: revealed
+                            ? (isCorrect
+                                  ? const Color(0xFF10B981)
+                                  : isSelected
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF27272A))
+                            : const Color(0xFF27272A),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey[600]!),
+                          ),
+                          child: revealed && isCorrect
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Color(0xFF10B981),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            opt,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[300],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildChecklist(List<ChecklistItem> items, String? title) {
-    return StatefulBuilder(builder: (context, setState) {
-      final checked = List<bool>.from(items.map((i) => i.checked));
-      return _buildChartContainer(title ?? 'Checklist', Icons.checklist, const Color(0xFF10B981),
-        Column(children: items.asMap().entries.map((e) {
-          final i = e.key; final item = e.value;
-          return GestureDetector(
-            onTap: () => setState(() => checked[i] = !checked[i]),
-            child: Padding(padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(children: [
-                Container(width: 22, height: 22, decoration: BoxDecoration(color: checked[i] ? const Color(0xFF10B981) : Colors.transparent, borderRadius: BorderRadius.circular(6), border: Border.all(color: checked[i] ? const Color(0xFF10B981) : Colors.grey[600]!)),
-                  child: checked[i] ? const Icon(Icons.check, size: 14, color: Colors.white) : null),
-                const SizedBox(width: 10),
-                Expanded(child: Text(item.text, style: TextStyle(fontSize: 13, color: Colors.grey[300], decoration: checked[i] ? TextDecoration.lineThrough : null))),
-              ]),
-            ),
-          );
-        }).toList()),
-      );
-    });
+    return StatefulBuilder(
+      builder: (context, setState) {
+        final checked = List<bool>.from(items.map((i) => i.checked));
+        return _buildChartContainer(
+          title ?? 'Checklist',
+          Icons.checklist,
+          const Color(0xFF10B981),
+          Column(
+            children: items.asMap().entries.map((e) {
+              final i = e.key;
+              final item = e.value;
+              return GestureDetector(
+                onTap: () => setState(() => checked[i] = !checked[i]),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: checked[i]
+                              ? const Color(0xFF10B981)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: checked[i]
+                                ? const Color(0xFF10B981)
+                                : Colors.grey[600]!,
+                          ),
+                        ),
+                        child: checked[i]
+                            ? const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          item.text,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[300],
+                            decoration: checked[i]
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildCollapsible(String title, String content) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14),
           childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-          iconColor: Colors.grey[400], collapsedIconColor: Colors.grey[500],
-          title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-          children: [Text(content, style: TextStyle(fontSize: 12, color: Colors.grey[400], height: 1.5))],
+          iconColor: Colors.grey[400],
+          collapsedIconColor: Colors.grey[500],
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          children: [
+            Text(
+              content,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[400],
+                height: 1.5,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -2207,39 +4561,132 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildDataTable(TableData data, String? title) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (title != null) Padding(padding: const EdgeInsets.all(12), child: Row(children: [const Icon(Icons.table_chart, size: 16, color: Color(0xFF3B82F6)), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white))])),
-        SingleChildScrollView(scrollDirection: Axis.horizontal, child: DataTable(
-          headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E26)),
-          columns: data.headers.map((h) => DataColumn(label: Text(h, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)))).toList(),
-          rows: data.rows.map((r) => DataRow(cells: r.map((c) => DataCell(Text(c, style: TextStyle(fontSize: 11, color: Colors.grey[400])))).toList())).toList(),
-        )),
-      ]),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.table_chart,
+                    size: 16,
+                    color: Color(0xFF3B82F6),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E26)),
+              columns: data.headers
+                  .map(
+                    (h) => DataColumn(
+                      label: Text(
+                        h,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              rows: data.rows
+                  .map(
+                    (r) => DataRow(
+                      cells: r
+                          .map(
+                            (c) => DataCell(
+                              Text(
+                                c,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCarousel(List<InfoCard> items) {
-    final colors = [const Color(0xFF3B82F6), const Color(0xFF8B5CF6), const Color(0xFF10B981), const Color(0xFFF59E0B)];
+    final colors = [
+      const Color(0xFF3B82F6),
+      const Color(0xFF8B5CF6),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+    ];
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       height: 140,
       child: PageView.builder(
         itemCount: items.length,
         controller: PageController(viewportFraction: 0.85),
         itemBuilder: (context, i) {
-          final item = items[i]; final color = item.color ?? colors[i % colors.length];
+          final item = items[i];
+          final color = item.color ?? colors[i % colors.length];
           return Container(
             margin: const EdgeInsets.only(right: 10),
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(gradient: LinearGradient(colors: [color.withOpacity(0.3), color.withOpacity(0.1)]), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.5))),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-              if (item.icon != null) Icon(item.icon, color: color, size: 28),
-              const SizedBox(height: 8),
-              Text(item.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-              if (item.subtitle != null) Text(item.subtitle!, style: TextStyle(fontSize: 11, color: Colors.grey[400])),
-            ]),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: color.withOpacity(0.5)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (item.icon != null) Icon(item.icon, color: color, size: 28),
+                const SizedBox(height: 8),
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                if (item.subtitle != null)
+                  Text(
+                    item.subtitle!,
+                    style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                  ),
+              ],
+            ),
           );
         },
       ),
@@ -2250,33 +4697,134 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildAudioPlayer(String url, String? title, Duration? duration) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Row(children: [
-        Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.play_arrow, color: Color(0xFF3B82F6), size: 28)),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title ?? 'Audio', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-          const SizedBox(height: 4),
-          Row(children: [Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(2), child: const LinearProgressIndicator(value: 0, backgroundColor: Color(0xFF27272A), valueColor: AlwaysStoppedAnimation(Color(0xFF3B82F6)), minHeight: 4))),
-            const SizedBox(width: 8), Text(duration != null ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}' : '0:00', style: TextStyle(fontSize: 10, color: Colors.grey[500]))]),
-        ])),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFF3B82F6).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.play_arrow,
+              color: Color(0xFF3B82F6),
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title ?? 'Audio',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: const LinearProgressIndicator(
+                          value: 0,
+                          backgroundColor: Color(0xFF27272A),
+                          valueColor: AlwaysStoppedAnimation(Color(0xFF3B82F6)),
+                          minHeight: 4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      duration != null
+                          ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}'
+                          : '0:00',
+                      style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildVideoPlayer(String url, String? title, String? thumbnail) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Column(children: [
-        Container(height: 140, decoration: BoxDecoration(color: const Color(0xFF1E1E26), borderRadius: const BorderRadius.vertical(top: Radius.circular(11))),
-          child: Center(child: Container(width: 56, height: 56, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle), child: const Icon(Icons.play_arrow, color: Colors.white, size: 36)))),
-        Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(color: Color(0xFF16161E), borderRadius: BorderRadius.vertical(bottom: Radius.circular(11))),
-          child: Row(children: [const Icon(Icons.videocam, size: 16, color: Color(0xFFEF4444)), const SizedBox(width: 8), Expanded(child: Text(title ?? 'Video', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)))])),
-      ]),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            height: 140,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E26),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
+            ),
+            child: Center(
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF16161E),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.videocam, size: 16, color: Color(0xFFEF4444)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title ?? 'Video',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2284,32 +4832,114 @@ print(f"Average: {avg}")''', 'python'),
     final ext = title.split('.').last.toLowerCase();
     final isPdf = ext == 'pdf';
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Row(children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: (isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6)).withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
-          child: Icon(isPdf ? Icons.picture_as_pdf : Icons.insert_drive_file, color: isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6))),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.white)), Text(ext.toUpperCase(), style: TextStyle(fontSize: 10, color: Colors.grey[500]))])),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(6)),
-          child: const Text('Download', style: TextStyle(fontSize: 11, color: Colors.white))),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: (isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6))
+                  .withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              isPdf ? Icons.picture_as_pdf : Icons.insert_drive_file,
+              color: isPdf ? const Color(0xFFEF4444) : const Color(0xFF3B82F6),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  ext.toUpperCase(),
+                  style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF27272A),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Text(
+              'Download',
+              style: TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildVoiceMessage(Duration? duration) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.6,
+      ),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF27272A))),
-      child: Row(children: [
-        Container(width: 36, height: 36, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle), child: const Icon(Icons.play_arrow, color: Colors.white, size: 20)),
-        const SizedBox(width: 10),
-        Expanded(child: Row(children: List.generate(20, (i) => Container(width: 3, height: 8 + Random().nextDouble() * 12, margin: const EdgeInsets.only(right: 2), decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.5), borderRadius: BorderRadius.circular(2)))))),
-        const SizedBox(width: 8),
-        Text(duration != null ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}' : '0:12', style: TextStyle(fontSize: 10, color: Colors.grey[500])),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.play_arrow, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Row(
+              children: List.generate(
+                20,
+                (i) => Container(
+                  width: 3,
+                  height: 8 + Random().nextDouble() * 12,
+                  margin: const EdgeInsets.only(right: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            duration != null
+                ? '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}'
+                : '0:12',
+            style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2317,53 +4947,221 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildQuickActions(List<ActionButton> actions) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      child: Wrap(spacing: 8, runSpacing: 8, children: actions.map((a) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.15), borderRadius: BorderRadius.circular(20), border: Border.all(color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.5))),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(a.icon, size: 16, color: a.color ?? const Color(0xFF3B82F6)), const SizedBox(width: 6), Text(a.label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: a.color ?? const Color(0xFF3B82F6)))]),
-        );
-      }).toList()),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: actions.map((a) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: (a.color ?? const Color(0xFF3B82F6)).withOpacity(0.5),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  a.icon,
+                  size: 16,
+                  color: a.color ?? const Color(0xFF3B82F6),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  a.label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: a.color ?? const Color(0xFF3B82F6),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildContactCard(ContactData contact) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Row(children: [
-        CircleAvatar(radius: 24, backgroundColor: const Color(0xFF3B82F6).withOpacity(0.2), child: Text(contact.name[0], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF3B82F6)))),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(contact.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-          if (contact.role != null) Text(contact.role!, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
-        ])),
-        if (contact.phone != null) Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.call, size: 18, color: Color(0xFF10B981))),
-        const SizedBox(width: 8),
-        if (contact.email != null) Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF3B82F6).withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.email, size: 18, color: Color(0xFF3B82F6))),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: const Color(0xFF3B82F6).withOpacity(0.2),
+            child: Text(
+              contact.name[0],
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3B82F6),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  contact.name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                if (contact.role != null)
+                  Text(
+                    contact.role!,
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                  ),
+              ],
+            ),
+          ),
+          if (contact.phone != null)
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.call, size: 18, color: Color(0xFF10B981)),
+            ),
+          const SizedBox(width: 8),
+          if (contact.email != null)
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.email,
+                size: 18,
+                color: Color(0xFF3B82F6),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   Widget _buildCalendarEvent(CalendarEventData event) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: event.color ?? const Color(0xFF3B82F6))),
-      child: Row(children: [
-        Container(width: 48, padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: (event.color ?? const Color(0xFF3B82F6)).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-          child: Column(children: [Text(event.date.split(' ').first, style: TextStyle(fontSize: 10, color: Colors.grey[400])), Text(event.date.split(' ').length > 1 ? event.date.split(' ')[1] : '', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: event.color ?? const Color(0xFF3B82F6)))])),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(event.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-          if (event.time != null) Row(children: [Icon(Icons.access_time, size: 12, color: Colors.grey[500]), const SizedBox(width: 4), Text(event.time!, style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
-          if (event.location != null) Row(children: [Icon(Icons.location_on, size: 12, color: Colors.grey[500]), const SizedBox(width: 4), Text(event.location!, style: TextStyle(fontSize: 11, color: Colors.grey[500]))]),
-        ])),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(6)),
-          child: const Text('Add', style: TextStyle(fontSize: 11, color: Colors.white))),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: event.color ?? const Color(0xFF3B82F6)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: (event.color ?? const Color(0xFF3B82F6)).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  event.date.split(' ').first,
+                  style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                ),
+                Text(
+                  event.date.split(' ').length > 1
+                      ? event.date.split(' ')[1]
+                      : '',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: event.color ?? const Color(0xFF3B82F6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                if (event.time != null)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 12,
+                        color: Colors.grey[500],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        event.time!,
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                if (event.location != null)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 12,
+                        color: Colors.grey[500],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        event.location!,
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF27272A),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Text(
+              'Add',
+              style: TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2371,23 +5169,50 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildMarkdown(String content) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Text(content.replaceAll('**', '').replaceAll('*', '').replaceAll('#', ''), style: TextStyle(fontSize: 13, color: Colors.grey[300], height: 1.5)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Text(
+        content.replaceAll('**', '').replaceAll('*', '').replaceAll('#', ''),
+        style: TextStyle(fontSize: 13, color: Colors.grey[300], height: 1.5),
+      ),
     );
   }
 
   Widget _buildMathEquation(String equation) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFF0D1117), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Row(children: [
-        const Icon(Icons.functions, color: Color(0xFF8B5CF6), size: 20),
-        const SizedBox(width: 12),
-        Expanded(child: Text(equation, style: const TextStyle(fontFamily: 'monospace', fontSize: 16, color: Colors.white, fontStyle: FontStyle.italic))),
-      ]),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1117),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.functions, color: Color(0xFF8B5CF6), size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              equation,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 16,
+                color: Colors.white,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2395,75 +5220,174 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildWeather(WeatherData weather) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.6,
+      ),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF06B6D4)]), borderRadius: BorderRadius.circular(16)),
-      child: Row(children: [
-        Icon(weather.icon, size: 48, color: Colors.white),
-        const SizedBox(width: 16),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('${weather.temperature.toInt()}°C', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          Text(weather.condition, style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.8))),
-          Text(weather.location, style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.6))),
-        ]),
-      ]),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF3B82F6), Color(0xFF06B6D4)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Icon(weather.icon, size: 48, color: Colors.white),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${weather.temperature.toInt()}°C',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                weather.condition,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+              Text(
+                weather.location,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.white.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCountdown(CountdownData data) {
     final diff = data.targetDate.difference(DateTime.now());
-    final days = diff.inDays; final hours = diff.inHours % 24;
+    final days = diff.inDays;
+    final hours = diff.inHours % 24;
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: (data.color ?? const Color(0xFFEF4444)).withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: data.color ?? const Color(0xFFEF4444))),
-      child: Column(children: [
-        Icon(Icons.timer, color: data.color ?? const Color(0xFFEF4444), size: 28),
-        const SizedBox(height: 8),
-        Text(data.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-        const SizedBox(height: 8),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _countdownUnit(days.toString(), 'Days'), const SizedBox(width: 16),
-          _countdownUnit(hours.toString(), 'Hours'), const SizedBox(width: 16),
-          _countdownUnit((diff.inMinutes % 60).toString(), 'Mins'),
-        ]),
-      ]),
+      decoration: BoxDecoration(
+        color: (data.color ?? const Color(0xFFEF4444)).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: data.color ?? const Color(0xFFEF4444)),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.timer,
+            color: data.color ?? const Color(0xFFEF4444),
+            size: 28,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            data.title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _countdownUnit(days.toString(), 'Days'),
+              const SizedBox(width: 16),
+              _countdownUnit(hours.toString(), 'Hours'),
+              const SizedBox(width: 16),
+              _countdownUnit((diff.inMinutes % 60).toString(), 'Mins'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _countdownUnit(String value, String label) {
-    return Column(children: [
-      Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-      Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
-    ]);
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+      ],
+    );
   }
 
   Widget _buildFlashcards(List<FlashcardData> cards) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       height: 140,
       child: PageView.builder(
         itemCount: cards.length,
         controller: PageController(viewportFraction: 0.9),
         itemBuilder: (context, i) {
-          return StatefulBuilder(builder: (context, setState) {
-            bool flipped = false;
-            return GestureDetector(
-              onTap: () => setState(() => flipped = !flipped),
-              child: Container(
-                margin: const EdgeInsets.only(right: 10),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(gradient: LinearGradient(colors: flipped ? [const Color(0xFF10B981), const Color(0xFF06B6D4)] : [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]), borderRadius: BorderRadius.circular(12)),
-                child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(flipped ? Icons.lightbulb : Icons.help_outline, color: Colors.white.withOpacity(0.5), size: 24),
-                  const SizedBox(height: 8),
-                  Text(flipped ? cards[i].back : cards[i].front, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white), textAlign: TextAlign.center),
-                  const SizedBox(height: 8),
-                  Text('Tap to ${flipped ? 'see question' : 'reveal answer'}', style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.6))),
-                ])),
-              ),
-            );
-          });
+          return StatefulBuilder(
+            builder: (context, setState) {
+              bool flipped = false;
+              return GestureDetector(
+                onTap: () => setState(() => flipped = !flipped),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: flipped
+                          ? [const Color(0xFF10B981), const Color(0xFF06B6D4)]
+                          : [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          flipped ? Icons.lightbulb : Icons.help_outline,
+                          color: Colors.white.withOpacity(0.5),
+                          size: 24,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          flipped ? cards[i].back : cards[i].front,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tap to ${flipped ? 'see question' : 'reveal answer'}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
     );
@@ -2471,39 +5395,114 @@ print(f"Average: {avg}")''', 'python'),
 
   Widget _buildPdfPreview(String url, String? title) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.5))),
-      child: Column(children: [
-        Container(height: 120, decoration: BoxDecoration(color: const Color(0xFF1E1E26), borderRadius: const BorderRadius.vertical(top: Radius.circular(11))),
-          child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.picture_as_pdf, color: Color(0xFFEF4444), size: 40),
-            const SizedBox(height: 8),
-            Text(title ?? 'PDF Document', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
-          ]))),
-        Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(color: Color(0xFF16161E), borderRadius: BorderRadius.vertical(bottom: Radius.circular(11))),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            _pdfAction(Icons.visibility, 'View'),
-            _pdfAction(Icons.download, 'Download'),
-            _pdfAction(Icons.share, 'Share'),
-          ])),
-      ]),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E26),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.picture_as_pdf,
+                    color: Color(0xFFEF4444),
+                    size: 40,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title ?? 'PDF Document',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF16161E),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _pdfAction(Icons.visibility, 'View'),
+                _pdfAction(Icons.download, 'Download'),
+                _pdfAction(Icons.share, 'Share'),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _pdfAction(IconData icon, String label) {
-    return Column(children: [
-      Container(width: 36, height: 36, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(8)), child: Icon(icon, size: 18, color: Colors.grey[400])),
-      const SizedBox(height: 4),
-      Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
-    ]);
+    return Column(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: const Color(0xFF27272A),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 18, color: Colors.grey[400]),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+      ],
+    );
   }
 
-  Widget _buildNote(String text) {
+  Widget _buildNote(String text, int variant) {
+    Color bgColor;
+    Color pinColor;
+
+    switch (variant) {
+      case 1: // Pink
+        bgColor = const Color(0xFFFBCFE8);
+        pinColor = const Color(0xFFDB2777);
+        break;
+      case 2: // Blue
+        bgColor = const Color(0xFFBAE6FD);
+        pinColor = const Color(0xFF0284C7);
+        break;
+      case 3: // Green
+        bgColor = const Color(0xFFBBF7D0);
+        pinColor = const Color(0xFF16A34A);
+        break;
+      case 4: // Orange
+        bgColor = const Color(0xFFFED7AA);
+        pinColor = const Color(0xFFEA580C);
+        break;
+      case 0:
+      default: // Yellow
+        bgColor = const Color(0xFFFEF08A);
+        pinColor = const Color(0xFFEF4444);
+        break;
+    }
+
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF08A), // Yellow sticky note
+        color: bgColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(2),
           topRight: Radius.circular(2),
@@ -2528,7 +5527,7 @@ print(f"Average: {avg}")''', 'python'),
               width: 12,
               height: 12,
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444), // Red pin
+                color: pinColor,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -2545,7 +5544,8 @@ print(f"Average: {avg}")''', 'python'),
             style: const TextStyle(
               fontSize: 16,
               color: Color(0xFF422006), // Dark brown text
-              fontFamily: 'Cursive', // Fallback to cursive if specific font not available
+              fontFamily:
+                  'Cursive', // Fallback to cursive if specific font not available
               fontStyle: FontStyle.italic,
               height: 1.5,
             ),
@@ -2555,12 +5555,44 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _buildPaper(String text) {
+  Widget _buildPaper(String text, int variant) {
+    Color bgColor = const Color(0xFFF8FAFC);
+    Color lineColor = const Color(0xFFE2E8F0); // Subtle blue-grey
+    Color marginColor = const Color(0xFFFECACA).withOpacity(0.5); // Red-ish
+    Color textColor = const Color(0xFF334155);
+    bool showHoles = true;
+    bool isBlueprint = false;
+
+    if (variant == 1) {
+      // Grid
+      bgColor = Colors.white;
+      lineColor = const Color(0xFFE2E8F0);
+    } else if (variant == 2) {
+      // Legal
+      bgColor = const Color(0xFFFEF9C3); // Yellowish
+      lineColor = const Color(0xFF94A3B8); // Blue lines
+      marginColor = const Color(0xFFEF4444).withOpacity(0.5);
+    } else if (variant == 3) {
+      // Blueprint
+      bgColor = const Color(0xFF1E3A8A); // Dark Blue
+      lineColor = Colors.white.withOpacity(0.15);
+      marginColor = Colors.transparent;
+      textColor = Colors.white.withOpacity(0.9);
+      showHoles = false;
+      isBlueprint = true;
+    } else if (variant == 4) {
+      // Dot Grid
+      bgColor = const Color(0xFFFAFAFA);
+      // Just implies different styling, for now simple
+    }
+
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC), // Off-white
+        color: bgColor,
         borderRadius: BorderRadius.circular(2),
         boxShadow: [
           BoxShadow(
@@ -2569,42 +5601,48 @@ print(f"Average: {avg}")''', 'python'),
             offset: const Offset(2, 2),
           ),
         ],
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
-          stops: const [0.95, 1.0], // Slight curl effect at bottom
-        ),
+        gradient: isBlueprint
+            ? null
+            : LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [bgColor, Color.lerp(bgColor, Colors.black, 0.02)!],
+                stops: const [0.95, 1.0], // Slight curl effect at bottom
+              ),
       ),
       child: Stack(
         children: [
-          // Binding holes
-          Positioned(
-            left: -12,
-            top: 0,
-            bottom: 0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(3, (index) => Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0A0A0C), // Background color to simulate hole
-                  shape: BoxShape.circle,
+          // Binding holes (if shown)
+          if (showHoles)
+            Positioned(
+              left: -12,
+              top: 0,
+              bottom: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(
+                  3,
+                  (index) => Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: const Color(
+                        0xFF0A0A0C,
+                      ), // Background color to simulate hole
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                 ),
-              )),
+              ),
             ),
-          ),
-          // Vertical red margin line
-          Positioned(
-            left: 20,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 1,
-              color: const Color(0xFFFECACA).withOpacity(0.5),
+          // Vertical margin line
+          if (marginColor != Colors.transparent && !isBlueprint)
+            Positioned(
+              left: 20,
+              top: 0,
+              bottom: 0,
+              child: Container(width: 1, color: marginColor),
             ),
-          ),
           // Content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2613,11 +5651,17 @@ print(f"Average: {avg}")''', 'python'),
                 text,
                 style: TextStyle(
                   fontSize: 15,
-                  color: const Color(0xFF334155),
+                  color: textColor,
+                  fontFamily: isBlueprint ? 'Monospace' : null,
                   height: 1.8, // Line height to match lines
-                  shadows: [
-                    Shadow(offset: const Offset(0, 1), color: Colors.white.withOpacity(0.5)),
-                  ],
+                  shadows: isBlueprint
+                      ? []
+                      : [
+                          Shadow(
+                            offset: const Offset(0, 1),
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ],
                 ),
               ),
             ],
@@ -2627,14 +5671,48 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _buildLetter(String text) {
+  Widget _buildLetter(String text, int variant) {
+    Color paperColor = const Color(0xFFF5E6D3);
+    Color borderColor = const Color(0xFFD4C5A2);
+    IconData sealIcon = Icons.stars;
+    Color sealColor = const Color(0xFFB91C1C);
+    Color textColor = const Color(0xFF3F2E18);
+
+    if (variant == 1) {
+      // Royal
+      paperColor = const Color(0xFFFFFAF0); // FloralWhite
+      borderColor = const Color(0xFFFFD700); // Gold
+      sealColor = const Color(0xFFDAA520);
+    } else if (variant == 2) {
+      // Love
+      paperColor = const Color(0xFFFFF0F5); // LavenderBlush
+      borderColor = const Color(0xFFFFB6C1);
+      sealIcon = Icons.favorite;
+      sealColor = const Color(0xFFE11D48);
+    } else if (variant == 3) {
+      // Ancient
+      paperColor = const Color(0xFFEAD196); // Darker parchment
+      borderColor = const Color(0xFF8D6E63);
+      sealIcon = Icons.history_edu;
+      sealColor = const Color(0xFF5D4037);
+    } else if (variant == 4) {
+      // Dark
+      paperColor = const Color(0xFF18181B);
+      borderColor = const Color(0xFF52525B);
+      sealIcon = Icons.nightlight_round;
+      sealColor = const Color(0xFF71717A);
+      textColor = const Color(0xFFE4E4E7);
+    }
+
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5E6D3), // Parchment
+        color: paperColor,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: const Color(0xFFD4C5A2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
@@ -2643,7 +5721,9 @@ print(f"Average: {avg}")''', 'python'),
           ),
         ],
         image: const DecorationImage(
-          image: NetworkImage('https://www.transparenttextures.com/patterns/aged-paper.png'), // Subtle texture attempt
+          image: NetworkImage(
+            'https://www.transparenttextures.com/patterns/aged-paper.png',
+          ), // Subtle texture attempt
           repeat: ImageRepeat.repeat,
           opacity: 0.1,
         ),
@@ -2659,19 +5739,23 @@ print(f"Average: {avg}")''', 'python'),
               height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFB91C1C).withOpacity(0.6), width: 2),
+                border: Border.all(color: sealColor.withOpacity(0.6), width: 2),
               ),
               child: Center(
-                child: Icon(Icons.stars, color: const Color(0xFFB91C1C).withOpacity(0.6), size: 24),
+                child: Icon(
+                  sealIcon,
+                  color: sealColor.withOpacity(0.6),
+                  size: 24,
+                ),
               ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF3F2E18), // Dark brown
+              color: textColor, // Dark brown
               fontFamily: 'Serif',
               height: 1.6,
               letterSpacing: 0.5,
@@ -2684,7 +5768,7 @@ print(f"Average: {avg}")''', 'python'),
               'Nexus AI',
               style: TextStyle(
                 fontSize: 12,
-                color: const Color(0xFF3F2E18).withOpacity(0.6),
+                color: textColor.withOpacity(0.6),
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -2695,21 +5779,59 @@ print(f"Average: {avg}")''', 'python'),
   }
 
   // Helper for chart containers
-  Widget _buildChartContainer(String? title, IconData icon, Color color, Widget child) {
+  Widget _buildChartContainer(
+    String? title,
+    IconData icon,
+    Color color,
+    Widget child,
+  ) {
     return Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(color: const Color(0xFF16161E), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF27272A))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (title != null) Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), decoration: const BoxDecoration(color: Color(0xFF161B22), borderRadius: BorderRadius.vertical(top: Radius.circular(11))),
-          child: Row(children: [Icon(icon, size: 16, color: color), const SizedBox(width: 8), Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white))])),
-        Padding(padding: const EdgeInsets.all(16), child: child),
-      ]),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF27272A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(
+                color: Color(0xFF161B22),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              ),
+              child: Row(
+                children: [
+                  Icon(icon, size: 16, color: color),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Padding(padding: const EdgeInsets.all(16), child: child),
+        ],
+      ),
     );
   }
 
-  Widget _buildMapBlock(MapLocation center, List<MapLocation>? markers, double zoom) {
+  Widget _buildMapBlock(
+    MapLocation center,
+    List<MapLocation>? markers,
+    double zoom,
+  ) {
     final allMarkers = markers ?? [center];
-    
+
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -2730,7 +5852,11 @@ print(f"Average: {avg}")''', 'python'),
             ),
             child: Row(
               children: [
-                const Icon(Icons.location_on, size: 16, color: Color(0xFF3B82F6)),
+                const Icon(
+                  Icons.location_on,
+                  size: 16,
+                  color: Color(0xFF3B82F6),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -2749,7 +5875,9 @@ print(f"Average: {avg}")''', 'python'),
           ),
           // Interactive map
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(11)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(11),
+            ),
             child: SizedBox(
               height: 180,
               child: FlutterMap(
@@ -2762,34 +5890,42 @@ print(f"Average: {avg}")''', 'python'),
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.scheduleme.app',
                   ),
                   MarkerLayer(
-                    markers: allMarkers.map((loc) => Marker(
-                      point: LatLng(loc.latitude, loc.longitude),
-                      width: 40,
-                      height: 40,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF3B82F6),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                    markers: allMarkers
+                        .map(
+                          (loc) => Marker(
+                            point: LatLng(loc.latitude, loc.longitude),
+                            width: 40,
+                            height: 40,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF3B82F6),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    )).toList(),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ],
               ),
@@ -2801,7 +5937,9 @@ print(f"Average: {avg}")''', 'python'),
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
                 color: Color(0xFF16161E),
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(11),
+                ),
               ),
               child: Text(
                 center.description!,
@@ -2866,7 +6004,10 @@ print(f"Average: {avg}")''', 'python'),
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF21262D),
                       borderRadius: BorderRadius.circular(6),
@@ -2874,11 +6015,18 @@ print(f"Average: {avg}")''', 'python'),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.copy_rounded, size: 12, color: Colors.grey[400]),
+                        Icon(
+                          Icons.copy_rounded,
+                          size: 12,
+                          color: Colors.grey[400],
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Copy',
-                          style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[400],
+                          ),
                         ),
                       ],
                     ),
@@ -2919,15 +6067,27 @@ print(f"Average: {avg}")''', 'python'),
         itemCount: images.length,
         separatorBuilder: (context, index) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
-          return _buildHorizontalGalleryImage(images[index], allImages: images, index: index);
+          return _buildHorizontalGalleryImage(
+            images[index],
+            allImages: images,
+            index: index,
+          );
         },
       ),
     );
   }
 
-  Widget _buildHorizontalGalleryImage(AIResponseImage image, {List<AIResponseImage>? allImages, int index = 0}) {
+  Widget _buildHorizontalGalleryImage(
+    AIResponseImage image, {
+    List<AIResponseImage>? allImages,
+    int index = 0,
+  }) {
     return GestureDetector(
-      onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+      onTap: () => _showFullScreenImage(
+        image,
+        allImages: allImages,
+        initialIndex: index,
+      ),
       child: Container(
         width: 140,
         decoration: BoxDecoration(
@@ -2945,21 +6105,32 @@ print(f"Average: {avg}")''', 'python'),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.25), size: 36),
+            Icon(
+              Icons.image_rounded,
+              color: Colors.white.withOpacity(0.25),
+              size: 36,
+            ),
             if (image.title != null)
               Positioned(
                 bottom: 8,
                 left: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     image.title!,
-                    style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2971,14 +6142,21 @@ print(f"Average: {avg}")''', 'python'),
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     '1/${allImages.length}',
-                    style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -2988,8 +6166,12 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-
-  Widget _buildSingleImage(AIResponseImage image, double maxWidth, {List<AIResponseImage>? allImages, int index = 0}) {
+  Widget _buildSingleImage(
+    AIResponseImage image,
+    double maxWidth, {
+    List<AIResponseImage>? allImages,
+    int index = 0,
+  }) {
     return Container(
       constraints: BoxConstraints(maxWidth: maxWidth),
       decoration: BoxDecoration(
@@ -3001,9 +6183,15 @@ print(f"Average: {avg}")''', 'python'),
         children: [
           // Image
           GestureDetector(
-            onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+            onTap: () => _showFullScreenImage(
+              image,
+              allImages: allImages,
+              initialIndex: index,
+            ),
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
               child: Container(
                 height: 180,
                 width: double.infinity,
@@ -3020,12 +6208,19 @@ print(f"Average: {avg}")''', 'python'),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.3), size: 48),
+                    Icon(
+                      Icons.image_rounded,
+                      color: Colors.white.withOpacity(0.3),
+                      size: 48,
+                    ),
                     Positioned(
                       bottom: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black54,
                           borderRadius: BorderRadius.circular(6),
@@ -3033,9 +6228,19 @@ print(f"Average: {avg}")''', 'python'),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
-                            Icon(Icons.zoom_out_map, color: Colors.white, size: 14),
+                            Icon(
+                              Icons.zoom_out_map,
+                              color: Colors.white,
+                              size: 14,
+                            ),
                             SizedBox(width: 4),
-                            Text('View', style: TextStyle(color: Colors.white, fontSize: 11)),
+                            Text(
+                              'View',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -3051,7 +6256,9 @@ print(f"Average: {avg}")''', 'python'),
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
                 color: Color(0xFF16161E),
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(11),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -3080,9 +6287,18 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _buildGalleryImage(AIResponseImage image, double height, {List<AIResponseImage>? allImages, int index = 0}) {
+  Widget _buildGalleryImage(
+    AIResponseImage image,
+    double height, {
+    List<AIResponseImage>? allImages,
+    int index = 0,
+  }) {
     return GestureDetector(
-      onTap: () => _showFullScreenImage(image, allImages: allImages, initialIndex: index),
+      onTap: () => _showFullScreenImage(
+        image,
+        allImages: allImages,
+        initialIndex: index,
+      ),
       child: Container(
         height: height,
         decoration: BoxDecoration(
@@ -3100,14 +6316,21 @@ print(f"Average: {avg}")''', 'python'),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.25), size: 28),
+            Icon(
+              Icons.image_rounded,
+              color: Colors.white.withOpacity(0.25),
+              size: 28,
+            ),
             if (image.title != null)
               Positioned(
                 bottom: 6,
                 left: 6,
                 right: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(4),
@@ -3126,22 +6349,21 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  void _showFullScreenImage(AIResponseImage image, {List<AIResponseImage>? allImages, int initialIndex = 0}) {
+  void _showFullScreenImage(
+    AIResponseImage image, {
+    List<AIResponseImage>? allImages,
+    int initialIndex = 0,
+  }) {
     final images = allImages ?? [image];
     final startIndex = allImages != null ? initialIndex : 0;
-    
+
     showDialog(
       context: context,
       barrierColor: Colors.black87,
-      builder: (context) => _FullScreenImageGallery(
-        images: images,
-        initialIndex: startIndex,
-      ),
+      builder: (context) =>
+          _FullScreenImageGallery(images: images, initialIndex: startIndex),
     );
   }
-
-
-
 
   Widget _buildMessageActions(ChatMessage message) {
     return Row(
@@ -3185,19 +6407,24 @@ print(f"Average: {avg}")''', 'python'),
                 _isTyping = true;
               });
               // Generate new response
-              Future.delayed(Duration(milliseconds: 1000 + Random().nextInt(1000)), () {
-                if (mounted) {
-                  setState(() {
-                    _isTyping = false;
-                    _messages.add(ChatMessage(
-                      isAi: true,
-                      sender: 'Nexus AI',
-                      message: _generateLoremIpsum(),
-                    ));
-                  });
-                  _scrollToBottom();
-                }
-              });
+              Future.delayed(
+                Duration(milliseconds: 1000 + Random().nextInt(1000)),
+                () {
+                  if (mounted) {
+                    setState(() {
+                      _isTyping = false;
+                      _messages.add(
+                        ChatMessage(
+                          isAi: true,
+                          sender: 'Nexus AI',
+                          message: _generateLoremIpsum(),
+                        ),
+                      );
+                    });
+                    _scrollToBottom();
+                  }
+                },
+              );
             }
           },
         ),
@@ -3249,7 +6476,8 @@ print(f"Average: {avg}")''', 'python'),
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // Pending Attachments display
-              if (message.pendingAttachments != null && message.pendingAttachments!.isNotEmpty)
+              if (message.pendingAttachments != null &&
+                  message.pendingAttachments!.isNotEmpty)
                 Container(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -3259,7 +6487,9 @@ print(f"Average: {avg}")''', 'python'),
                     spacing: 6,
                     runSpacing: 6,
                     alignment: WrapAlignment.end,
-                    children: message.pendingAttachments!.map((att) => _buildSentAttachmentChip(att)).toList(),
+                    children: message.pendingAttachments!
+                        .map((att) => _buildSentAttachmentChip(att))
+                        .toList(),
                   ),
                 ),
               // Message text
@@ -3339,8 +6569,8 @@ print(f"Average: {avg}")''', 'python'),
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 6),
           Text(
-            attachment.name.length > 15 
-                ? '${attachment.name.substring(0, 12)}...' 
+            attachment.name.length > 15
+                ? '${attachment.name.substring(0, 12)}...'
                 : attachment.name,
             style: const TextStyle(fontSize: 11, color: Colors.white70),
           ),
@@ -3348,7 +6578,6 @@ print(f"Average: {avg}")''', 'python'),
       ),
     );
   }
-
 
   Widget _buildAttachment(ChatAttachment attachment) {
     return Container(
@@ -3480,7 +6709,12 @@ print(f"Average: {avg}")''', 'python'),
             ),
           // Input Row
           Padding(
-            padding: EdgeInsets.fromLTRB(16, _pendingAttachments.isEmpty ? 12 : 8, 16, 24),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              _pendingAttachments.isEmpty ? 12 : 8,
+              16,
+              24,
+            ),
             child: Row(
               children: [
                 // Add Button - Opens Attachment Options
@@ -3513,12 +6747,18 @@ print(f"Average: {avg}")''', 'python'),
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
-                        hintText: _pendingAttachments.isNotEmpty 
-                            ? 'Add a message...' 
+                        hintText: _pendingAttachments.isNotEmpty
+                            ? 'Add a message...'
                             : 'Ask anything about your courses...',
-                        hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        hintStyle: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -3541,7 +6781,11 @@ print(f"Average: {avg}")''', 'python'),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.send, color: Colors.white, size: 20),
+                    child: const Icon(
+                      Icons.send,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ],
@@ -3640,7 +6884,10 @@ print(f"Average: {avg}")''', 'python'),
       decoration: BoxDecoration(
         color: const Color(0xFF0A0A0C).withOpacity(0.95),
         border: Border(
-          top: BorderSide(color: const Color(0xFF10B981).withOpacity(0.5), width: 2),
+          top: BorderSide(
+            color: const Color(0xFF10B981).withOpacity(0.5),
+            width: 2,
+          ),
         ),
       ),
       child: Row(
@@ -3667,7 +6914,9 @@ print(f"Average: {avg}")''', 'python'),
               decoration: BoxDecoration(
                 color: const Color(0xFF10B981).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFF10B981).withOpacity(0.5)),
+                border: Border.all(
+                  color: const Color(0xFF10B981).withOpacity(0.5),
+                ),
               ),
               child: Row(
                 children: [
@@ -3678,7 +6927,11 @@ print(f"Average: {avg}")''', 'python'),
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: Color.lerp(const Color(0xFF10B981), const Color(0xFFEF4444), _recordingAnimController!.value),
+                          color: Color.lerp(
+                            const Color(0xFF10B981),
+                            const Color(0xFFEF4444),
+                            _recordingAnimController!.value,
+                          ),
                           shape: BoxShape.circle,
                         ),
                       );
@@ -3687,7 +6940,11 @@ print(f"Average: {avg}")''', 'python'),
                   const SizedBox(width: 12),
                   Text(
                     'Recording... ${_formatDuration(_recordingDuration)}',
-                    style: const TextStyle(color: Color(0xFF10B981), fontSize: 14, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Color(0xFF10B981),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -3719,7 +6976,6 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-
   // ========== ATTACHMENT OPTIONS BOTTOM SHEET ==========
   void _showAttachmentSheet() {
     showModalBottomSheet(
@@ -3734,24 +6990,55 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildAttachmentOption(Icons.camera_alt_rounded, 'Camera', const Color(0xFF3B82F6), () {
-                  Navigator.pop(context);
-                  _addAttachment(AttachmentType.camera, 'Photo_${DateTime.now().millisecondsSinceEpoch}.jpg');
-                })),
+                Expanded(
+                  child: _buildAttachmentOption(
+                    Icons.camera_alt_rounded,
+                    'Camera',
+                    const Color(0xFF3B82F6),
+                    () {
+                      Navigator.pop(context);
+                      _addAttachment(
+                        AttachmentType.camera,
+                        'Photo_${DateTime.now().millisecondsSinceEpoch}.jpg',
+                      );
+                    },
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _buildAttachmentOption(Icons.folder_rounded, 'File', const Color(0xFF8B5CF6), () {
-                  Navigator.pop(context);
-                  _showFilePickerSheet();
-                })),
+                Expanded(
+                  child: _buildAttachmentOption(
+                    Icons.folder_rounded,
+                    'File',
+                    const Color(0xFF8B5CF6),
+                    () {
+                      Navigator.pop(context);
+                      _showFilePickerSheet();
+                    },
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _buildAttachmentOption(Icons.mic_rounded, 'Voice', const Color(0xFF10B981), () {
-                  Navigator.pop(context);
-                  _startRecording();
-                })),
+                Expanded(
+                  child: _buildAttachmentOption(
+                    Icons.mic_rounded,
+                    'Voice',
+                    const Color(0xFF10B981),
+                    () {
+                      Navigator.pop(context);
+                      _startRecording();
+                    },
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -3774,26 +7061,67 @@ print(f"Average: {avg}")''', 'python'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF27272A),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            const Text('Choose File Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            const Text(
+              'Choose File Type',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildFileTypeOption(Icons.image_rounded, 'Images', const Color(0xFF3B82F6), () {
-                  Navigator.pop(context);
-                  _addAttachment(AttachmentType.image, 'image_${DateTime.now().millisecondsSinceEpoch}.png');
-                })),
+                Expanded(
+                  child: _buildFileTypeOption(
+                    Icons.image_rounded,
+                    'Images',
+                    const Color(0xFF3B82F6),
+                    () {
+                      Navigator.pop(context);
+                      _addAttachment(
+                        AttachmentType.image,
+                        'image_${DateTime.now().millisecondsSinceEpoch}.png',
+                      );
+                    },
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _buildFileTypeOption(Icons.picture_as_pdf_rounded, 'PDF', const Color(0xFFEF4444), () {
-                  Navigator.pop(context);
-                  _addAttachment(AttachmentType.file, 'document.pdf');
-                })),
+                Expanded(
+                  child: _buildFileTypeOption(
+                    Icons.picture_as_pdf_rounded,
+                    'PDF',
+                    const Color(0xFFEF4444),
+                    () {
+                      Navigator.pop(context);
+                      _addAttachment(AttachmentType.file, 'document.pdf');
+                    },
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _buildFileTypeOption(Icons.insert_drive_file_rounded, 'Other', const Color(0xFFF59E0B), () {
-                  Navigator.pop(context);
-                  _addAttachment(AttachmentType.file, 'file_${DateTime.now().millisecondsSinceEpoch}.txt');
-                })),
+                Expanded(
+                  child: _buildFileTypeOption(
+                    Icons.insert_drive_file_rounded,
+                    'Other',
+                    const Color(0xFFF59E0B),
+                    () {
+                      Navigator.pop(context);
+                      _addAttachment(
+                        AttachmentType.file,
+                        'file_${DateTime.now().millisecondsSinceEpoch}.txt',
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -3803,7 +7131,12 @@ print(f"Average: {avg}")''', 'python'),
     );
   }
 
-  Widget _buildFileTypeOption(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _buildFileTypeOption(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -3816,15 +7149,26 @@ print(f"Average: {avg}")''', 'python'),
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-
-  Widget _buildAttachmentOption(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _buildAttachmentOption(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -3846,7 +7190,14 @@ print(f"Average: {avg}")''', 'python'),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(height: 10),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
@@ -3861,7 +7212,8 @@ class ChatMessage {
   final ChatAttachment? attachment;
   final List<PendingAttachment>? pendingAttachments;
   final List<AIResponseImage>? images;
-  final List<AIContentBlock>? contentBlocks; // New: multiple text/image blocks in order
+  final List<AIContentBlock>?
+  contentBlocks; // New: multiple text/image blocks in order
 
   ChatMessage({
     required this.isAi,
@@ -3893,11 +7245,7 @@ class PendingAttachment {
   final AttachmentType type;
   final String name;
 
-  PendingAttachment({
-    required this.id,
-    required this.type,
-    required this.name,
-  });
+  PendingAttachment({required this.id, required this.type, required this.name});
 }
 
 class AIResponseImage {
@@ -3905,30 +7253,50 @@ class AIResponseImage {
   final String? caption;
   final String? title;
 
-  AIResponseImage({
-    required this.url,
-    this.caption,
-    this.title,
-  });
+  AIResponseImage({required this.url, this.caption, this.title});
 }
 
 /// Content block types for multi-part AI responses
-enum AIContentBlockType { 
-  text, images, code, map, barChart, pieChart,
+enum AIContentBlockType {
+  text,
+  images,
+  code,
+  map,
+  barChart,
+  pieChart,
   // Phase 1: Data Visualization
-  lineChart, radarChart, progressBars, timeline,
+  lineChart,
+  radarChart,
+  progressBars,
+  timeline,
   // Phase 2: Interactive Content
-  quiz, checklist, collapsible, dataTable, carousel,
+  quiz,
+  checklist,
+  collapsible,
+  dataTable,
+  carousel,
   // Phase 3: Media
-  audioPlayer, videoPlayer, fileAttachment, voiceMessage,
+  audioPlayer,
+  videoPlayer,
+  fileAttachment,
+  voiceMessage,
   // Phase 4: Actions
-  quickActions, deepLinks, contactCard, calendarEvent,
+  quickActions,
+  deepLinks,
+  contactCard,
+  calendarEvent,
   // Phase 5: Rich Formatting
-  markdown, mathEquation,
+  markdown,
+  mathEquation,
   // Phase 6: Bonus
-  weather, countdown, flashcards, pdfPreview,
+  weather,
+  countdown,
+  flashcards,
+  pdfPreview,
   // New Styles
-  note, paper, letter,
+  note,
+  paper,
+  letter,
 }
 
 /// Location data for map content blocks
@@ -3971,7 +7339,12 @@ class ProgressItem {
   final double max;
   final Color? color;
 
-  ProgressItem({required this.label, required this.value, this.max = 100, this.color});
+  ProgressItem({
+    required this.label,
+    required this.value,
+    this.max = 100,
+    this.color,
+  });
 }
 
 /// Timeline event
@@ -3982,7 +7355,13 @@ class TimelineEvent {
   final Color? color;
   final IconData? icon;
 
-  TimelineEvent({required this.title, this.description, required this.date, this.color, this.icon});
+  TimelineEvent({
+    required this.title,
+    this.description,
+    required this.date,
+    this.color,
+    this.icon,
+  });
 }
 
 /// Quiz data
@@ -3991,7 +7370,11 @@ class QuizData {
   final List<String> options;
   final int correctIndex;
 
-  QuizData({required this.question, required this.options, required this.correctIndex});
+  QuizData({
+    required this.question,
+    required this.options,
+    required this.correctIndex,
+  });
 }
 
 /// Checklist item
@@ -4018,7 +7401,13 @@ class InfoCard {
   final IconData? icon;
   final Color? color;
 
-  InfoCard({required this.title, this.subtitle, this.description, this.icon, this.color});
+  InfoCard({
+    required this.title,
+    this.subtitle,
+    this.description,
+    this.icon,
+    this.color,
+  });
 }
 
 /// Action button
@@ -4028,7 +7417,12 @@ class ActionButton {
   final Color? color;
   final String? action;
 
-  ActionButton({required this.label, required this.icon, this.color, this.action});
+  ActionButton({
+    required this.label,
+    required this.icon,
+    this.color,
+    this.action,
+  });
 }
 
 /// Contact data
@@ -4039,7 +7433,13 @@ class ContactData {
   final String? email;
   final String? avatarUrl;
 
-  ContactData({required this.name, this.role, this.phone, this.email, this.avatarUrl});
+  ContactData({
+    required this.name,
+    this.role,
+    this.phone,
+    this.email,
+    this.avatarUrl,
+  });
 }
 
 /// Calendar event data
@@ -4050,7 +7450,13 @@ class CalendarEventData {
   final String? location;
   final Color? color;
 
-  CalendarEventData({required this.title, required this.date, this.time, this.location, this.color});
+  CalendarEventData({
+    required this.title,
+    required this.date,
+    this.time,
+    this.location,
+    this.color,
+  });
 }
 
 /// Weather data
@@ -4060,7 +7466,12 @@ class WeatherData {
   final String condition;
   final IconData icon;
 
-  WeatherData({required this.location, required this.temperature, required this.condition, required this.icon});
+  WeatherData({
+    required this.location,
+    required this.temperature,
+    required this.condition,
+    required this.icon,
+  });
 }
 
 /// Countdown data
@@ -4132,68 +7543,995 @@ class AIContentBlock {
   final String? markdownContent;
   final String? mathEquation;
 
+  // Variant for different styles (default 0)
+  int variant = 0;
+
   // Constructors for each type
-  AIContentBlock.text(this.text) : type = AIContentBlockType.text, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.text(this.text, {this.variant = 0})
+    : type = AIContentBlockType.text,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.note(this.text) : type = AIContentBlockType.note, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.note(this.text, {this.variant = 0})
+    : type = AIContentBlockType.note,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.paper(this.text) : type = AIContentBlockType.paper, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.paper(this.text, {this.variant = 0})
+    : type = AIContentBlockType.paper,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.letter(this.text) : type = AIContentBlockType.letter, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.letter(this.text, {this.variant = 0})
+    : type = AIContentBlockType.letter,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.images(this.images) : type = AIContentBlockType.images, text = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.images(this.images)
+    : type = AIContentBlockType.images,
+      text = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.code(this.code, {this.language = 'dart'}) : type = AIContentBlockType.code, text = null, images = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.code(this.code, {this.language = 'dart'})
+    : type = AIContentBlockType.code,
+      text = null,
+      images = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.map({required this.mapCenter, this.mapMarkers, this.mapZoom = 15.0}) : type = AIContentBlockType.map, text = null, images = null, code = null, language = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.map({
+    required this.mapCenter,
+    this.mapMarkers,
+    this.mapZoom = 15.0,
+  }) : type = AIContentBlockType.map,
+       text = null,
+       images = null,
+       code = null,
+       language = null,
+       chartData = null,
+       lineData = null,
+       chartTitle = null,
+       progressItems = null,
+       timelineEvents = null,
+       quizData = null,
+       checklistItems = null,
+       collapsibleTitle = null,
+       collapsibleContent = null,
+       tableData = null,
+       carouselItems = null,
+       mediaUrl = null,
+       mediaTitle = null,
+       mediaDuration = null,
+       thumbnailUrl = null,
+       actionButtons = null,
+       contactData = null,
+       eventData = null,
+       weatherData = null,
+       countdownData = null,
+       flashcards = null,
+       markdownContent = null,
+       mathEquation = null;
 
-  AIContentBlock.barChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.barChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.barChart({required this.chartData, this.chartTitle})
+    : type = AIContentBlockType.barChart,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.pieChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.pieChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.pieChart({required this.chartData, this.chartTitle})
+    : type = AIContentBlockType.pieChart,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.lineChart({required this.lineData, this.chartTitle}) : type = AIContentBlockType.lineChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.lineChart({required this.lineData, this.chartTitle})
+    : type = AIContentBlockType.lineChart,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.radarChart({required this.chartData, this.chartTitle}) : type = AIContentBlockType.radarChart, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.radarChart({required this.chartData, this.chartTitle})
+    : type = AIContentBlockType.radarChart,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.progressBars({required this.progressItems, this.chartTitle}) : type = AIContentBlockType.progressBars, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.progressBars({required this.progressItems, this.chartTitle})
+    : type = AIContentBlockType.progressBars,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.timeline({required this.timelineEvents, this.chartTitle}) : type = AIContentBlockType.timeline, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.timeline({required this.timelineEvents, this.chartTitle})
+    : type = AIContentBlockType.timeline,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      progressItems = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.quiz({required this.quizData}) : type = AIContentBlockType.quiz, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.quiz({required this.quizData})
+    : type = AIContentBlockType.quiz,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.checklist({required this.checklistItems, this.chartTitle}) : type = AIContentBlockType.checklist, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.checklist({required this.checklistItems, this.chartTitle})
+    : type = AIContentBlockType.checklist,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.collapsible({required this.collapsibleTitle, required this.collapsibleContent}) : type = AIContentBlockType.collapsible, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.collapsible({
+    required this.collapsibleTitle,
+    required this.collapsibleContent,
+  }) : type = AIContentBlockType.collapsible,
+       text = null,
+       images = null,
+       code = null,
+       language = null,
+       mapCenter = null,
+       mapMarkers = null,
+       mapZoom = null,
+       chartData = null,
+       lineData = null,
+       chartTitle = null,
+       progressItems = null,
+       timelineEvents = null,
+       quizData = null,
+       checklistItems = null,
+       tableData = null,
+       carouselItems = null,
+       mediaUrl = null,
+       mediaTitle = null,
+       mediaDuration = null,
+       thumbnailUrl = null,
+       actionButtons = null,
+       contactData = null,
+       eventData = null,
+       weatherData = null,
+       countdownData = null,
+       flashcards = null,
+       markdownContent = null,
+       mathEquation = null;
 
-  AIContentBlock.dataTable({required this.tableData, this.chartTitle}) : type = AIContentBlockType.dataTable, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.dataTable({required this.tableData, this.chartTitle})
+    : type = AIContentBlockType.dataTable,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.carousel({required this.carouselItems, this.chartTitle}) : type = AIContentBlockType.carousel, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.carousel({required this.carouselItems, this.chartTitle})
+    : type = AIContentBlockType.carousel,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.audioPlayer({required this.mediaUrl, this.mediaTitle, this.mediaDuration}) : type = AIContentBlockType.audioPlayer, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.audioPlayer({
+    required this.mediaUrl,
+    this.mediaTitle,
+    this.mediaDuration,
+  }) : type = AIContentBlockType.audioPlayer,
+       text = null,
+       images = null,
+       code = null,
+       language = null,
+       mapCenter = null,
+       mapMarkers = null,
+       mapZoom = null,
+       chartData = null,
+       lineData = null,
+       chartTitle = null,
+       progressItems = null,
+       timelineEvents = null,
+       quizData = null,
+       checklistItems = null,
+       collapsibleTitle = null,
+       collapsibleContent = null,
+       tableData = null,
+       carouselItems = null,
+       thumbnailUrl = null,
+       actionButtons = null,
+       contactData = null,
+       eventData = null,
+       weatherData = null,
+       countdownData = null,
+       flashcards = null,
+       markdownContent = null,
+       mathEquation = null;
 
-  AIContentBlock.videoPlayer({required this.mediaUrl, this.mediaTitle, this.thumbnailUrl}) : type = AIContentBlockType.videoPlayer, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.videoPlayer({
+    required this.mediaUrl,
+    this.mediaTitle,
+    this.thumbnailUrl,
+  }) : type = AIContentBlockType.videoPlayer,
+       text = null,
+       images = null,
+       code = null,
+       language = null,
+       mapCenter = null,
+       mapMarkers = null,
+       mapZoom = null,
+       chartData = null,
+       lineData = null,
+       chartTitle = null,
+       progressItems = null,
+       timelineEvents = null,
+       quizData = null,
+       checklistItems = null,
+       collapsibleTitle = null,
+       collapsibleContent = null,
+       tableData = null,
+       carouselItems = null,
+       mediaDuration = null,
+       actionButtons = null,
+       contactData = null,
+       eventData = null,
+       weatherData = null,
+       countdownData = null,
+       flashcards = null,
+       markdownContent = null,
+       mathEquation = null;
 
-  AIContentBlock.fileAttachment({required this.mediaUrl, required this.mediaTitle}) : type = AIContentBlockType.fileAttachment, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.fileAttachment({
+    required this.mediaUrl,
+    required this.mediaTitle,
+  }) : type = AIContentBlockType.fileAttachment,
+       text = null,
+       images = null,
+       code = null,
+       language = null,
+       mapCenter = null,
+       mapMarkers = null,
+       mapZoom = null,
+       chartData = null,
+       lineData = null,
+       chartTitle = null,
+       progressItems = null,
+       timelineEvents = null,
+       quizData = null,
+       checklistItems = null,
+       collapsibleTitle = null,
+       collapsibleContent = null,
+       tableData = null,
+       carouselItems = null,
+       mediaDuration = null,
+       thumbnailUrl = null,
+       actionButtons = null,
+       contactData = null,
+       eventData = null,
+       weatherData = null,
+       countdownData = null,
+       flashcards = null,
+       markdownContent = null,
+       mathEquation = null;
 
-  AIContentBlock.voiceMessage({this.mediaDuration}) : type = AIContentBlockType.voiceMessage, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.voiceMessage({this.mediaDuration})
+    : type = AIContentBlockType.voiceMessage,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.quickActions({required this.actionButtons}) : type = AIContentBlockType.quickActions, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.quickActions({required this.actionButtons})
+    : type = AIContentBlockType.quickActions,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.contactCard({required this.contactData}) : type = AIContentBlockType.contactCard, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.contactCard({required this.contactData})
+    : type = AIContentBlockType.contactCard,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.calendarEvent({required this.eventData}) : type = AIContentBlockType.calendarEvent, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.calendarEvent({required this.eventData})
+    : type = AIContentBlockType.calendarEvent,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.markdown({required this.markdownContent}) : type = AIContentBlockType.markdown, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, mathEquation = null;
+  AIContentBlock.markdown({required this.markdownContent})
+    : type = AIContentBlockType.markdown,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      mathEquation = null;
 
-  AIContentBlock.mathEquation({required this.mathEquation}) : type = AIContentBlockType.mathEquation, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null;
+  AIContentBlock.mathEquation({required this.mathEquation})
+    : type = AIContentBlockType.mathEquation,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null;
 
-  AIContentBlock.weather({required this.weatherData}) : type = AIContentBlockType.weather, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.weather({required this.weatherData})
+    : type = AIContentBlockType.weather,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.countdown({required this.countdownData}) : type = AIContentBlockType.countdown, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.countdown({required this.countdownData})
+    : type = AIContentBlockType.countdown,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.flashcards({required this.flashcards}) : type = AIContentBlockType.flashcards, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaUrl = null, mediaTitle = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.flashcards({required this.flashcards})
+    : type = AIContentBlockType.flashcards,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaUrl = null,
+      mediaTitle = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      markdownContent = null,
+      mathEquation = null;
 
-  AIContentBlock.pdfPreview({required this.mediaUrl, this.mediaTitle}) : type = AIContentBlockType.pdfPreview, text = null, images = null, code = null, language = null, mapCenter = null, mapMarkers = null, mapZoom = null, chartData = null, lineData = null, chartTitle = null, progressItems = null, timelineEvents = null, quizData = null, checklistItems = null, collapsibleTitle = null, collapsibleContent = null, tableData = null, carouselItems = null, mediaDuration = null, thumbnailUrl = null, actionButtons = null, contactData = null, eventData = null, weatherData = null, countdownData = null, flashcards = null, markdownContent = null, mathEquation = null;
+  AIContentBlock.pdfPreview({required this.mediaUrl, this.mediaTitle})
+    : type = AIContentBlockType.pdfPreview,
+      text = null,
+      images = null,
+      code = null,
+      language = null,
+      mapCenter = null,
+      mapMarkers = null,
+      mapZoom = null,
+      chartData = null,
+      lineData = null,
+      chartTitle = null,
+      progressItems = null,
+      timelineEvents = null,
+      quizData = null,
+      checklistItems = null,
+      collapsibleTitle = null,
+      collapsibleContent = null,
+      tableData = null,
+      carouselItems = null,
+      mediaDuration = null,
+      thumbnailUrl = null,
+      actionButtons = null,
+      contactData = null,
+      eventData = null,
+      weatherData = null,
+      countdownData = null,
+      flashcards = null,
+      markdownContent = null,
+      mathEquation = null;
 }
 
 // Swipeable fullscreen image gallery
@@ -4201,13 +8539,11 @@ class _FullScreenImageGallery extends StatefulWidget {
   final List<AIResponseImage> images;
   final int initialIndex;
 
-  const _FullScreenImageGallery({
-    required this.images,
-    this.initialIndex = 0,
-  });
+  const _FullScreenImageGallery({required this.images, this.initialIndex = 0});
 
   @override
-  State<_FullScreenImageGallery> createState() => _FullScreenImageGalleryState();
+  State<_FullScreenImageGallery> createState() =>
+      _FullScreenImageGalleryState();
 }
 
 class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
@@ -4230,7 +8566,7 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
   @override
   Widget build(BuildContext context) {
     final currentImage = widget.images[_currentIndex];
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -4250,7 +8586,11 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
                         color: const Color(0xFF27272A),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 20),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -4260,12 +8600,19 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
                       children: [
                         Text(
                           currentImage.title ?? 'Image ${_currentIndex + 1}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                         if (currentImage.caption != null)
                           Text(
                             currentImage.caption!,
-                            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                            ),
                           ),
                       ],
                     ),
@@ -4273,14 +8620,21 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
                   // Page indicator text
                   if (widget.images.length > 1)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF27272A),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
                         '${_currentIndex + 1}/${widget.images.length}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                 ],
@@ -4313,8 +8667,8 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
                       height: 8,
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       decoration: BoxDecoration(
-                        color: _currentIndex == index 
-                            ? const Color(0xFF3B82F6) 
+                        color: _currentIndex == index
+                            ? const Color(0xFF3B82F6)
                             : const Color(0xFF27272A),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -4367,17 +8721,27 @@ class _FullScreenImageGalleryState extends State<_FullScreenImageGallery> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.image_rounded, color: Colors.white.withOpacity(0.4), size: 64),
+                Icon(
+                  Icons.image_rounded,
+                  color: Colors.white.withOpacity(0.4),
+                  size: 64,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   image.title ?? 'Demo Image',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 14,
+                  ),
                 ),
                 if (image.caption != null) ...[
                   const SizedBox(height: 8),
                   Text(
                     image.caption!,
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
