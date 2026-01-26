@@ -2,23 +2,23 @@
 
 A premium Flutter-based scheduling and productivity application for students, featuring an advanced AI chat assistant with 24+ rich content types.
 
-## ✨ Features
+## Features
 
 ### Core Modules
-- **📅 Calendar** — Interactive calendar with event management
-- **🏠 Home Dashboard** — Daily overview, quick actions, and widgets
-- **📝 Notes** — Document storage with PDFs, images, audio, and video
-- **📊 Attendance Tracker** — Track and visualize attendance records
-- **🤖 AI Chat (Nexus AI)** — Advanced AI assistant with rich responses
-- **⚙️ Settings** — App configuration and preferences
+- **Calendar** — Interactive calendar with event management
+- **Home Dashboard** — Daily overview, quick actions, and widgets
+- **Notes** — Document storage with PDFs, images, audio, and video
+- **Attendance Tracker** — Track and visualize attendance records
+- **AI Chat (Nexus AI)** — Advanced AI assistant with rich responses
+- **Settings** — App configuration and preferences
 
 ---
 
-## 🤖 AI Chat - Content Block System
+## AI Chat - Content Block System
 
 The Nexus AI chat features a powerful **multi-block response system** supporting 24+ content types. The AI can respond with charts, interactive elements, media, and more.
 
-### 📊 Data Visualization
+### Data Visualization
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -29,7 +29,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | Progress Bars | Animated progress indicators | `#progress` |
 | Timeline | Vertical event timeline | `#timeline` |
 
-### 📝 Interactive Content
+### Interactive Content
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -39,7 +39,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | Data Table | Scrollable data tables | `#table` |
 | Cards Carousel | Swipeable info cards | `#cards` |
 
-### 🎵 Media
+### Media
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -48,7 +48,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | File Attachment | File preview with download | — |
 | Voice Message | Waveform visualization | — |
 
-### 🔗 Actions & Links
+### Actions & Links
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -56,7 +56,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | Contact Card | Contact info with call/email | `#contact` |
 | Calendar Event | Event card with "Add" button | `#event` |
 
-### 🎨 Rich Formatting
+### Rich Formatting
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -64,7 +64,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | Math Equation | Mathematical formula display | — |
 | Code Block | Syntax highlighted code | `#code` |
 
-### 🌟 Bonus Widgets
+### Bonus Widgets
 
 | Type | Description | Test Keyword |
 |------|-------------|--------------|
@@ -74,7 +74,7 @@ The Nexus AI chat features a powerful **multi-block response system** supporting
 | PDF Preview | Document preview with actions | — |
 | Interactive Map | Zoomable map with markers | `#map` |
 
-### 🧪 Developer Testing
+### Developer Testing
 
 Use these keywords in the chat to test content types:
 
@@ -106,7 +106,7 @@ Use these keywords in the chat to test content types:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -119,7 +119,7 @@ Use these keywords in the chat to test content types:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ScduleMEv4o1/
@@ -139,7 +139,7 @@ ScduleMEv4o1/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -171,7 +171,7 @@ flutter run
 
 ---
 
-## 📦 Build
+## Build
 
 ```bash
 # Debug APK
@@ -186,7 +186,7 @@ flutter build appbundle --release
 
 ---
 
-## 🎨 Design System
+## Design System
 
 ### Colors
 | Name | Hex | Usage |
@@ -206,7 +206,7 @@ flutter build appbundle --release
 
 ---
 
-## 📚 Dependencies
+## Dependencies
 
 ```yaml
 dependencies:
@@ -217,13 +217,13 @@ dependencies:
 
 ---
 
-## 📄 License
+## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing`)
@@ -233,4 +233,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-**Made with ❤️ using Flutter**
+**Made with Flutter**

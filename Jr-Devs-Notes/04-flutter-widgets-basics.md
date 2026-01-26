@@ -2,14 +2,14 @@
 
 In Flutter, **everything is a widget**. Understanding widgets is the key to building Flutter apps. Let's break it down from the ground up!
 
-## 🎯 What is a Widget?
+## What is a Widget?
 
 A widget is a **description of part of your user interface**.
 
 Think of widgets as:
-- 🧱 Building blocks of your UI
-- 📦 Reusable components
-- 🎨 Both visible (buttons, text) and invisible (layouts, padding)
+- Building blocks of your UI
+- Reusable components
+- Both visible (buttons, text) and invisible (layouts, padding)
 
 ### Simple Analogy
 
@@ -18,7 +18,7 @@ Building a Flutter app is like building with LEGO:
 - Combine pieces = Compose widgets
 - Final creation = Your app
 
-## 🔑 Two Types of Widgets
+## Two Types of Widgets
 
 ### 1. StatelessWidget
 
@@ -83,7 +83,7 @@ class _CounterState extends State<Counter> {
 - Responds to user input
 - Examples: Forms, counters, animated elements
 
-## 🏗️ Essential Layout Widgets
+## Essential Layout Widgets
 
 ### Container
 
@@ -181,7 +181,7 @@ Row(
 // Red container takes 2/3 of width, blue takes 1/3
 ```
 
-## 🎨 Common UI Widgets
+## Common UI Widgets
 
 ### Text
 
@@ -272,7 +272,7 @@ TextField(
 )
 ```
 
-## 📱 Scaffold - The App Structure
+## Scaffold - The App Structure
 
 Most screens use `Scaffold` as the base.
 
@@ -313,7 +313,7 @@ Scaffold(
 )
 ```
 
-## 🔄 ListView - Scrollable Lists
+## ListView - Scrollable Lists
 
 ### Basic ListView
 
@@ -347,7 +347,7 @@ ListView.builder(
 )
 ```
 
-## 🎯 Widget Composition
+## Widget Composition
 
 The power of Flutter: **compose small widgets into big ones**.
 
@@ -419,39 +419,39 @@ UserCard(
 )
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 1. **Break down complex UIs** into smaller widgets
 2. **Use const constructors** when possible for performance
    ```dart
-   const Text('Hello')  // ✅ Good
-   Text('Hello')        // ⚠️ Works, but not optimized
+   const Text('Hello')  // Good
+   Text('Hello')        // Works, but not optimized
    ```
 3. **Extract reusable widgets** into separate classes
 4. **Name widgets clearly**: `UserProfileCard` not `Card1`
 5. **Keep build methods simple**: If it's complex, split it up
 
-## 🚫 Common Mistakes
+## Common Mistakes
 
 ### 1. Forgetting const
 
 ```dart
-// ❌ Creates new widget every rebuild
+// Creates new widget every rebuild
 Text('Hello')
 
-// ✅ Reuses same widget
+// Reuses same widget
 const Text('Hello')
 ```
 
 ### 2. Not Using Keys for Lists
 
 ```dart
-// ❌ Flutter might lose track of items
+// Flutter might lose track of items
 ListView.builder(
   itemBuilder: (context, index) => MyWidget(),
 )
 
-// ✅ Unique keys help Flutter track items
+// Unique keys help Flutter track items
 ListView.builder(
   itemBuilder: (context, index) => MyWidget(key: ValueKey(index)),
 )
@@ -460,7 +460,7 @@ ListView.builder(
 ### 3. Deeply Nested Widgets
 
 ```dart
-// ❌ Hard to read and maintain
+// Hard to read and maintain
 return Container(
   child: Column(
     children: [
@@ -477,7 +477,7 @@ return Container(
   ),
 );
 
-// ✅ Extract into separate widgets
+// Extract into separate widgets
 return Container(
   child: Column(
     children: [
@@ -489,7 +489,7 @@ return Container(
 );
 ```
 
-## ✅ Quick Reference
+## Quick Reference
 
 | Widget | Purpose |
 |--------|---------|
@@ -506,7 +506,7 @@ return Container(
 | `ListView` | Scrollable list |
 | `Scaffold` | Basic app structure |
 
-## 🎓 Practice Exercise
+## Practice Exercise
 
 Try building this:
 

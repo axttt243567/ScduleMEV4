@@ -1,4 +1,4 @@
-# Jr Devs Notes 📚
+# Jr Devs Notes
 
 Welcome to the Junior Developer Notes section! This folder contains educational materials to help you understand Flutter development from the ground up.
 

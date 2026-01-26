@@ -2,14 +2,14 @@
 
 The `pubspec.yaml` file is the configuration center of your Flutter project. Think of it as the blueprint that tells Flutter what your app needs to run.
 
-## 🎯 What is pubspec.yaml?
+## What is pubspec.yaml?
 
 - **Configuration file** for your Flutter project
 - Written in YAML format (indentation matters!)
 - Manages dependencies, assets, app metadata
 - Similar to `package.json` in Node.js or `requirements.txt` in Python
 
-## 📋 Basic Structure
+## Basic Structure
 
 ```yaml
 name: my_flutter_app
@@ -34,9 +34,9 @@ flutter:
   uses-material-design: true
 ```
 
-## 🔑 Key Sections Explained
+## Key Sections Explained
 
-### 1. **Project Metadata**
+### 1. Project Metadata
 
 ```yaml
 name: my_flutter_app
@@ -48,7 +48,7 @@ version: 1.0.0+1
 - `description`: Brief description of your app
 - `version`: App version (format: `major.minor.patch+buildNumber`)
 
-### 2. **Environment**
+### 2. Environment
 
 ```yaml
 environment:
@@ -58,7 +58,7 @@ environment:
 - Specifies Dart SDK version compatibility
 - Ensures your app runs on compatible Dart versions
 
-### 3. **Dependencies** 📦
+### 3. Dependencies
 
 ```yaml
 dependencies:
@@ -78,7 +78,7 @@ dependencies:
 - `1.1.0`: Exact version only
 - `>=1.1.0 <2.0.0`: Any version in this range
 
-### 4. **Dev Dependencies** 🛠️
+### 4. Dev Dependencies
 
 ```yaml
 dev_dependencies:
@@ -91,7 +91,7 @@ dev_dependencies:
 - Not included in the final app
 - Examples: testing tools, code formatters, linters
 
-### 5. **Flutter Section**
+### 5. Flutter Section
 
 ```yaml
 flutter:
@@ -117,7 +117,7 @@ flutter:
 - Specify font family and file paths
 - Can set different weights (400=regular, 700=bold)
 
-## 🎨 Common Use Cases
+## Common Use Cases
 
 ### Adding a Package
 
@@ -164,16 +164,16 @@ flutter:
 Text('Hello', style: TextStyle(fontFamily: 'CustomFont'))
 ```
 
-## ⚠️ Common Mistakes
+## Common Mistakes
 
 1. **Indentation errors**: YAML is sensitive to spaces
    ```yaml
-   # ❌ Wrong
+   # WRONG
    flutter:
    assets:
      - assets/images/
    
-   # ✅ Correct
+   # CORRECT
    flutter:
      assets:
        - assets/images/
@@ -183,14 +183,14 @@ Text('Hello', style: TextStyle(fontFamily: 'CustomFont'))
 
 3. **Wrong path separators**: Always use `/` not `\`
    ```yaml
-   # ❌ Wrong
+   # WRONG
    - assets\images\logo.png
    
-   # ✅ Correct
+   # CORRECT
    - assets/images/logo.png
    ```
 
-## 🚀 Essential Commands
+## Essential Commands
 
 ```bash
 # Install/update dependencies
@@ -206,7 +206,7 @@ flutter pub deps
 flutter pub cache clean
 ```
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Declare folders, not individual files** for assets:
    ```yaml
@@ -226,13 +226,13 @@ flutter pub cache clean
 
 5. **Commit `pubspec.lock`** to ensure consistent builds across team
 
-## ✅ Quick Checklist
+## Quick Checklist
 
-- [ ] Correct indentation (2 or 4 spaces consistently)
-- [ ] Run `flutter pub get` after changes
-- [ ] Declare all assets being used
-- [ ] Use meaningful package versions
-- [ ] Test after adding new dependencies
+- Correct indentation (2 or 4 spaces consistently)
+- Run `flutter pub get` after changes
+- Declare all assets being used
+- Use meaningful package versions
+- Test after adding new dependencies
 
 ---
 

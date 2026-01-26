@@ -2,14 +2,14 @@
 
 The `lib/` folder is where your Flutter app lives. It's the heart of your project, containing all the Dart code that makes your app work.
 
-## 📁 The lib Folder
+## The lib Folder
 
 ### What is lib/?
 
 - Short for "library"
 - Contains **all your Dart code**
 - Where you'll spend most of your development time
-- This is where the magic happens! ✨
+- This is where the magic happens!
 
 ### Typical lib/ Structure
 
@@ -37,7 +37,7 @@ lib/
 
 **Note:** This structure is recommended but not mandatory. Organize based on your project needs!
 
-## 🚀 Understanding main.dart
+## Understanding main.dart
 
 ### What is main.dart?
 
@@ -113,9 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 ```
 
-## 🔍 Breaking Down main.dart
+## Breaking Down main.dart
 
-### 1. **Imports**
+### 1. Imports
 
 ```dart
 import 'package:flutter/material.dart';
@@ -124,7 +124,7 @@ import 'package:flutter/material.dart';
 - Imports Flutter's Material Design widgets
 - `material.dart` gives you access to widgets like `Scaffold`, `AppBar`, `Text`, etc.
 
-### 2. **main() Function**
+### 2. main() Function
 
 ```dart
 void main() {
@@ -136,7 +136,7 @@ void main() {
 - `runApp()` takes a widget and makes it the root of your app
 - Execution starts here when you launch the app
 
-### 3. **MyApp Widget (Root Widget)**
+### 3. MyApp Widget (Root Widget)
 
 ```dart
 class MyApp extends StatelessWidget {
@@ -159,7 +159,7 @@ class MyApp extends StatelessWidget {
 - `theme`: Configures colors, fonts, etc.
 - `home`: The first screen users see
 
-### 4. **StatefulWidget vs StatelessWidget**
+### 4. StatefulWidget vs StatelessWidget
 
 **StatelessWidget:**
 - Doesn't change over time
@@ -171,7 +171,7 @@ class MyApp extends StatelessWidget {
 - Has mutable state
 - Example: Counter, form inputs
 
-## 🎯 Common Patterns in main.dart
+## Common Patterns in main.dart
 
 ### Simple Navigation Setup
 
@@ -226,12 +226,12 @@ void main() async {
 }
 ```
 
-## 🏗️ Organizing Your Code
+## Organizing Your Code
 
 ### Problem: Everything in main.dart
 
 ```dart
-// ❌ Don't do this - main.dart becomes huge!
+// Don't do this - main.dart becomes huge!
 void main() { runApp(MyApp()); }
 
 class MyApp extends StatelessWidget { ... }
@@ -282,7 +282,7 @@ class HomeScreen extends StatelessWidget {
 }
 ```
 
-## 💡 Best Practices
+## Best Practices
 
 1. **Keep main.dart minimal**: Only app configuration and root widget
 2. **Separate screens into files**: One screen = one file
@@ -293,7 +293,7 @@ class HomeScreen extends StatelessWidget {
    - Variables: `camelCase`
 5. **Import only what you need**: Avoid `import 'package:flutter/cupertino.dart'` if you're using Material
 
-## 🔧 File Organization Tips
+## File Organization Tips
 
 ### Small Project (< 10 screens)
 
@@ -338,16 +338,16 @@ lib/
     └── constants/
 ```
 
-## ✅ Quick Checklist
+## Quick Checklist
 
-- [ ] Understand that `lib/` contains all your Dart code
-- [ ] Know that `main.dart` is the entry point
-- [ ] Keep `main.dart` clean and minimal
-- [ ] Organize code into logical folders as project grows
-- [ ] One widget per file for better organization
-- [ ] Use proper naming conventions
+- Understand that `lib/` contains all your Dart code
+- Know that `main.dart` is the entry point
+- Keep `main.dart` clean and minimal
+- Organize code into logical folders as project grows
+- One widget per file for better organization
+- Use proper naming conventions
 
-## 🎓 Learning Exercise
+## Learning Exercise
 
 Try this:
 1. Create a new file `lib/screens/welcome_screen.dart`
