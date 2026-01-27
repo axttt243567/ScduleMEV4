@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
+import 'dart:ui'; // For ImageFilter
 
 class MemoryPage extends StatefulWidget {
   const MemoryPage({super.key});
@@ -131,7 +132,7 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
           GestureDetector(
             onTap: () {
               setState(() {
-                _selectedLayout = _selectedLayout > 1 ? _selectedLayout - 1 : 15;
+                _selectedLayout = _selectedLayout > 1 ? _selectedLayout - 1 : 22;
               });
             },
             child: Container(
@@ -178,7 +179,7 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
           GestureDetector(
             onTap: () {
               setState(() {
-                _selectedLayout = _selectedLayout < 15 ? _selectedLayout + 1 : 1;
+                _selectedLayout = _selectedLayout < 22 ? _selectedLayout + 1 : 1;
               });
             },
             child: Container(
@@ -249,27 +250,44 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
                   _buildLayoutOption(2, 'Timeline', Icons.timeline, const Color(0xFF10B981)),
                   _buildLayoutOption(3, 'Masonry Gallery', Icons.dashboard, const Color(0xFFF59E0B)),
                   _buildLayoutOption(4, 'Expandable List', Icons.list_alt, const Color(0xFF8B5CF6)),
-                  _buildLayoutOption(5, 'Calendar View', Icons.calendar_month, const Color(0xFFEC4899)),
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text('More Layouts', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                    child: Text('Advanced Layouts', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                   ),
-                  _buildLayoutOption(6, 'Kanban Board', Icons.view_kanban, const Color(0xFF06B6D4)),
-                  _buildLayoutOption(7, 'Mind Map', Icons.hub, const Color(0xFFF97316)),
-                  _buildLayoutOption(8, 'Card Stack', Icons.layers, const Color(0xFF14B8A6)),
-                  _buildLayoutOption(9, 'Magazine', Icons.article, const Color(0xFFE11D48)),
-                  _buildLayoutOption(10, 'Metro Tiles', Icons.apps, const Color(0xFF6366F1)),
+                  _buildLayoutOption(5, 'Kanban Board', Icons.view_kanban, const Color(0xFF06B6D4)),
+                  _buildLayoutOption(6, 'Magazine', Icons.article, const Color(0xFFE11D48)),
+                  _buildLayoutOption(7, 'Control Center', Icons.settings_suggest, const Color(0xFFF43F5E)),
+                  _buildLayoutOption(8, 'Flow Timeline', Icons.linear_scale, const Color(0xFF0891B2)),
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text('AI Memory Management', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                    child: Text('System Layouts', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                   ),
-                  _buildLayoutOption(11, 'Neural Network', Icons.blur_on, const Color(0xFF9333EA)),
-                  _buildLayoutOption(12, 'Data Flow', Icons.account_tree, const Color(0xFF0EA5E9)),
-                  _buildLayoutOption(13, 'Agent Dashboard', Icons.smart_toy, const Color(0xFFD946EF)),
-                  _buildLayoutOption(14, 'Memory Graph', Icons.scatter_plot, const Color(0xFF22C55E)),
-                  _buildLayoutOption(15, 'Control Center', Icons.settings_suggest, const Color(0xFFF43F5E)),
+                  _buildLayoutOption(9, 'Analytics Hub', Icons.insights, const Color(0xFF3B82F6)),
+                  _buildLayoutOption(10, 'Wiki Knowledge', Icons.menu_book, const Color(0xFFEC4899)),
+                  _buildLayoutOption(11, 'Timeline Pro', Icons.history_edu, const Color(0xFF14B8A6)),
+                  _buildLayoutOption(12, 'Focus Mode', Icons.center_focus_strong, const Color(0xFF6366F1)),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text('Premium Layouts', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  ),
+                  _buildLayoutOption(13, 'Glassmorphism', Icons.blur_on, const Color(0xFFC850C0)),
+                  _buildLayoutOption(14, 'Neo-Brutalism', Icons.branding_watermark, Colors.white),
+                  _buildLayoutOption(15, 'Minimal Editorial', Icons.article_outlined, const Color(0xFF9E9E9E)),
+                  _buildLayoutOption(16, 'Cyberpunk', Icons.terminal, const Color(0xFF00FF41)),
+                  _buildLayoutOption(17, 'Polaroid', Icons.photo_camera_back, const Color(0xFF8D6E63)),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text('Analog Variations', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  ),
+                  _buildLayoutOption(18, 'Cork Board', Icons.push_pin, const Color(0xFFD2B48C)),
+                  _buildLayoutOption(19, 'Film Strip', Icons.movie, const Color(0xFF1F1F1F)),
+                  _buildLayoutOption(20, 'Sticky Notes', Icons.note, const Color(0xFFFEF08A)),
+                  _buildLayoutOption(21, 'Index Cards', Icons.style, const Color(0xFF9CA3AF)),
+                  _buildLayoutOption(22, 'Passport', Icons.airplane_ticket, const Color(0xFF3B82F6)),
 
                 ],
               ),
@@ -349,31 +367,48 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
       case 4:
         return _buildLayout4ExpandableList();
       case 5:
-        return _buildLayout5Calendar();
+        return _buildLayout5Kanban();
       case 6:
-        return _buildLayout6Kanban();
+        return _buildLayout6Magazine();
       case 7:
-        return _buildLayout7MindMap();
+        return _buildLayout7ControlCenter();
       case 8:
-        return _buildLayout8CardStack();
+        return _buildLayout8FlowTimeline();
       case 9:
-        return _buildLayout9Magazine();
+        return _buildLayout9AnalyticsHub();
       case 10:
-        return _buildLayout10MetroTiles();
+        return _buildLayout10WikiKnowledge();
       case 11:
-        return _buildLayout11NeuralNetwork();
+        return _buildLayout11TimelinePro();
       case 12:
-        return _buildLayout12DataFlow();
+        return _buildLayout12FocusMode();
       case 13:
-        return _buildLayout13AgentDashboard();
+        return _buildLayout13Glass();
       case 14:
-        return _buildLayout14MemoryGraph();
+        return _buildLayout14Brutalism();
       case 15:
-        return _buildLayout15ControlCenter();
+        return _buildLayout15MinimalEditorial();
+      case 16:
+        return _buildLayout16Cyberpunk();
+      case 17:
+        return _buildLayout17Polaroid();
+      case 18:
+        return _buildLayout18CorkBoard();
+      case 19:
+        return _buildLayout19FilmStrip();
+      case 20:
+        return _buildLayout20StickyNotes();
+      case 21:
+        return _buildLayout21IndexCards();
+      case 22:
+        return _buildLayout22Passport();
       default:
         return _buildLayout1CardGrid();
     }
   }
+
+
+
 
 
 
@@ -1107,270 +1142,7 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
   // ============================================================
   // LAYOUT 5: Calendar Integration View
   // ============================================================
-  Widget _buildLayout5Calendar() {
-    final now = DateTime.now();
-    final firstDayOfMonth = DateTime(now.year, now.month, 1);
-    final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
-    final firstWeekday = firstDayOfMonth.weekday % 7;
-    final daysInMonth = lastDayOfMonth.day;
 
-    // Get memories for selected date
-    final selectedMemories = _memories.where((m) {
-      return m.timestamp.year == _selectedDate.year &&
-          m.timestamp.month == _selectedDate.month &&
-          m.timestamp.day == _selectedDate.day;
-    }).toList();
-
-    // Get dates that have memories
-    final memoryDates = _memories.map((m) => DateTime(m.timestamp.year, m.timestamp.month, m.timestamp.day)).toSet();
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEC4899).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.calendar_month, size: 16, color: const Color(0xFFEC4899)),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Calendar',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: const Color(0xFFEC4899),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Mini Calendar
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF16161E),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF27272A)),
-            ),
-            child: Column(
-              children: [
-                // Month header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.chevron_left, color: Colors.grey[400]),
-                    const SizedBox(width: 16),
-                    Text(
-                      _getMonthName(now.month) + ' ${now.year}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(Icons.chevron_right, color: Colors.grey[400]),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Day labels
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-                      .map((d) => SizedBox(
-                            width: 32,
-                            child: Center(
-                              child: Text(
-                                d,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[500],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                ),
-                const SizedBox(height: 8),
-                // Calendar grid
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: 42,
-                  itemBuilder: (context, index) {
-                    final dayNumber = index - firstWeekday + 1;
-                    if (dayNumber < 1 || dayNumber > daysInMonth) {
-                      return const SizedBox();
-                    }
-                    final date = DateTime(now.year, now.month, dayNumber);
-                    final isSelected = date.day == _selectedDate.day &&
-                        date.month == _selectedDate.month &&
-                        date.year == _selectedDate.year;
-                    final isToday = date.day == now.day &&
-                        date.month == now.month &&
-                        date.year == now.year;
-                    final hasMemory = memoryDates.contains(date);
-
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedDate = date),
-                      child: Container(
-                        margin: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFF3B82F6)
-                              : isToday
-                                  ? const Color(0xFF3B82F6).withOpacity(0.2)
-                                  : Colors.transparent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Text(
-                              '$dayNumber',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: isSelected
-                                    ? Colors.white
-                                    : isToday
-                                        ? const Color(0xFF3B82F6)
-                                        : Colors.grey[300],
-                                fontWeight: isSelected || isToday
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                            if (hasMemory && !isSelected)
-                              Positioned(
-                                bottom: 4,
-                                child: Container(
-                                  width: 4,
-                                  height: 4,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFEC4899),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Selected date label
-          Text(
-            _getFullDateLabel(_selectedDate),
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[400],
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Memories for selected date
-          Expanded(
-            child: selectedMemories.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.event_busy, size: 48, color: Colors.grey[700]),
-                        const SizedBox(height: 12),
-                        Text(
-                          'No memories for this date',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: selectedMemories.length,
-                    itemBuilder: (context, index) {
-                      final memory = selectedMemories[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: _buildCalendarMemoryCard(memory),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCalendarMemoryCard(MemoryItem memory) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16161E),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: _getCategoryColor(memory.category).withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              memory.icon,
-              size: 20,
-              color: _getCategoryColor(memory.category),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  memory.title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatTime(memory.timestamp),
-                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                ),
-              ],
-            ),
-          ),
-          Icon(Icons.chevron_right, color: Colors.grey[600], size: 20),
-        ],
-      ),
-    );
-  }
 
   // ============================================================
   // Helper Methods
@@ -1459,9 +1231,9 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
   }
 
   // ============================================================
-  // LAYOUT 6: Kanban Board
+  // LAYOUT 5: Kanban Board
   // ============================================================
-  Widget _buildLayout6Kanban() {
+  Widget _buildLayout5Kanban() {
     final columns = ['To Review', 'Important', 'Archived'];
     final columnColors = [const Color(0xFF06B6D4), const Color(0xFFF59E0B), const Color(0xFF6B7280)];
     
@@ -1548,144 +1320,17 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
   // ============================================================
   // LAYOUT 7: Mind Map
   // ============================================================
-  Widget _buildLayout7MindMap() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Mind Map', Icons.hub, const Color(0xFFF97316)),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Central node
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFFF97316), Color(0xFFEA580C)]),
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: const Color(0xFFF97316).withOpacity(0.4), blurRadius: 20)],
-                      ),
-                      child: const Icon(Icons.memory, color: Colors.white, size: 32),
-                    ),
-                    const SizedBox(height: 20),
-                    // Branch nodes
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: _memories.map((memory) {
-                        return Container(
-                          width: 150,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF16161E),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _getCategoryColor(memory.category).withOpacity(0.5)),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(memory.icon, color: _getCategoryColor(memory.category), size: 24),
-                              const SizedBox(height: 8),
-                              Text(memory.title, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 4),
-                              Text(_getCategoryLabel(memory.category), style: TextStyle(color: _getCategoryColor(memory.category), fontSize: 10)),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // ============================================================
   // LAYOUT 8: Card Stack (Tinder-like)
   // ============================================================
-  Widget _buildLayout8CardStack() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Card Stack', Icons.layers, const Color(0xFF14B8A6)),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: List.generate(min(_memories.length, 4), (index) {
-                  final reverseIndex = min(_memories.length, 4) - 1 - index;
-                  final memory = _memories[reverseIndex];
-                  final scale = 1.0 - (index * 0.05);
-                  final offset = index * 8.0;
-                  return Transform.translate(
-                    offset: Offset(0, offset),
-                    child: Transform.scale(
-                      scale: scale,
-                      child: Container(
-                        width: 300,
-                        height: 400,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [_getCategoryColor(memory.category), _getCategoryColor(memory.category).withOpacity(0.7)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))],
-                        ),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 56, height: 56,
-                              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
-                              child: Icon(memory.icon, color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(memory.title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 12),
-                            Expanded(child: Text(memory.content, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5))),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-                                  child: Text(_getCategoryLabel(memory.category), style: const TextStyle(color: Colors.white, fontSize: 11)),
-                                ),
-                                const Spacer(),
-                                Text(_formatTimestamp(memory.timestamp), style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // ============================================================
-  // LAYOUT 9: Magazine Style
+  // LAYOUT 6: Magazine Style
   // ============================================================
-  Widget _buildLayout9Magazine() {
+  Widget _buildLayout6Magazine() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1766,55 +1411,7 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
   // ============================================================
   // LAYOUT 10: Metro Tiles (Windows-style)
   // ============================================================
-  Widget _buildLayout10MetroTiles() {
-    final tileColors = [
-      const Color(0xFF0078D4), const Color(0xFF107C10), const Color(0xFFFFB900),
-      const Color(0xFFE81123), const Color(0xFF5C2D91), const Color(0xFF00B294),
-    ];
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Metro Tiles', Icons.apps, const Color(0xFF6366F1)),
-          const SizedBox(height: 16),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 1.0,
-              ),
-              itemCount: _memories.length,
-              itemBuilder: (context, index) {
-                final memory = _memories[index];
-                final color = tileColors[index % tileColors.length];
-                final isLarge = index % 3 == 0;
-                return Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(memory.icon, color: Colors.white, size: isLarge ? 32 : 28),
-                      const Spacer(),
-                      Text(memory.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: isLarge ? 16 : 13)),
-                      const SizedBox(height: 4),
-                      Text(_formatTimestamp(memory.timestamp), style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildLayoutHeader(String title, IconData icon, Color color) {
     return Row(
@@ -1843,523 +1440,27 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
   // ============================================================
   // LAYOUT 11: Neural Network (AI Memory Visualization)
   // ============================================================
-  Widget _buildLayout11NeuralNetwork() {
-    final memoryTypes = [
-      {'name': 'Short-term', 'count': 12, 'color': const Color(0xFF9333EA), 'icon': Icons.flash_on},
-      {'name': 'Long-term', 'count': 45, 'color': const Color(0xFF6366F1), 'icon': Icons.storage},
-      {'name': 'Episodic', 'count': 28, 'color': const Color(0xFF0EA5E9), 'icon': Icons.event},
-      {'name': 'Semantic', 'count': 67, 'color': const Color(0xFF22C55E), 'icon': Icons.category},
-    ];
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Neural Network', Icons.blur_on, const Color(0xFF9333EA)),
-          const SizedBox(height: 16),
-          // Memory Type Stats
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [const Color(0xFF9333EA).withOpacity(0.15), const Color(0xFF6366F1).withOpacity(0.15)],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF9333EA).withOpacity(0.3)),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.memory, color: Color(0xFF9333EA), size: 20),
-                    const SizedBox(width: 8),
-                    Text('Memory Types', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: memoryTypes.map((type) => Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 48, height: 48,
-                          decoration: BoxDecoration(
-                            color: (type['color'] as Color).withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(type['icon'] as IconData, color: type['color'] as Color, size: 22),
-                        ),
-                        const SizedBox(height: 8),
-                        Text('${type['count']}', style: TextStyle(color: type['color'] as Color, fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text(type['name'] as String, style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-                      ],
-                    ),
-                  )).toList(),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Neural connections visualization
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF16161E),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF27272A)),
-              ),
-              child: Stack(
-                children: [
-                  // Grid pattern background
-                  CustomPaint(
-                    size: const Size(double.infinity, double.infinity),
-                    painter: _NeuralGridPainter(),
-                  ),
-                  // Memory nodes
-                  ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _memories.length,
-                    itemBuilder: (context, index) {
-                      final memory = _memories[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E2E),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _getCategoryColor(memory.category).withOpacity(0.5)),
-                          boxShadow: [BoxShadow(color: _getCategoryColor(memory.category).withOpacity(0.1), blurRadius: 10)],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40, height: 40,
-                              decoration: BoxDecoration(
-                                gradient: RadialGradient(colors: [_getCategoryColor(memory.category), _getCategoryColor(memory.category).withOpacity(0.3)]),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(memory.icon, color: Colors.white, size: 18),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(memory.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 13)),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(color: _getCategoryColor(memory.category).withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
-                                        child: Text(_getCategoryLabel(memory.category), style: TextStyle(color: _getCategoryColor(memory.category), fontSize: 9)),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.link, size: 10, color: Colors.grey[600]),
-                                      Text(' 3 connections', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: const Color(0xFF22C55E).withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                              child: const Text('Active', style: TextStyle(color: Color(0xFF22C55E), fontSize: 10)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ============================================================
   // LAYOUT 12: Data Flow (Chat to Memory Pipeline)
   // ============================================================
-  Widget _buildLayout12DataFlow() {
-    final pipeline = [
-      {'stage': 'User Input', 'icon': Icons.chat_bubble, 'color': const Color(0xFF0EA5E9), 'desc': 'Chats & Activities'},
-      {'stage': 'Processing', 'icon': Icons.settings, 'color': const Color(0xFFF59E0B), 'desc': 'AI Analysis'},
-      {'stage': 'Extraction', 'icon': Icons.filter_alt, 'color': const Color(0xFF8B5CF6), 'desc': 'Key Information'},
-      {'stage': 'Storage', 'icon': Icons.save, 'color': const Color(0xFF22C55E), 'desc': 'Memory Bank'},
-    ];
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Data Flow', Icons.account_tree, const Color(0xFF0EA5E9)),
-          const SizedBox(height: 16),
-          // Pipeline visualization
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF16161E),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF27272A)),
-            ),
-            child: Row(
-              children: List.generate(pipeline.length * 2 - 1, (index) {
-                if (index.isOdd) {
-                  return Expanded(child: Container(height: 2, color: const Color(0xFF27272A)));
-                }
-                final stage = pipeline[index ~/ 2];
-                return Column(
-                  children: [
-                    Container(
-                      width: 50, height: 50,
-                      decoration: BoxDecoration(
-                        color: (stage['color'] as Color).withOpacity(0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: stage['color'] as Color),
-                      ),
-                      child: Icon(stage['icon'] as IconData, color: stage['color'] as Color, size: 22),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(stage['stage'] as String, style: TextStyle(color: stage['color'] as Color, fontSize: 10, fontWeight: FontWeight.w600)),
-                    Text(stage['desc'] as String, style: TextStyle(color: Colors.grey[600], fontSize: 8)),
-                  ],
-                );
-              }),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Activity to Memory conversion
-          Expanded(
-            child: ListView.builder(
-              itemCount: _memories.length,
-              itemBuilder: (context, index) {
-                final memory = _memories[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF16161E),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF27272A)),
-                  ),
-                  child: Row(
-                    children: [
-                      // Source (Chat/Activity)
-                      Container(
-                        width: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0EA5E9).withOpacity(0.1),
-                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.chat, color: const Color(0xFF0EA5E9), size: 20),
-                            const SizedBox(height: 4),
-                            Text('Chat', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
-                            Text(_formatTimestamp(memory.timestamp), style: TextStyle(color: Colors.grey[600], fontSize: 8)),
-                          ],
-                        ),
-                      ),
-                      // Arrow
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.arrow_forward, color: Colors.grey[700], size: 16),
-                      ),
-                      // Resulting Memory
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(memory.icon, color: _getCategoryColor(memory.category), size: 16),
-                                  const SizedBox(width: 8),
-                                  Expanded(child: Text(memory.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 13))),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Text(memory.content, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFF22C55E).withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                        child: const Text('Stored', style: TextStyle(color: Color(0xFF22C55E), fontSize: 9)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ============================================================
   // LAYOUT 13: Multi-Agent Dashboard
   // ============================================================
-  Widget _buildLayout13AgentDashboard() {
-    final agents = [
-      {'name': 'Planner Agent', 'status': 'Active', 'memories': 23, 'color': const Color(0xFF3B82F6), 'icon': Icons.event_note},
-      {'name': 'Research Agent', 'status': 'Idle', 'memories': 45, 'color': const Color(0xFF22C55E), 'icon': Icons.search},
-      {'name': 'Memory Agent', 'status': 'Active', 'memories': 89, 'color': const Color(0xFFD946EF), 'icon': Icons.psychology},
-      {'name': 'Task Agent', 'status': 'Processing', 'memories': 12, 'color': const Color(0xFFF59E0B), 'icon': Icons.task_alt},
-    ];
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Agent Dashboard', Icons.smart_toy, const Color(0xFFD946EF)),
-          const SizedBox(height: 16),
-          // Agents Grid
-          SizedBox(
-            height: 140,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: agents.length,
-              itemBuilder: (context, index) {
-                final agent = agents[index];
-                final isActive = agent['status'] == 'Active';
-                return Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [(agent['color'] as Color).withOpacity(0.15), const Color(0xFF16161E)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: (agent['color'] as Color).withOpacity(0.5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: (agent['color'] as Color).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                            child: Icon(agent['icon'] as IconData, color: agent['color'] as Color, size: 18),
-                          ),
-                          const Spacer(),
-                          Container(
-                            width: 8, height: 8,
-                            decoration: BoxDecoration(
-                              color: isActive ? const Color(0xFF22C55E) : Colors.grey,
-                              shape: BoxShape.circle,
-                              boxShadow: isActive ? [BoxShadow(color: const Color(0xFF22C55E).withOpacity(0.5), blurRadius: 6)] : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Text(agent['name'] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
-                      const SizedBox(height: 4),
-                      Text('${agent['memories']} memories', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-                      Text(agent['status'] as String, style: TextStyle(color: agent['color'] as Color, fontSize: 10)),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Shared Memory Pool
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF16161E),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF27272A)),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.share, color: Color(0xFFD946EF), size: 18),
-                        const SizedBox(width: 8),
-                        const Text('Shared Memory Pool', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(color: const Color(0xFFD946EF).withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                          child: Text('${_memories.length} items', style: const TextStyle(color: Color(0xFFD946EF), fontSize: 10)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(color: Color(0xFF27272A), height: 1),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: _memories.length,
-                      itemBuilder: (context, index) {
-                        final memory = _memories[index];
-                        final agentIndex = index % agents.length;
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFF1E1E2E), borderRadius: BorderRadius.circular(10)),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 32, height: 32,
-                                decoration: BoxDecoration(color: (agents[agentIndex]['color'] as Color).withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
-                                child: Icon(agents[agentIndex]['icon'] as IconData, color: agents[agentIndex]['color'] as Color, size: 16),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(memory.title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
-                                    Text('From ${agents[agentIndex]['name']}', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-                                  ],
-                                ),
-                              ),
-                              Icon(Icons.sync, color: Colors.grey[600], size: 14),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ============================================================
   // LAYOUT 14: Memory Graph (Connections & Categories)
   // ============================================================
-  Widget _buildLayout14MemoryGraph() {
-    final categories = MemoryCategory.values;
-    
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLayoutHeader('Memory Graph', Icons.scatter_plot, const Color(0xFF22C55E)),
-          const SizedBox(height: 16),
-          // Category filters
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final cat = categories[index];
-                final count = _memories.where((m) => m.category == cat).length;
-                return Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: _getCategoryColor(cat).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: _getCategoryColor(cat).withOpacity(0.5)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(width: 8, height: 8, decoration: BoxDecoration(color: _getCategoryColor(cat), shape: BoxShape.circle)),
-                      const SizedBox(width: 8),
-                      Text(_getCategoryLabel(cat), style: TextStyle(color: _getCategoryColor(cat), fontSize: 12, fontWeight: FontWeight.w500)),
-                      const SizedBox(width: 6),
-                      Text('($count)', style: TextStyle(color: Colors.grey[500], fontSize: 11)),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Graph visualization
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF16161E),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF27272A)),
-              ),
-              child: Stack(
-                children: [
-                  // Connection lines (simulated)
-                  CustomPaint(size: const Size(double.infinity, double.infinity), painter: _ConnectionsPainter()),
-                  // Memory nodes as floating bubbles
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: _memories.map((memory) {
-                        return Container(
-                          width: 110,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [_getCategoryColor(memory.category).withOpacity(0.2), const Color(0xFF1E1E2E)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _getCategoryColor(memory.category).withOpacity(0.5)),
-                            boxShadow: [BoxShadow(color: _getCategoryColor(memory.category).withOpacity(0.2), blurRadius: 8)],
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(memory.icon, color: _getCategoryColor(memory.category), size: 22),
-                              const SizedBox(height: 6),
-                              Text(memory.title, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.link, size: 10, color: Colors.grey[600]),
-                                  Text(' ${(memory.id.hashCode % 5) + 1}', style: TextStyle(color: Colors.grey[600], fontSize: 9)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // ============================================================
-  // LAYOUT 15: Control Center (System Memory Management)
+  // LAYOUT 7: Control Center
   // ============================================================
-  Widget _buildLayout15ControlCenter() {
+  Widget _buildLayout7ControlCenter() {
     final stats = [
       {'label': 'Total Memories', 'value': '152', 'icon': Icons.memory, 'color': const Color(0xFFF43F5E)},
       {'label': 'Storage Used', 'value': '2.4 GB', 'icon': Icons.storage, 'color': const Color(0xFF3B82F6)},
@@ -2510,52 +1611,1217 @@ class _MemoryPageState extends State<MemoryPage> with TickerProviderStateMixin {
       ),
     );
   }
-}
 
-// Custom painters for neural network visualization
-class _NeuralGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF27272A).withOpacity(0.3)
-      ..strokeWidth = 0.5;
-    const spacing = 30.0;
-    for (var x = 0.0; x < size.width; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (var y = 0.0; y < size.height; y += spacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
+  // ============================================================
+  // LAYOUT 16: Dashboard Pro (Inspired by 15 + 1)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 8: Flow Timeline
+  // ============================================================
+  Widget _buildLayout8FlowTimeline() {
+    final stages = ['Input', 'Process', 'Store', 'Retrieve'];
+    final stageColors = [const Color(0xFF0891B2), const Color(0xFFF59E0B), const Color(0xFF22C55E), const Color(0xFF8B5CF6)];
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLayoutHeader('Flow Timeline', Icons.linear_scale, const Color(0xFF0891B2)),
+          const SizedBox(height: 16),
+          // Flow stages
+          Container(
+            height: 60,
+            child: Row(
+              children: List.generate(stages.length * 2 - 1, (index) {
+                if (index.isOdd) {
+                  return Container(width: 30, height: 3, decoration: BoxDecoration(gradient: LinearGradient(colors: [stageColors[index ~/ 2], stageColors[index ~/ 2 + 1]])));
+                }
+                final i = index ~/ 2;
+                return Container(
+                  width: 60,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(color: stageColors[i].withOpacity(0.2), shape: BoxShape.circle, border: Border.all(color: stageColors[i], width: 2)),
+                        child: Center(child: Text('${i + 1}', style: TextStyle(color: stageColors[i], fontWeight: FontWeight.bold))),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(stages[i], style: TextStyle(color: stageColors[i], fontSize: 9, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Timeline with flow indicators
+          Expanded(
+            child: ListView.builder(
+              itemCount: _memories.length,
+              itemBuilder: (context, index) {
+                final memory = _memories[index];
+                final stage = index % stages.length;
+                return IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Timeline
+                      Column(
+                        children: [
+                          Container(width: 12, height: 12, decoration: BoxDecoration(color: stageColors[stage], shape: BoxShape.circle)),
+                          if (index < _memories.length - 1) Expanded(child: Container(width: 2, color: const Color(0xFF27272A))),
+                        ],
+                      ),
+                      const SizedBox(width: 12),
+                      // Card
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF16161E),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: stageColors[stage].withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: stageColors[stage].withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                                child: Text(stages[stage], style: TextStyle(color: stageColors[stage], fontSize: 9, fontWeight: FontWeight.w500)),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(memory.title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+                                    Text(_formatTimestamp(memory.timestamp), style: TextStyle(color: Colors.grey[600], fontSize: 10)),
+                                  ],
+                                ),
+                              ),
+                              Icon(memory.icon, color: _getCategoryColor(memory.category), size: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
-class _ConnectionsPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF22C55E).withOpacity(0.1)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-    final points = [
-      Offset(size.width * 0.2, size.height * 0.3),
-      Offset(size.width * 0.5, size.height * 0.2),
-      Offset(size.width * 0.8, size.height * 0.4),
-      Offset(size.width * 0.3, size.height * 0.6),
-      Offset(size.width * 0.7, size.height * 0.7),
-    ];
-    for (var i = 0; i < points.length; i++) {
-      for (var j = i + 1; j < points.length; j++) {
-        canvas.drawLine(points[i], points[j], paint);
-      }
-    }
+  // ============================================================
+  // LAYOUT 18: News Feed (Inspired by 9 + 4)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 19: Workspace Board (Inspired by 6 + 3)
+  // ============================================================
+
+  // ============================================================
+  // LAYOUT 9: Analytics Hub
+  // ============================================================
+  Widget _buildLayout9AnalyticsHub() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildLayoutHeader('Analytics Hub', Icons.insights, const Color(0xFF3B82F6)),
+          const SizedBox(height: 16),
+          // Main Chart Area (Simulated)
+          Expanded(
+            flex: 2,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF16161E),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF27272A)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.show_chart, color: Color(0xFF3B82F6), size: 18),
+                      const SizedBox(width: 8),
+                      const Text('Memory Access Trends', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(6)),
+                        child: const Text('Last 30 Days', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(14, (index) {
+                        final height = 20.0 + (index * 7 % 100) + (index % 3 * 20);
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: height,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF3B82F6).withOpacity(index == 13 ? 1.0 : 0.4),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Stats Grid
+          Expanded(
+            flex: 3,
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.3,
+              children: [
+                _buildAnalyticsCard('Total Memories', '${_memories.length}', Icons.storage, const Color(0xFFF97316)),
+                _buildAnalyticsCard('Categories', '${MemoryCategory.values.length}', Icons.category, const Color(0xFF10B981)),
+                _buildAnalyticsCard('Avg. Length', '142 chars', Icons.format_align_left, const Color(0xFF8B5CF6)),
+                _buildAnalyticsCard('Attachments', '24', Icons.attach_file, const Color(0xFFEC4899)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+
+  Widget _buildAnalyticsCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16161E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(icon, color: color, size: 24),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text(label, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 22: Project Desk (Kanban + Todo + Calendar)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 23: Code Terminal (Monospace + Log Style)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 24: Galaxy View (Radial Scatter)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 10: Wiki Knowledge
+  // ============================================================
+  Widget _buildLayout10WikiKnowledge() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildLayoutHeader('Wiki Base', Icons.menu_book, const Color(0xFFEC4899)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Sidebar: TOC
+                Container(
+                  width: 100,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: const BoxDecoration(
+                    border: Border(right: BorderSide(color: Color(0xFF27272A))),
+                  ),
+                  child: ListView(
+                    children: [
+                      const Text('CONTENTS', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                      const SizedBox(height: 12),
+                      ...MemoryCategory.values.map((cat) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(_getCategoryLabel(cat), style: TextStyle(color: _getCategoryColor(cat), fontSize: 11, fontWeight: FontWeight.w500)),
+                      )),
+                      const Divider(color: Color(0xFF27272A)),
+                      const Text('Introduction', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                      const SizedBox(height: 8),
+                      const Text('References', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    ],
+                  ),
+                ),
+                // Main Content
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(left: 16),
+                    itemCount: _memories.length,
+                    itemBuilder: (context, index) {
+                      final memory = _memories[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(memory.title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'serif')), // Serif for wiki look
+                             const Padding(
+                               padding: EdgeInsets.symmetric(vertical: 8),
+                               child: Divider(color: Color(0xFF27272A)),
+                             ),
+                             Text(memory.content, style: TextStyle(color: Colors.grey[300], fontSize: 14, height: 1.6, fontFamily: 'serif')),
+                             const SizedBox(height: 8),
+                             Row(
+                               children: [
+                                 Text('[edit]', style: TextStyle(color: Colors.blue[400], fontSize: 10)),
+                                 const SizedBox(width: 8),
+                                 Text('Updated ${_formatTimestamp(memory.timestamp)}', style: TextStyle(color: Colors.grey[600], fontSize: 10, fontStyle: FontStyle.italic)),
+                               ],
+                             ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 26: Media Studio (Grid + Preview)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 27: Priority Matrix (Eisenhower Grid)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 11: Timeline Pro
+  // ============================================================
+  Widget _buildLayout11TimelinePro() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildLayoutHeader('Timeline Pro', Icons.history_edu, const Color(0xFF14B8A6)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _memories.length,
+              itemBuilder: (context, index) {
+                final memory = _memories[index];
+                return IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      // Date side
+                      Container(
+                        width: 50,
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(index == 0 ? 'Now' : '${index}h', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Text('ago', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
+                          ],
+                        ),
+                      ),
+                      // Line
+                      Column(
+                        children: [
+                          Container(
+                            width: 14, height: 14,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF16161E),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: _getCategoryColor(memory.category), width: 2),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(width: 2, color: const Color(0xFF27272A)),
+                          ),
+                        ],
+                      ),
+                      // Content
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(16, 0, 0, 24),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF16161E),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF27272A)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: _getCategoryColor(memory.category).withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
+                                    child: Text(_getCategoryLabel(memory.category), style: TextStyle(color: _getCategoryColor(memory.category), fontSize: 9)),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(Icons.more_horiz, color: Colors.grey, size: 16),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(memory.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                              const SizedBox(height: 4),
+                              Text(memory.content, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 29: Conversation Thread (Chat Style)
+  // ============================================================
+
+
+  // ============================================================
+  // LAYOUT 12: Focus Mode
+  // ============================================================
+  Widget _buildLayout12FocusMode() {
+    return Stack(
+      children: [
+        // Ambient Background
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.center,
+                radius: 1.0,
+                colors: [const Color(0xFF6366F1).withOpacity(0.2), Colors.black],
+                stops: const [0.0, 0.8],
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.center_focus_strong, color: Color(0xFF6366F1), size: 32),
+              const SizedBox(height: 16),
+              const Text('FOCUS MODE', style: TextStyle(color: Colors.white, letterSpacing: 4, fontSize: 12)),
+              const Spacer(),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF16161E),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(color: const Color(0xFF6366F1).withOpacity(0.2), blurRadius: 40, spreadRadius: 0),
+                  ],
+                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: _getCategoryColor(_memories.first.category).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_memories.first.icon, size: 40, color: _getCategoryColor(_memories.first.category)),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(_memories.first.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    Text(_memories.first.content, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 16, height: 1.5)),
+                    const SizedBox(height: 32),
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                       children: [
+                         IconButton(onPressed: (){}, icon: const Icon(Icons.close, color: Colors.grey)),
+                         const SizedBox(width: 32),
+                         FloatingActionButton(
+                           backgroundColor: const Color(0xFF6366F1),
+                           onPressed: (){},
+                           child: const Icon(Icons.check, color: Colors.white),
+                         ),
+                       ],
+                     ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Text('Swipe for next memory', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  // ============================================================
+  // LAYOUT 13: Glassmorphism Grid
+  // ============================================================
+  Widget _buildLayout13Glass() {
+    return Stack(
+      children: [
+        // Ambient Background
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF4158D0), Color(0xFFC850C0), Color(0xFFFFCC70)],
+            ),
+          ),
+        ),
+        // Glass Grid
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+               _buildLayoutHeader('Glassmorphism', Icons.blur_on, Colors.white),
+               const SizedBox(height: 16),
+               Expanded(
+                 child: GridView.builder(
+                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                     crossAxisCount: 2,
+                     crossAxisSpacing: 16,
+                     mainAxisSpacing: 16,
+                     childAspectRatio: 0.8,
+                   ),
+                   itemCount: _memories.length,
+                   itemBuilder: (context, index) {
+                     final memory = _memories[index];
+                     return ClipRRect(
+                       borderRadius: BorderRadius.circular(20),
+                       child: BackdropFilter(
+                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                         child: Container(
+                           padding: const EdgeInsets.all(16),
+                           decoration: BoxDecoration(
+                             color: Colors.white.withOpacity(0.2),
+                             border: Border.all(color: Colors.white.withOpacity(0.3)),
+                             borderRadius: BorderRadius.circular(20),
+                           ),
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Container(
+                                 padding: const EdgeInsets.all(8),
+                                 decoration: BoxDecoration(
+                                   color: Colors.white.withOpacity(0.3),
+                                   shape: BoxShape.circle,
+                                 ),
+                                 child: Icon(memory.icon, color: Colors.white, size: 20),
+                               ),
+                               const Spacer(),
+                               Text(
+                                 memory.title,
+                                 style: GoogleFonts.outfit(
+                                   fontSize: 16,
+                                   fontWeight: FontWeight.w600,
+                                   color: Colors.white,
+                                 ),
+                               ),
+                               const SizedBox(height: 4),
+                               Text(
+                                 memory.content,
+                                 maxLines: 3,
+                                 overflow: TextOverflow.ellipsis,
+                                 style: GoogleFonts.outfit(
+                                   fontSize: 12,
+                                   color: Colors.white.withOpacity(0.8),
+                                 ),
+                               ),
+                             ],
+                           ),
+                         ),
+                       ),
+                     );
+                   },
+                 ),
+               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 14: Neo-Brutalism List
+  // ============================================================
+  Widget _buildLayout14Brutalism() {
+    final bgColors = [const Color(0xFFFEF08A), const Color(0xFFE9D5FF), const Color(0xFFBAF7D0), const Color(0xFFFECACA), const Color(0xFFBFDBFE)];
+    
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF08A),
+                  border: Border.all(color: Colors.black, width: 2),
+                  boxShadow: const [BoxShadow(color: Colors.black, offset: Offset(4, 4))],
+                ),
+                child: const Text('NEO-BRUTALISM', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView.separated(
+              itemCount: _memories.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                final memory = _memories[index];
+                final bgColor = bgColors[index % bgColors.length];
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    border: Border.all(color: Colors.black, width: 2),
+                    boxShadow: const [BoxShadow(color: Colors.black, offset: Offset(4, 4))],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(memory.icon, color: Colors.black, size: 24),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                             color: Colors.black,
+                             borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(_getCategoryLabel(memory.category).toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+                          ),
+                          const Spacer(),
+                          Text(_formatTimestamp(memory.timestamp), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(memory.title, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Text(memory.content, style: const TextStyle(color: Colors.black, fontSize: 14)),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 15: Minimal Editorial
+  // ============================================================
+  Widget _buildLayout15MinimalEditorial() {
+    return Container(
+      color: const Color(0xFFFAFAFA), // Light background
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Text(
+              'M E M O R I E S',
+              style: GoogleFonts.playfairDisplay(
+                color: Colors.black87,
+                fontSize: 24,
+                letterSpacing: 4,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          Expanded(
+            child: ListView.separated(
+              itemCount: _memories.length,
+              separatorBuilder: (_, __) => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Divider(color: Colors.black12, thickness: 1),
+              ),
+              itemBuilder: (context, index) {
+                final memory = _memories[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          _formatTimestamp(memory.timestamp).toUpperCase(),
+                          style: GoogleFonts.lato(
+                            color: Colors.grey[600],
+                            fontSize: 10,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(memory.icon, color: Colors.black54, size: 16),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      memory.title,
+                      style: GoogleFonts.playfairDisplay(
+                        color: Colors.black87,
+                        fontSize: 22,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      memory.content,
+                      style: GoogleFonts.lato(
+                        color: Colors.black54,
+                        fontSize: 14,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 16: Cyberpunk Stream
+  // ============================================================
+  Widget _buildLayout16Cyberpunk() {
+    return Container(
+      color: const Color(0xFF050510),
+      child: Column(
+        children: [
+          // Glitchy Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFF00FF41), width: 1)),
+            ),
+            child: Text(
+              'SYSTEM_MEMORIES_V4.0 // CONNECTED',
+              style: GoogleFonts.shareTechMono(
+                color: const Color(0xFF00FF41),
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _memories.length,
+              itemBuilder: (context, index) {
+                final memory = _memories[index];
+                final isPink = index % 2 == 0;
+                final accentColor = isPink ? const Color(0xFFFF00FF) : const Color(0xFF00FFFF);
+                
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.all(2), // Border width
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    boxShadow: [
+                      BoxShadow(color: accentColor.withOpacity(0.5), blurRadius: 10, spreadRadius: 1),
+                    ],
+                  ),
+                  child: Container(
+                    color: const Color(0xFF0D0D15),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.terminal, color: accentColor, size: 16),
+                            const SizedBox(width: 8),
+                            Text(
+                              'ID: ${memory.id.padLeft(4, '0')}',
+                              style: GoogleFonts.shareTechMono(color: accentColor, fontSize: 12),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '[ENCRYPTED]',
+                              style: GoogleFonts.shareTechMono(color: Colors.grey[700], fontSize: 10),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '> ${memory.title}',
+                          style: GoogleFonts.shareTechMono(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          memory.content,
+                          style: GoogleFonts.shareTechMono(
+                            color: const Color(0xFFB0B0B0),
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 17: Polaroid Scatter
+  // ============================================================
+  Widget _buildLayout17Polaroid() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF8D6E63), // Wood color equivalent
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          children: _memories.asMap().entries.map((entry) {
+            final index = entry.key;
+            final memory = entry.value;
+            final rotate = (index % 5 - 2) * 0.05; // -0.1 to 0.1 radians ~ -6 to 6 degrees
+            
+            return Transform.rotate(
+              angle: rotate,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 40, left: 30, right: 30),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5)),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: _getCategoryColor(memory.category).withOpacity(0.1),
+                      child: Center(
+                        child: Icon(memory.icon, size: 64, color: _getCategoryColor(memory.category)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                       memory.title,
+                       style: GoogleFonts.caveat(
+                         color: Colors.black87,
+                         fontSize: 24,
+                         fontWeight: FontWeight.bold,
+                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _formatTimestamp(memory.timestamp),
+                      style: GoogleFonts.caveat(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 18: Cork Board
+  // ============================================================
+  Widget _buildLayout18CorkBoard() {
+    return Container(
+      color: const Color(0xFFD2B48C), // Cork color
+      child: Stack(
+        children: [
+          // Texture simulation (simple noise points could be here, but solid color is fine for MVP)
+          GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 24,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: _memories.length,
+            itemBuilder: (context, index) {
+              final memory = _memories[index];
+              return Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                   Container(
+                     padding: const EdgeInsets.fromLTRB(12, 24, 12, 12),
+                     decoration: const BoxDecoration(
+                       color: Color(0xFFFFFBEB), // Paper color
+                       boxShadow: [
+                         BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(2, 2)),
+                       ],
+                     ),
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         Row(
+                           children: [
+                             Icon(memory.icon, size: 16, color: Colors.brown),
+                             const SizedBox(width: 4),
+                             Expanded(child: Text(memory.title, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.brown))),
+                           ],
+                         ),
+                         const Divider(color: Colors.brown, thickness: 0.5),
+                         Expanded(
+                           child: Text(
+                             memory.content, 
+                             style: const TextStyle(fontSize: 11, color: Colors.black87, height: 1.2),
+                             maxLines: 5,
+                             overflow: TextOverflow.fade,
+                           ),
+                         ),
+                       ],
+                     ),
+                   ),
+                   // Push Pin
+                   Positioned(
+                     top: -8,
+                     child: Icon(Icons.push_pin, color: Colors.red[700], size: 24),
+                   ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 19: Film Strip
+  // ============================================================
+  Widget _buildLayout19FilmStrip() {
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: SizedBox(
+          height: 300,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _memories.length,
+            itemBuilder: (context, index) {
+              final memory = _memories[index];
+              return Container(
+                margin: const EdgeInsets.only(right: 2),
+                width: 220,
+                color: Colors.black,
+                child: Column(
+                  children: [
+                    // Top Sprockets
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(4, (i) => Container(width: 12, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)))),
+                    ),
+                    // Frame
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F1F1F),
+                          border: Border.all(color: Colors.grey[800]!),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(memory.icon, color: Colors.white70, size: 32),
+                            const SizedBox(height: 12),
+                            Text(
+                              memory.title,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Bottom Sprockets
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(4, (i) => Container(width: 12, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)))),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 20: Sticky Notes
+  // ============================================================
+  Widget _buildLayout20StickyNotes() {
+    final colors = [const Color(0xFFFEF08A), const Color(0xFFFBCFE8), const Color(0xFFBAF7D0), const Color(0xFFBFDBFE)];
+    
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(16),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        itemCount: _memories.length,
+        itemBuilder: (context, index) {
+          final memory = _memories[index];
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colors[index % colors.length],
+              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [const Spacer(), Icon(memory.icon, size: 16, color: Colors.black54)]),
+                Text(memory.title, style: GoogleFonts.permanentMarker(fontSize: 14, color: Colors.black87)),
+                const SizedBox(height: 8),
+                Expanded(child: Text(memory.content, style: GoogleFonts.kalam(fontSize: 12, color: Colors.black87))),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 21: Index Cards
+  // ============================================================
+  Widget _buildLayout21IndexCards() {
+    return Container(
+      color: const Color(0xFFE5E7EB),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(24),
+        itemCount: _memories.length,
+        itemBuilder: (context, index) {
+          final memory = _memories[index];
+          return Container(
+            height: 160,
+            margin: EdgeInsets.only(bottom: index == _memories.length - 1 ? 0 : 0), // Normal list
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                // The Card
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(top: index * 0.0), // No overlap logic simple list for now to avoid complexity errors
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                  ),
+                  child: Column(
+                    children: [
+                      // Red Line
+                      Container(height: 1, color: Colors.red[200], margin: const EdgeInsets.only(top: 30)),
+                      const SizedBox(height: 2),
+                      Container(height: 1, color: Colors.red[200]),
+                      // Content
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(memory.title.toUpperCase(), style: GoogleFonts.courierPrime(fontWeight: FontWeight.bold)),
+                                  const Spacer(),
+                                  Text(_formatTimestamp(memory.timestamp), style: GoogleFonts.courierPrime(fontSize: 10, color: Colors.grey)),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(memory.content, style: GoogleFonts.courierPrime(fontSize: 12, height: 1.5)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Tab
+                Positioned(
+                  top: 0,
+                  left: 20,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                    ),
+                    child: Text('REF-${memory.id}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================
+  // LAYOUT 22: Passport Stamps
+  // ============================================================
+  Widget _buildLayout22Passport() {
+    return Container(
+      color: const Color(0xFFF0E6D2), // Old paper
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(24),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 24,
+                mainAxisSpacing: 24,
+                childAspectRatio: 1.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final memory = _memories[index];
+                  final color = [Colors.indigo, Colors.teal, Colors.brown, Colors.red[700]][index % 4];
+                  return Transform.rotate(
+                    angle: (index % 3 - 1) * 0.1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: color!.withOpacity(0.7), width: 3),
+                        borderRadius: BorderRadius.circular(index % 2 == 0 ? 50 : 12),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(memory.icon, color: color.withOpacity(0.7)),
+                          const SizedBox(height: 8),
+                          Text(
+                            'VISITED',
+                            style: GoogleFonts.specialElite(color: color.withOpacity(0.7), fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            _formatTimestamp(memory.timestamp),
+                            style: GoogleFonts.specialElite(color: color.withOpacity(0.7), fontSize: 10),
+                          ),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              memory.title,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.specialElite(color: color.withOpacity(0.9), fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                childCount: _memories.length,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-
 
 // ============================================================
 // Data Models
