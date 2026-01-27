@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scdulemev4o1/features/schedules/screens/schedules_page.dart';
+import '../../notes/screens/vault_management_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -46,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     // API Key Section
                     // Schedules Section
                     _buildSchedulesSection(),
+                    _buildVaultSection(),
                     
                     _buildApiKeySection(),
                     
@@ -358,6 +360,75 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 4),
                     Text(
                       'Create and manage your schedules',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white54,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVaultSection() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFF27272A)),
+        ),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const VaultManagementPage(),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.folder_special,
+                  color: Colors.orangeAccent,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Vault Management',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Manage your vaults and files',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[500],
