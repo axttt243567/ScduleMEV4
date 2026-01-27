@@ -11,21 +11,18 @@ class _SettingsPageState extends State<SettingsPage> {
   // Toggle states
   bool autoSummarization = true;
   bool ocrHandwriting = true;
-  bool webSearch = false;
+  bool webSearch = false; // Pro feature
   bool conversationBranching = false;
-  bool interfaceGlow = false;
-  int selectedTheme = 0; // 0 = slate, 1 = blue, 2 = green, 3 = rose, etc.
 
-  final List<Color> themeColors = [
-    const Color(0xFF0F172A), // Slate
-    const Color(0xFF3B82F6), // Blue
-    const Color(0xFF10B981), // Emerald
-    const Color(0xFFF43F5E), // Rose
-    const Color(0xFFF59E0B), // Amber
-    const Color(0xFF8B5CF6), // Indigo
-    const Color(0xFF71717A), // Zinc
-    const Color(0xFFF97316), // Orange
-  ];
+  // API Key State
+  final TextEditingController _apiKeyController = TextEditingController();
+  bool _isApiKeyVisible = false;
+
+  @override
+  void dispose() {
+    _apiKeyController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,20 +41,31 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     // Profile Card
                     _buildProfileCard(),
-                    // Theme Section
-                    _buildThemeSection(),
+                    
+                    // API Key Section
+                    _buildApiKeySection(),
+                    
                     // System Health
                     _buildSystemHealthSection(),
+                    
                     // Hero Section (Smart Assistant)
                     _buildHeroSection(),
+                    
                     // Group Header
                     _buildGroupHeader('Advanced Capabilities'),
+                    
                     // Features List
                     _buildFeaturesList(),
+                    
+                    // Storage & Data
+                    _buildStorageSection(),
+                    
+                    // About
+                    _buildAboutSection(),
+                    
                     // Security Notice
                     _buildSecurityNotice(),
-                    // Save Button
-                    _buildSaveButton(),
+                    
                     // Footer
                     _buildFooter(),
                     const SizedBox(height: 40),
@@ -297,28 +305,16 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildThemeSection() {
+  Widget _buildApiKeySection() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section Header
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 12),
-            child: Text(
-              'THEMES',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-          // Theme Card
+          _buildGroupHeader('Access & Security'),
+          const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: const Color(0xFF16161E),
               borderRadius: BorderRadius.circular(20),
@@ -327,80 +323,70 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'COLOR PALETTES',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.2,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Color Grid
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: themeColors.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = selectedTheme == index;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedTheme = index),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: themeColors[index],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected
-                                ? const Color(0xFF3B82F6)
-                                : Colors.transparent,
-                            width: 2,
-                          ),
-                        ),
-                        child: isSelected
-                            ? const Center(
-                                child: Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              )
-                            : null,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Gemini API Key',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    );
-                  },
+                    ),
+                    InkWell(
+                      onTap: () {
+                         // TODO: Launch URL
+                      },
+                      child: Text(
+                        'GET KEY',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                          color: const Color(0xFF3B82F6),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                // Interface Glow Toggle
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: const Color(0xFF27272A), width: 1),
+                    color: const Color(0xFF0A0A0C),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF27272A)),
+                  ),
+                  child: TextField(
+                    controller: _apiKeyController,
+                    obscureText: !_isApiKeyVisible,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Enter your Gemini API key',
+                      hintStyle: TextStyle(color: Colors.grey[700]),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isApiKeyVisible ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.grey[600],
+                          size: 18,
+                        ),
+                        onPressed: () => setState(() => _isApiKeyVisible = !_isApiKeyVisible),
+                      ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Interface Glow',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                      _buildToggle(
-                        interfaceGlow,
-                        (val) => setState(() => interfaceGlow = val),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Required for AI functionalities. Your key is stored locally.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
@@ -476,39 +462,7 @@ class _SettingsPageState extends State<SettingsPage> {
               progress: 0.84,
               color: const Color(0xFF3B82F6),
             ),
-            const SizedBox(height: 16),
-            // API Key
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0A0A0C),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.key, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 10),
-                  Text(
-                    'API Key: ****420x',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    'MANAGE',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                      color: const Color(0xFF3B82F6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // API Key removed from here as it has its own section
           ],
         ),
       ),
@@ -846,42 +800,157 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildStorageSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'DATA & STORAGE',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF16161E),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF27272A)),
+            ),
+            child: Column(
+              children: [
+                _buildActionItem(
+                  icon: Icons.cleaning_services,
+                  title: 'Clear App Cache',
+                  onTap: () {},
+                ),
+                Container(height: 1, color: const Color(0xFF27272A)),
+                _buildActionItem(
+                  icon: Icons.download,
+                  title: 'Export User Data',
+                  onTap: () {},
+                ),
+                Container(height: 1, color: const Color(0xFF27272A)),
+                _buildActionItem(
+                  icon: Icons.restore,
+                  title: 'Reset All Settings',
+                  isDestructive: true,
+                  onTap: () {},
+                  showArrow: false,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        width: double.infinity,
-        height: 56,
-        decoration: BoxDecoration(
-          color: const Color(0xFF3B82F6),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF3B82F6).withOpacity(0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ABOUT',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: Colors.grey[600],
             ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              // Save preferences and go back
-              Navigator.pop(context);
-            },
-            child: const Center(
+          ),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF16161E),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF27272A)),
+            ),
+            child: Column(
+              children: [
+                _buildActionItem(
+                  icon: Icons.info_outline,
+                  title: 'App Version',
+                  trailing: 'v4.2.0',
+                  onTap: () {},
+                  showArrow: false,
+                ),
+                Container(height: 1, color: const Color(0xFF27272A)),
+                _buildActionItem(
+                  icon: Icons.description,
+                  title: 'Terms of Service',
+                  onTap: () {},
+                ),
+                Container(height: 1, color: const Color(0xFF27272A)),
+                _buildActionItem(
+                  icon: Icons.privacy_tip,
+                  title: 'Privacy Policy',
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    bool showArrow = true,
+    String? trailing,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isDestructive ? const Color(0xFFEF4444) : Colors.grey[400],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
               child: Text(
-                'Save Preferences',
+                title,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      isDestructive ? const Color(0xFFEF4444) : Colors.white,
                 ),
               ),
             ),
-          ),
+            if (trailing != null)
+              Text(
+                trailing,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+            if (showArrow) ...[
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Colors.grey[700],
+              ),
+            ],
+          ],
         ),
       ),
     );
