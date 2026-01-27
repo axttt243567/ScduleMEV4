@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'memory_page.dart';
+import '../../memory/screens/memory_page.dart';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});

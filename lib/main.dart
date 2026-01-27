@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'pages/home_page.dart';
-import 'pages/attendance_page.dart';
-import 'pages/calendar_page.dart';
-import 'pages/notes_page.dart';
+import 'features/home/screens/home_page.dart';
+import 'features/attendance/screens/attendance_page.dart';
+import 'features/calendar/screens/calendar_page.dart';
+import 'features/notes/screens/notes_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,11 +75,6 @@ class _MainNavigationState extends State<MainNavigation> {
               children: [
                 _buildNavItem(Icons.home_outlined, Icons.home, 0),
                 _buildNavItem(Icons.fact_check_outlined, Icons.fact_check, 1),
-                _buildNavItem(
-                  Icons.calendar_month_outlined,
-                  Icons.calendar_month,
-                  2,
-                ),
                 _buildNavItem(Icons.note_alt_outlined, Icons.note_alt, 3),
               ],
             ),

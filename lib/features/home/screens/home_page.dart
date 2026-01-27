@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'settings_page.dart';
+import '../../settings/screens/settings_page.dart';
+import '../../calendar/screens/calendar_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -584,7 +585,18 @@ class _HomePageState extends State<HomePage> {
           return Padding(
             padding: EdgeInsets.only(right: index < days.length - 1 ? 16 : 0),
             child: GestureDetector(
-              onTap: () => setState(() => selectedDay = index),
+              onTap: () {
+                if (selectedDay == index) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CalendarPage(),
+                    ),
+                  );
+                } else {
+                  setState(() => selectedDay = index);
+                }
+              },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: EdgeInsets.symmetric(
