@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'memory_page.dart';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -2159,6 +2160,28 @@ print(f"Average: {avg}")''',
           ),
           // Spacer to push icon to right
           const Spacer(),
+          // Memory Button - Navigate to Memory Page
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MemoryPage()),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16161E),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF27272A)),
+              ),
+              child: Icon(
+                Icons.memory,
+                color: Colors.grey[400],
+                size: 20,
+              ),
+            ),
+          ),
           // Hashtag Button - Dev Testing
           GestureDetector(
             onTap: () => _showHashtagsBottomSheet(),
