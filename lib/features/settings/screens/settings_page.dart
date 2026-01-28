@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scdulemev4o1/features/schedules/screens/schedules_page.dart';
+import 'package:scdulemev4o1/shared/services/settings_service.dart';
 import '../../notes/screens/vault_management_page.dart';
+import 'package:scdulemev4o1/features/memory/screens/memory_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -15,10 +17,36 @@ class _SettingsPageState extends State<SettingsPage> {
   bool ocrHandwriting = true;
   bool webSearch = false; // Pro feature
   bool conversationBranching = false;
+  
+  final SettingsService _settingsService = SettingsService();
 
   // API Key State
   final TextEditingController _apiKeyController = TextEditingController();
   bool _isApiKeyVisible = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadApiKey();
+  }
+
+  Future<void> _loadApiKey() async {
+    final key = await _settingsService.getGeminiApiKey();
+    if (key != null && mounted) {
+      setState(() {
+        _apiKeyController.text = key;
+      });
+    }
+  }
+
+  Future<void> _saveApiKey() async {
+    await _settingsService.saveGeminiApiKey(_apiKeyController.text.trim());
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('API Key saved successfully!')),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -48,6 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     // Schedules Section
                     _buildSchedulesSection(),
                     _buildVaultSection(),
+                    _buildMemorySection(),
                     
                     _buildApiKeySection(),
                     
@@ -449,6 +478,75 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildMemorySection() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF16161E),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFF27272A)),
+        ),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MemoryPage(),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.purpleAccent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.psychology,
+                  color: Colors.purpleAccent,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Memories',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'View and manage your memories',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white54,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildApiKeySection() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
@@ -470,25 +568,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Gemini API Key',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    Row(
+                      children: [
+                        const Icon(Icons.key, color: Colors.white70, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Gemini API Key',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                     InkWell(
                       onTap: () {
-                         // TODO: Launch URL
+                         // Opens common help URL or shows dialog
                       },
-                      child: Text(
-                        'GET KEY',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                          color: const Color(0xFF3B82F6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3B82F6).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'GET KEY',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF3B82F6),
+                          ),
                         ),
                       ),
                     ),
@@ -496,25 +606,38 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 16),
                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFF0A0A0C),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF27272A)),
+                    border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)),
                   ),
-                  child: TextField(
-                    controller: _apiKeyController,
-                    obscureText: !_isApiKeyVisible,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontFamily: 'monospace',
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Enter your Gemini API key',
-                      hintStyle: TextStyle(color: Colors.grey[700]),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      suffixIcon: IconButton(
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12),
+                        child: Icon(Icons.vpn_key_outlined, size: 18, color: Colors.grey[600]),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _apiKeyController,
+                          obscureText: !_isApiKeyVisible,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white,
+                            fontFamily: 'monospace',
+                            letterSpacing: 1,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Paste your API Key here',
+                            hintStyle: TextStyle(color: Colors.grey[700], letterSpacing: 0),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          ),
+                          onChanged: (_) {}, 
+                        ),
+                      ),
+                      IconButton(
                         icon: Icon(
                           _isApiKeyVisible ? Icons.visibility : Icons.visibility_off,
                           color: Colors.grey[600],
@@ -522,15 +645,31 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         onPressed: () => setState(() => _isApiKeyVisible = !_isApiKeyVisible),
                       ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _saveApiKey,
+                    icon: const Icon(Icons.save_alt, size: 16),
+                    label: const Text("Save API Key"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B82F6),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Required for AI functionalities. Your key is stored locally.',
+                  'Your key is stored locally on your device and used only to communicate with Gemini.',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey[600],
+                    height: 1.4,
                   ),
                 ),
               ],

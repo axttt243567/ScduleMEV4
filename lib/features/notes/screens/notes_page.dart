@@ -9,6 +9,7 @@ import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path_lib;
 import '../../chat/screens/ai_chat_page.dart';
+import '../../ai_notes_chat/screens/ai_notes_chat_page.dart';  // Added import
 import '../models/note_model.dart';
 import '../data/vault_data.dart';
 import 'vault_management_page.dart';
@@ -111,6 +112,16 @@ class _NotesPageState extends State<NotesPage> {
               );
             },
             child: _buildIconButton(Icons.grid_view_rounded),
+          ),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AiNotesChatPage()),
+              );
+            },
+            child: _buildIconButton(Icons.edit_note_rounded, isHighlighted: true),
           ),
           const SizedBox(width: 12),
           GestureDetector(
